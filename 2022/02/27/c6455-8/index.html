@@ -1,0 +1,254 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>TMS320C6455入门实践（八） | 小裘控制系统</title><meta name="keywords" content="DSP,6455,Flash,EMIF"><meta name="author" content="裘剑东"><meta name="copyright" content="裘剑东"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="Flash驱动、C6455的EMIF接口与程序固化">
+<meta property="og:type" content="article">
+<meta property="og:title" content="TMS320C6455入门实践（八）">
+<meta property="og:url" content="http://qjdxmy.com/2022/02/27/c6455-8/">
+<meta property="og:site_name" content="小裘控制系统">
+<meta property="og:description" content="Flash驱动、C6455的EMIF接口与程序固化">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://qjdxmy.com/2022/02/27/c6455-8/2022-02-27-18-50-48.png">
+<meta property="article:published_time" content="2022-02-27T07:49:05.000Z">
+<meta property="article:modified_time" content="2024-04-17T12:40:48.533Z">
+<meta property="article:author" content="裘剑东">
+<meta property="article:tag" content="DSP">
+<meta property="article:tag" content="6455">
+<meta property="article:tag" content="Flash">
+<meta property="article:tag" content="EMIF">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://qjdxmy.com/2022/02/27/c6455-8/2022-02-27-18-50-48.png"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="http://qjdxmy.com/2022/02/27/c6455-8/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '天',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery@2/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery@2/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'TMS320C6455入门实践（八）',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2024-04-17 20:40:48'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 6.0.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/me.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data is-center"><div class="data-item"><a href="/archives/"><div class="headline">文章</div><div class="length-num">84</div></a></div><div class="data-item"><a href="/tags/"><div class="headline">标签</div><div class="length-num">101</div></a></div><div class="data-item"><a href="/categories/"><div class="headline">分类</div><div class="length-num">18</div></a></div></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/download/"><i class="fa-fw fas fa-download"></i><span> 下载</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 链接</span></a></div><div class="menus_item"><a class="site-page" href="/resume/"><i class="fa-fw fas fa-heart"></i><span> 个人简历</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="not-top-img" id="page-header"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">小裘控制系统</a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/download/"><i class="fa-fw fas fa-download"></i><span> 下载</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 链接</span></a></div><div class="menus_item"><a class="site-page" href="/resume/"><i class="fa-fw fas fa-heart"></i><span> 个人简历</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav></header><main class="layout" id="content-inner"><div id="post"><div id="post-info"><h1 class="post-title">TMS320C6455入门实践（八）</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2022-02-27T07:49:05.000Z" title="发表于 2022-02-27 15:49:05">2022-02-27</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2024-04-17T12:40:48.533Z" title="更新于 2024-04-17 20:40:48">2024-04-17</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/DSP%E5%BC%80%E5%8F%91/">DSP开发</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/DSP%E5%BC%80%E5%8F%91/C6455/">C6455</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="TMS320C6455入门实践（八）"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"></span></span></div></div></div><article class="post-content" id="article-container"><p>本系列文章链接</p>
+<ul>
+<li>
+<a href="/2022/02/27/c6455-1/" title="TMS320C6455入门实践（一）——编译CSL静态库">TMS320C6455入门实践（一）——编译CSL静态库</a>
+</li>
+<li>
+<a href="/2022/02/27/c6455-2/" title="TMS320C6455入门实践（二）——中断相关">TMS320C6455入门实践（二）——中断相关</a>
+</li>
+<li>
+<a href="/2022/02/27/c6455-3/" title="TMS320C6455入门实践（三）——PLL相关">TMS320C6455入门实践（三）——PLL相关</a>
+</li>
+<li>
+<a href="/2022/02/27/c6455-4/" title="TMS320C6455入门实践（四）——GPIO与定时器">TMS320C6455入门实践（四）——GPIO与定时器</a>
+</li>
+<li>
+<a href="/2022/02/27/c6455-5/" title="TMS320C6455入门实践（五）——cmd链接脚本">TMS320C6455入门实践（五）——cmd链接脚本</a>
+</li>
+<li>
+<a href="/2022/02/27/c6455-6/" title="TMS320C6455入门实践（六）——编写boot程序">TMS320C6455入门实践（六）——编写boot程序</a>
+</li>
+<li>
+<a href="/2022/02/27/c6455-7/" title="TMS320C6455入门实践（七）——生成启动镜像">TMS320C6455入门实践（七）——生成启动镜像</a>
+</li>
+<li>
+<a href="/2022/02/27/c6455-8/" title="TMS320C6455入门实践（八）——Flash驱动与程序固化">TMS320C6455入门实践（八）——Flash驱动与程序固化</a>
+</li>
+<li>
+<a href="/2022/02/27/c6455-9/" title="TMS320C6455入门实践（九）——DDR上运行代码">TMS320C6455入门实践（九）——DDR上运行代码</a>
+</li>
+<li>
+<a href="/2022/02/27/c6455-10/" title="TMS320C6455入门实践（十）——EDMA3相关">TMS320C6455入门实践（十）——EDMA3相关</a>
+</li>
+</ul>
+<hr>
+<p>本文主要介绍Flash驱动、C6455的EMIF接口与程序固化，参考文档为：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://www.ti.com/lit/ug/spru971e/spru971e.pdf">SPRU971E - TMS320C645x DSP External Memory Interface (EMIF) User’s Guide</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.cypress.com/file/215146/download">S29JL064J 64-Mb (8M × 8-Bit/4M × 16-Bit), 3V, Simultaneous Read/Write Flash</a></li>
+</ul>
+<h2 id="Flash-驱动">Flash 驱动</h2>
+<p>  Flash的驱动程序肯定要根据具体的Flash型号来写（废话），但大体上应该都差不多。我们用的是Cypress的Flash S29JL064J，目前Cypress已经被infineon收购。<br>
+  这是一款总容量64Mbit的Flash，数据位宽可以配置为8bit或者16bit，C6455要求从EMIF启动时，存储器的数据位宽为8bit。Flash的引脚排布、电气特性等只和电路设计时有关。写驱动程序只要关注它的一些操作命令就好了。主要内容都集中在Datasheet的第十章和第十一章。</p>
+<h3 id="Flash-命令">Flash 命令</h3>
+<img src="/2022/02/27/c6455-8/2022-02-27-18-50-48.png" class="">
+<p>  第十章末尾有这样一张表，总结了不同指令的发送方式。有一些地方需要注意一下。</p>
+<ul>
+<li>Reset指令是往任意地址写0xF0，这个在退出Auto Select模式，或者清除命令超时错误（DQ5）时需要用到。</li>
+<li>在Auto Select模式下可以读取Flash的生产厂商ID、DeviceID。需要先往指定的地址写入指定的数据，然后才能在相应的位置读到这些信息。就是如果刚写完就立刻读好像读不到正确的数据，需要稍微等一会儿才行。我在程序中没有另外加延时，而是在往对应地址依次写入0xAA、0x55、0x90后，连续在（BA）X00地址读了两遍，第二次读到的才是当作真正的生产厂商ID，后面再去读DeviceID就没有这样的问题了。</li>
+<li>Secured Silicon Region是一块独立于Flash本身存储空间的一块区域，可以用于存放Electronic Serial Number（ESN），用于永久地唯一识别这一器件。我们基本用不到。</li>
+<li>基本的Program指令比较麻烦，要写一个字节就需要写四次。用Unlock Bypass的模式就可以将写一个字节缩短到写两次。开启Unlock Bypass后如果写完了要用Unlock Bypass Reset来退出这种模式。</li>
+<li>Erase的指令有两种，一种是整块芯片都擦除，一种是只擦除一个Sector。Flash想要重新编程就要先擦除，擦除是把整块区域都写“1”的过程，往Flash写入只能把“1”改成“0”，而不能把“0”改成“1”。Flash的擦除需要一定时间，编程中需要采用一定方式对擦除结果进行确认，S29JL064J的写入与擦除所需时间如下表所示：</li>
+</ul>
+<img src="/2022/02/27/c6455-8/2022-02-27-19-26-13.png" class="">
+<p>  在擦除单个Sector时，注意Sector的划分，S29JL064J的部分Sector是8k字节的，而其他大部分是64k字节的。<br>
+  最后还有Erase Suspend和Erase Resume的功能，就是暂停擦除和继续擦除；CFI Query也用的不多，大家感兴趣可以自行查阅。</p>
+<h3 id="状态检测">状态检测</h3>
+<p>  Flash Datasheet的第十一章就是介绍如何确定当前Flash的状态。</p>
+<ul>
+<li>DQ7可以用来查询是否写入或者擦除完成。如果我知道某个地址存的数据应该是什么，然后我就去读那个地址，如果读到的数据的第7位（DQ7）和实际数据不符，那就说明写入或者擦除还未完成，这个就常用在数据写入的时候。</li>
+<li>DQ2和DQ6主要用来指示Flash的擦除状态。这两位都会有一个“翻转”的机制。如果Flash正在擦除某一块Sector，那么连续两次读其中的一个地址上的数据，两次读到的数据总这两位是不一样的。而如果一块Sector处于暂停擦除的状态，那么连续两次读到的数据中，DQ2是会变化的，但DQ6不会变化。</li>
+<li>DQ5也很重要，它指示写入或者擦除超时。如果DQ5变为“1”，就要用Reset命令复位。</li>
+</ul>
+<h2 id="EMIF">EMIF</h2>
+<p>  EMIF的异步存储器接口在SPRU971E的第四章有详细的介绍。EMIF每一个CE都对应有一个配置寄存器CEnCFG，如果是异步接口还有一个异步等待周期配置寄存器需要关注，所以在配置上是非常简单的，关键是参数怎样设置。</p>
+<h3 id="读时序">读时序</h3>
+<img src="/2022/02/27/c6455-8/2022-02-27-19-27-12.png" class="">
+<p>  上图是EMIF的异步读时序，分为Setup、Strobe和Hold三个阶段，在AOE的上升沿对数据进行采样。我们需要根据Flash的时序要求明确这三个阶段需要设置为几个时钟周期。<br>
+  EMIF的时钟是主频的1/3，我们没有有PLL1进行配置，因此主频是外部晶振的频率50MHz，周期20ns，所以EMIF时钟的周期为60ns。</p>
+<img src="/2022/02/27/c6455-8/2022-02-27-19-27-23.png" class="">
+<p>  再看Flash的时序图，主要信息是，在OE或者CE有效后，最多70ns，输出数据就有效了（我们的芯片速度等级是70）。所以我们可以把EMIF的Setup设置成2个EMIF的时钟周期，也就是120ns，那时候Flash的数据肯定有效了。<br>
+  Strobe的时间没有什么特殊的要求。<br>
+  Hold的时间留一个周期肯定也够了。对于Flash来说，如果地址撤销，那么输出信号就无效了。设置一个周期的Hold，也就是CE和地址都会在OE无效（变高）之后再保持60ns，这段时间内数据都是稳定的，基本能保证采到正确的数据。</p>
+<h3 id="写时序">写时序</h3>
+<img src="/2022/02/27/c6455-8/2022-02-27-19-27-36.png" class="">
+<p>  关于Flash的写时序也是类似的，这时候数据在WE的下降沿被采样写入FLASH，S29JL064J对数据的建立时间要求并不高，但要求的保持时间最大为40ns，也就是为了稳妥起见，在WE下降沿之后再让数据至少稳定保持40ns。</p>
+<h3 id="CSL的使用-4">CSL的使用</h3>
+<p>  EMIF的使能是在PERCFG1寄存器中，这个寄存器不需要Unlock就可以改写。<br>
+  同样，CSL_emifaInit()没有实际作用。CSL_emifaOpen()获取EMIF配置寄存器的基地址。最后调用CSL_emifaHwSetup()，利用相关的结构体完成配置即可。</p>
+<h2 id="其他">其他</h2>
+<ul>
+<li>在</li>
+</ul>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="mailto:undefined">裘剑东</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="http://qjdxmy.com/2022/02/27/c6455-8/">http://qjdxmy.com/2022/02/27/c6455-8/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="http://qjdxmy.com" target="_blank">小裘控制系统</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/DSP/">DSP</a><a class="post-meta__tags" href="/tags/6455/">6455</a><a class="post-meta__tags" href="/tags/Flash/">Flash</a><a class="post-meta__tags" href="/tags/EMIF/">EMIF</a></div><div class="post_share"><div class="social-share" data-image="/2022/02/27/c6455-8/2022-02-27-18-50-48.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/social-share.js/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2022/02/27/c6455-7/"><img class="prev-cover" src="/2022/02/27/c6455-7/2022-02-27-18-47-08.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">TMS320C6455入门实践（七）</div></div></a></div><div class="next-post pull-right"><a href="/2022/02/27/c6455-9/"><img class="next-cover" src="/2022/02/27/c6455-9/2022-02-27-19-44-39.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">TMS320C6455入门实践（九）</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/2022/03/09/phase-review-1/" title="近期C6000 DSP开发小结"><img class="cover" src="/2022/03/09/phase-review-1/2022-03-09-22-40-16.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-03-09</div><div class="title">近期C6000 DSP开发小结</div></div></a></div><div><a href="/2022/02/27/c6455-1/" title="TMS320C6455入门实践（一）"><img class="cover" src="/2022/02/27/c6455-1/2022-02-27-16-54-12.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-02-27</div><div class="title">TMS320C6455入门实践（一）</div></div></a></div><div><a href="/2022/02/27/c6455-10/" title="TMS320C6455入门实践（十）"><img class="cover" src="/2022/02/27/c6455-10/2022-02-27-19-49-41.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-02-27</div><div class="title">TMS320C6455入门实践（十）</div></div></a></div><div><a href="/2022/02/27/c6455-2/" title="TMS320C6455入门实践（二）"><img class="cover" src="/2022/02/27/c6455-2/2022-02-27-17-27-11.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-02-27</div><div class="title">TMS320C6455入门实践（二）</div></div></a></div><div><a href="/2022/02/27/c6455-3/" title="TMS320C6455入门实践（三）"><img class="cover" src="/2022/02/27/c6455-3/2022-02-27-17-33-45.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-02-27</div><div class="title">TMS320C6455入门实践（三）</div></div></a></div><div><a href="/2022/02/27/c6455-4/" title="TMS320C6455入门实践（四）"><img class="cover" src="/2022/02/27/c6455-4/2022-02-27-17-36-28.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-02-27</div><div class="title">TMS320C6455入门实践（四）</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/me.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">裘剑东</div><div class="author-info__description">芯来科技基础软件开发工程师，嵌入式开发爱好者</div></div><div class="card-info-data is-center"><div class="card-info-data-item"><a href="/archives/"><div class="headline">文章</div><div class="length-num">84</div></a></div><div class="card-info-data-item"><a href="/tags/"><div class="headline">标签</div><div class="length-num">101</div></a></div><div class="card-info-data-item"><a href="/categories/"><div class="headline">分类</div><div class="length-num">18</div></a></div></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/qiujiandong"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/qiujiandong" target="_blank" title="Github"><i class="fab fa-github"></i></a><a class="social-icon" href="mailto:1335521934@qq.com" target="_blank" title="Email"><i class="fas fa-envelope"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">最好的程序员做自己的硬件！</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content is-expand"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Flash-%E9%A9%B1%E5%8A%A8"><span class="toc-number">1.</span> <span class="toc-text">Flash 驱动</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Flash-%E5%91%BD%E4%BB%A4"><span class="toc-number">1.1.</span> <span class="toc-text">Flash 命令</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%8A%B6%E6%80%81%E6%A3%80%E6%B5%8B"><span class="toc-number">1.2.</span> <span class="toc-text">状态检测</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#EMIF"><span class="toc-number">2.</span> <span class="toc-text">EMIF</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AF%BB%E6%97%B6%E5%BA%8F"><span class="toc-number">2.1.</span> <span class="toc-text">读时序</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%86%99%E6%97%B6%E5%BA%8F"><span class="toc-number">2.2.</span> <span class="toc-text">写时序</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#CSL%E7%9A%84%E4%BD%BF%E7%94%A8-4"><span class="toc-number">2.3.</span> <span class="toc-text">CSL的使用</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%B6%E4%BB%96"><span class="toc-number">3.</span> <span class="toc-text">其他</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2025/01/01/summary-2024/" title="2024年终总结"><img src="/2025/01/01/summary-2024/2025-01-01-21-54-27.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="2024年终总结"/></a><div class="content"><a class="title" href="/2025/01/01/summary-2024/" title="2024年终总结">2024年终总结</a><time datetime="2025-01-01T09:19:27.000Z" title="发表于 2025-01-01 17:19:27">2025-01-01</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2024/04/17/learn-cuda/" title="CUDA优化入门"><img src="/2024/04/17/learn-cuda/2024-04-16-15-52-38.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="CUDA优化入门"/></a><div class="content"><a class="title" href="/2024/04/17/learn-cuda/" title="CUDA优化入门">CUDA优化入门</a><time datetime="2024-04-17T12:00:00.000Z" title="发表于 2024-04-17 20:00:00">2024-04-17</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2024/04/04/bipartite-match/" title="二分图的判断与匹配"><img src="/2024/04/04/bipartite-match/2024-04-05-00-11-55.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="二分图的判断与匹配"/></a><div class="content"><a class="title" href="/2024/04/04/bipartite-match/" title="二分图的判断与匹配">二分图的判断与匹配</a><time datetime="2024-04-04T13:43:47.000Z" title="发表于 2024-04-04 21:43:47">2024-04-04</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2024/01/19/summary/" title="长风破浪会有时"><img src="/2024/01/19/summary/wrapped2023.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="长风破浪会有时"/></a><div class="content"><a class="title" href="/2024/01/19/summary/" title="长风破浪会有时">长风破浪会有时</a><time datetime="2024-01-19T13:15:25.000Z" title="发表于 2024-01-19 21:15:25">2024-01-19</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/06/05/remote-vivado/" title="Vivado远程开发探索"><img src="/2023/06/05/remote-vivado/2023-06-15-16-22-13.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Vivado远程开发探索"/></a><div class="content"><a class="title" href="/2023/06/05/remote-vivado/" title="Vivado远程开发探索">Vivado远程开发探索</a><time datetime="2023-06-05T09:52:47.000Z" title="发表于 2023-06-05 17:52:47">2023-06-05</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2025 By 裘剑东</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.js"></script><div class="js-pjax"><script>(() => {
+  const $mermaidWrap = document.querySelectorAll('#article-container .mermaid-wrap')
+  if ($mermaidWrap.length) {
+    window.runMermaid = () => {
+      window.loadMermaid = true
+      const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default'
+
+      Array.from($mermaidWrap).forEach((item, index) => {
+        const mermaidSrc = item.firstElementChild
+        const mermaidThemeConfig = '%%{init:{ \'theme\':\'' + theme + '\'}}%%\n'
+        const mermaidID = 'mermaid-' + index
+        const mermaidDefinition = mermaidThemeConfig + mermaidSrc.textContent
+        mermaid.mermaidAPI.render(mermaidID, mermaidDefinition, (svgCode) => {
+          mermaidSrc.insertAdjacentHTML('afterend', svgCode)
+        })
+      })
+    }
+
+    const loadMermaid = () => {
+      window.loadMermaid ? runMermaid() : getScript('https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js').then(runMermaid)
+    }
+
+    window.pjax ? loadMermaid() : document.addEventListener('DOMContentLoaded', loadMermaid)
+  }
+})()</script></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

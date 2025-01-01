@@ -1,0 +1,247 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>近期C6000 DSP开发小结 | 小裘控制系统</title><meta name="keywords" content="DSP,6455,DMA,ABI"><meta name="author" content="裘剑东"><meta name="copyright" content="裘剑东"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="使用C++开发DSP，初始化列表中的数组初始化，COFF和EABI，near和far，EDMA3配置">
+<meta property="og:type" content="article">
+<meta property="og:title" content="近期C6000 DSP开发小结">
+<meta property="og:url" content="http://qjdxmy.com/2022/03/09/phase-review-1/">
+<meta property="og:site_name" content="小裘控制系统">
+<meta property="og:description" content="使用C++开发DSP，初始化列表中的数组初始化，COFF和EABI，near和far，EDMA3配置">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://qjdxmy.com/2022/03/09/phase-review-1/2022-03-09-22-40-16.png">
+<meta property="article:published_time" content="2022-03-09T12:34:32.000Z">
+<meta property="article:modified_time" content="2024-04-17T12:40:48.593Z">
+<meta property="article:author" content="裘剑东">
+<meta property="article:tag" content="DSP">
+<meta property="article:tag" content="6455">
+<meta property="article:tag" content="DMA">
+<meta property="article:tag" content="ABI">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://qjdxmy.com/2022/03/09/phase-review-1/2022-03-09-22-40-16.png"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="http://qjdxmy.com/2022/03/09/phase-review-1/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '天',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery@2/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery@2/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '近期C6000 DSP开发小结',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2024-04-17 20:40:48'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 6.0.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/me.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data is-center"><div class="data-item"><a href="/archives/"><div class="headline">文章</div><div class="length-num">84</div></a></div><div class="data-item"><a href="/tags/"><div class="headline">标签</div><div class="length-num">101</div></a></div><div class="data-item"><a href="/categories/"><div class="headline">分类</div><div class="length-num">18</div></a></div></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/download/"><i class="fa-fw fas fa-download"></i><span> 下载</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 链接</span></a></div><div class="menus_item"><a class="site-page" href="/resume/"><i class="fa-fw fas fa-heart"></i><span> 个人简历</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="not-top-img" id="page-header"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">小裘控制系统</a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/download/"><i class="fa-fw fas fa-download"></i><span> 下载</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 链接</span></a></div><div class="menus_item"><a class="site-page" href="/resume/"><i class="fa-fw fas fa-heart"></i><span> 个人简历</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav></header><main class="layout" id="content-inner"><div id="post"><div id="post-info"><h1 class="post-title">近期C6000 DSP开发小结</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2022-03-09T12:34:32.000Z" title="发表于 2022-03-09 20:34:32">2022-03-09</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2024-04-17T12:40:48.593Z" title="更新于 2024-04-17 20:40:48">2024-04-17</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/DSP%E5%BC%80%E5%8F%91/">DSP开发</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="近期C6000 DSP开发小结"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"></span></span></div></div></div><article class="post-content" id="article-container"><h2 id="使用C-开发DSP">使用C++开发DSP</h2>
+<p>  如果你也跟我一样刚开始接触C6000系列的DSP，我觉得可以尝试一下用C++来开发，虽然说这么做代码的执行效率可能会比C或者纯汇编的开发来得低，但它胜在能够让整个工程的脉络更加清晰。</p>
+<img src="/2022/03/09/phase-review-1/2022-03-09-20-50-14.png" class="">
+<p>  面向C6000开发的cl6x编译器对C++有比较好的支持。上面三个文档就在编译器的安装路径下，一个是介绍COFF移植到EABI的注意点，另外两个一个是关于编译器的文档，一个是关于汇编工具的文档。本文中的部分内容主要也是参考上面的文档。<br>
+  编译器支持的C标准是C89，支持的C++标准是C++98（而且有一些例外，本文中没有列出），支持的C++的主要特性有下面这些：</p>
+<blockquote><ul>
+<li>Complete C++ standard library support</li>
+<li>Templates</li>
+<li>Exceptions, which are enabled with the --exceptions option</li>
+<li>Run-time type information (RTTI), which can be enabled with the --rtti compiler option</li>
+</ul>
+</blockquote>
+<p>  它虽然并不是完全支持C++98，但上面这些特性基本上完全够用了，模板、异常处理。特别是模板类的定义和类的继承让一些算法的实现方便很多。<br>
+  实现了C++的灵活性的同时，肯定损失了不少性能，因此还可以使能“<mark class="hl-label orange">Embedded C++</mark> ”的选项，它限制了部分开销较大的C++的功能，从一定程度上能够提高代码的执行效率，受到限制的功能主要有下面这些：</p>
+<blockquote><ul>
+<li>Templates</li>
+<li>Exception handling</li>
+<li>Run-time type information</li>
+<li>The new cast syntax</li>
+<li>The keyword mutable</li>
+<li>Multiple inheritance</li>
+<li>Virtual inheritance</li>
+</ul>
+</blockquote>
+<p>  可以注意到，这里模板、虚继承、多重继承都被禁用了。所以如果决定使能“Embedded C++”时，就要注意写代码的时候不能用到上面这些特性。使能Embedded C++势必能够提高代码的执行效率，是否需要使能可以根据实际情况决定。<br>
+  我先写了一段最简单的代码试了一下，然后发现没有输出。（一度以为它对C++的支持有毛病）</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;Hello World!&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>  后来发现是栈溢出的问题，DSP的开发，一直没有栈溢出的报错。有个Stack Usage的窗口我也用不了，可能是我的CCS版本太低的缘故。每次栈溢出了，程序就会跑飞。我一开始没有输出就是stack设置得太小了。<br>
+  cl6x对C/C++采用同样的编译命令，所以其实源代码中可以C和C++的代码混着写。C++的代码在调用C写的函数的时候，C写的函数的声明需要有<mark class="hl-label orange">exter "C"</mark> 的说明，可以把C函数的声明包括在 “exter “C” {}” 的花括号中间。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">ifdef</span> __cplusplus</span></span><br><span class="line"><span class="keyword">extern</span> <span class="string">&quot;C&quot;</span> &#123;</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line"><span class="comment">// function declarations</span></span><br><span class="line"><span class="meta">#<span class="keyword">ifdef</span> __cplusplus</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br></pre></td></tr></table></figure>
+<h2 id="初始化列表中的数组初始化">初始化列表中的数组初始化</h2>
+<p>  C++11中新引入了初始化列表，<mark class="hl-label orange">initializer-clause</mark> 。这个在C++98里面是没有的，下面是两种规范中对“赋值运算表达式”的定义，C++11中做了这一更改。</p>
+<div class="note info flat"><p>C++11 中的定义</p>
+</div>
+<img src="/2022/03/09/phase-review-1/2022-03-09-21-41-46.png" class="">
+<div class="note info flat"><p>C++98 中的定义</p>
+</div>
+<img src="/2022/03/09/phase-review-1/2022-03-09-21-42-52.png" class="">
+<p>  我当时是想在类的构造函数的初始化列表里直接初始化数组，后来发现不行，才在构造函数的函数体里逐个初始化数组的每个元素。后来我做了一个简单的实验。<br>
+  这是我在windows下的g++版本</p>
+<img src="/2022/03/09/phase-review-1/2022-03-09-21-57-03.png" class="">
+<p>  用C++98的标准来编译的，报错。</p>
+<img src="/2022/03/09/phase-review-1/2022-03-09-22-40-16.png" class="">
+<p>  用C++11的标准来编译的，就能正常通过。</p>
+<img src="/2022/03/09/phase-review-1/2022-03-09-22-40-37.png" class="">
+<h2 id="COFF与EABI">COFF与EABI</h2>
+<p>  COFF和EABI主要就是设置编译生成的目标文件的格式。COFF是传统的格式，EABI是新的格式。我们能用新的就用新的呗。但以前的驱动文件是以COFF的标准写的，要从COFF移植到EABI是我们需要关心的问题。<br>
+  COFF和EABI的差异在上面的文档SPRAB09中有详细的介绍。我目前觉得最大的区别就是，在编译COFF格式的目标文件的时候，C/C++的源文件中的symbol前面会加上一个下划线。而EABI则不会有这个情况。<br>
+  如果整个工程中的源文件都是用C/C++写的，那就不会有什么问题，因为每个源文件都遵守相同的规则。但是如果有用汇编写的源文件，目标文件格式是COFF，那么“.asm”文件中的symbol前面都至少有一个下划线，那样才能和C/C++的源文件link；而如果目标文件格式是EABI，那这些symbol就和C/C++的源文件中保持一致就行。</p>
+<img src="/2022/03/09/phase-review-1/2022-03-09-22-52-22.png" class="">
+<p>  上面这个报错就是因为在汇编文件中的symbol定义都是在前面加了下划线的，所以在link的时候就出现了找不到symbol的问题。</p>
+<img src="/2022/03/09/phase-review-1/2022-03-09-22-58-57.png" class="">
+<p>  这一问题最简单的办法我觉得就是把上面这个“–strip_coff_underscore”的选项勾上。这样在编译的时候“.asm”文件中的symbol前面的下划线都会被去掉。当然还可以去改汇编的源代码，但那样就相对来说麻烦很多了。</p>
+<h2 id="数据地址模型">数据地址模型</h2>
+<p>  文档里写的是“Data Adress Model”，我也不知道我的翻译合不合适。大概是说有一个数据页面指针（DP），里面存放一个基地址，在这一基地址附近的数据可以很快被访问到，因为偏移地址可以直接嵌在一条指令里面；而如果待访问的数据不在DP指针附近，那就需要多个周期才能访问到需要的数据。前者是near类型的变量，后者是far类型的变量。</p>
+<img src="/2022/03/09/phase-review-1/2022-03-09-23-09-08.png" class="">
+<p>  DSP有三种可选的设置。near和far分别表示变量默认为near类型的访问或者far类型的访问。而“far aggregates”则表示数组作为far类型访问，而其他的变量作为near类型访问。<br>
+  如果设置了很多全局变量，就有可能出现这样的错误。就是near类型的访问够不到这些变量了。</p>
+<div class="note danger flat"><p>the xx-bit relocated address xxx is too large to encode in the 15-bit unsigned field</p>
+</div>
+<img src="/2022/03/09/phase-review-1/2022-03-09-23-12-10.png" class="">
+<p>  最简单的解决办法就是把访问类型设置成far，这样会导致变量的访问变慢；或者设置部分变量为far。比如：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> far a;</span><br></pre></td></tr></table></figure>
+<h2 id="EDMA3配置">EDMA3配置</h2>
+<p>  C6000系列的EDMA3可以实现非常灵活的数据传输功能。我用过C6455的EDMA和M6678的EDMA，它们的功能几乎完全一样，不同的可能只是通道数量、中断源的编号不同。下面的代码以C6455的CSL驱动函数为例做一个介绍。<br>
+  EDMA有很多通道，每个通道可能会和一个外部事件绑定（也可能没有），这是固定的。通道和PaRAM还有队列的关系可以用户自己设置。队列是有优先级的，队列号小的优先级高（会优先出队列）。每个队列都和一个传输控制器对应，多个传输控制器在数据总线上也有优先级，这也可以设置。EDMA功能的实现最关键的还是PaRAM的设置，它决定了每次传输要实现的功能。<br>
+  下面是某一个PaRAM的设置代码。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">hParam = CSL_edma3GetParamHandle(ms_hEdma3, <span class="number">0</span>, &amp;status);</span><br><span class="line">paramSetup.option = CSL_EDMA3_OPT_MAKE(CSL_EDMA3_ITCCH_DIS, \</span><br><span class="line">                                       CSL_EDMA3_TCCH_EN, \</span><br><span class="line">                                       CSL_EDMA3_ITCINT_DIS, \</span><br><span class="line">                                       CSL_EDMA3_TCINT_DIS,\</span><br><span class="line">                                       CSL_EDMA3_CHA_3,\</span><br><span class="line">                                       CSL_EDMA3_TCC_NORMAL,\</span><br><span class="line">                                       CSL_EDMA3_FIFOWIDTH_32BIT, \</span><br><span class="line">                                       CSL_EDMA3_STATIC_DIS, \</span><br><span class="line">                                       CSL_EDMA3_SYNC_A, \</span><br><span class="line">                                       CSL_EDMA3_ADDRMODE_INCR, \</span><br><span class="line">                                       CSL_EDMA3_ADDRMODE_CONST);</span><br><span class="line">paramSetup.srcAddr = IR_IMG_RD_ADDR;</span><br><span class="line">paramSetup.aCntbCnt = CSL_EDMA3_CNT_MAKE(<span class="number">8</span>, <span class="number">1</span>);</span><br><span class="line">paramSetup.dstAddr = ms_pMatIr0-&gt;GetHeaderAddr();</span><br><span class="line">paramSetup.srcDstBidx = CSL_EDMA3_BIDX_MAKE(<span class="number">0</span>, <span class="number">0</span>);</span><br><span class="line">paramSetup.linkBcntrld = CSL_EDMA3_LINKBCNTRLD_MAKE(<span class="number">1</span>&lt;&lt;<span class="number">5</span>,<span class="number">0</span>); </span><br><span class="line">paramSetup.srcDstCidx = CSL_EDMA3_CIDX_MAKE(<span class="number">0</span>, <span class="number">0</span>);</span><br><span class="line">paramSetup.cCnt = <span class="number">1</span>;</span><br><span class="line">CSL_edma3ParamSetup(hParam, &amp;paramSetup);</span><br></pre></td></tr></table></figure>
+<div class="note primary flat"><p>一个事件产生，或者一次手动触发，通道控制器（CC）就会向传输控制器（TC）发送一个传输请求（TR）</p>
+</div>
+<p>  A模式和AB模式的区别主要在于，一个TR传输的数据量。A模式一个TR传输ACnt数据，AB模式一个TR传输ACnt×BCnt的数据。<br>
+  TC完成一次TR之后一般就会等待下一次触发，但如果设置了ITCCH，在这次TR完成之后还会触发另一个传输。TCCH表示在完成了整个PaRAM的传输之后会触发另一个传输。<mark class="hl-label orange">这个叫做“Chain”</mark> 。<br>
+  中断也是类似的，ITCINT表示在这次TR完成之后会触发中断。TCINT表示在完成了整个PaRAM的传输之后会触发中断。<br>
+  在整个PaRAM传输完成之后，可以设置link字段，从别的PaRAM把参数复制过来，更新PaRAM。<mark class="hl-label orange">这个叫做“Link”</mark> 。<br>
+  合理地设置Chain和Link就能利用EDMA实现复杂的数据传输功能。</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="mailto:undefined">裘剑东</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="http://qjdxmy.com/2022/03/09/phase-review-1/">http://qjdxmy.com/2022/03/09/phase-review-1/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="http://qjdxmy.com" target="_blank">小裘控制系统</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/DSP/">DSP</a><a class="post-meta__tags" href="/tags/6455/">6455</a><a class="post-meta__tags" href="/tags/DMA/">DMA</a><a class="post-meta__tags" href="/tags/ABI/">ABI</a></div><div class="post_share"><div class="social-share" data-image="/2022/03/09/phase-review-1/2022-03-09-22-40-16.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/social-share.js/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2022/03/04/op-prec/"><img class="prev-cover" src="/2022/03/04/op-prec/2022-03-04-10-14-40.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">C11 &amp; C++11运算符优先级</div></div></a></div><div class="next-post pull-right"><a href="/2022/03/19/electromagnetic/"><img class="next-cover" src="/2022/03/19/electromagnetic/2022-03-20-18-24-17.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">电磁感应、电感与变压器</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/2022/02/27/c6455-1/" title="TMS320C6455入门实践（一）"><img class="cover" src="/2022/02/27/c6455-1/2022-02-27-16-54-12.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-02-27</div><div class="title">TMS320C6455入门实践（一）</div></div></a></div><div><a href="/2022/02/27/c6455-10/" title="TMS320C6455入门实践（十）"><img class="cover" src="/2022/02/27/c6455-10/2022-02-27-19-49-41.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-02-27</div><div class="title">TMS320C6455入门实践（十）</div></div></a></div><div><a href="/2022/02/27/c6455-2/" title="TMS320C6455入门实践（二）"><img class="cover" src="/2022/02/27/c6455-2/2022-02-27-17-27-11.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-02-27</div><div class="title">TMS320C6455入门实践（二）</div></div></a></div><div><a href="/2022/02/27/c6455-3/" title="TMS320C6455入门实践（三）"><img class="cover" src="/2022/02/27/c6455-3/2022-02-27-17-33-45.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-02-27</div><div class="title">TMS320C6455入门实践（三）</div></div></a></div><div><a href="/2022/02/27/c6455-4/" title="TMS320C6455入门实践（四）"><img class="cover" src="/2022/02/27/c6455-4/2022-02-27-17-36-28.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-02-27</div><div class="title">TMS320C6455入门实践（四）</div></div></a></div><div><a href="/2022/02/27/c6455-5/" title="TMS320C6455入门实践（五）"><img class="cover" src="/2022/02/27/c6455-5/2022-02-27-18-33-46.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-02-27</div><div class="title">TMS320C6455入门实践（五）</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/me.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">裘剑东</div><div class="author-info__description">芯来科技基础软件开发工程师，嵌入式开发爱好者</div></div><div class="card-info-data is-center"><div class="card-info-data-item"><a href="/archives/"><div class="headline">文章</div><div class="length-num">84</div></a></div><div class="card-info-data-item"><a href="/tags/"><div class="headline">标签</div><div class="length-num">101</div></a></div><div class="card-info-data-item"><a href="/categories/"><div class="headline">分类</div><div class="length-num">18</div></a></div></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/qiujiandong"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/qiujiandong" target="_blank" title="Github"><i class="fab fa-github"></i></a><a class="social-icon" href="mailto:1335521934@qq.com" target="_blank" title="Email"><i class="fas fa-envelope"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">最好的程序员做自己的硬件！</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content is-expand"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8C-%E5%BC%80%E5%8F%91DSP"><span class="toc-number">1.</span> <span class="toc-text">使用C++开发DSP</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%88%9D%E5%A7%8B%E5%8C%96%E5%88%97%E8%A1%A8%E4%B8%AD%E7%9A%84%E6%95%B0%E7%BB%84%E5%88%9D%E5%A7%8B%E5%8C%96"><span class="toc-number">2.</span> <span class="toc-text">初始化列表中的数组初始化</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#COFF%E4%B8%8EEABI"><span class="toc-number">3.</span> <span class="toc-text">COFF与EABI</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%95%B0%E6%8D%AE%E5%9C%B0%E5%9D%80%E6%A8%A1%E5%9E%8B"><span class="toc-number">4.</span> <span class="toc-text">数据地址模型</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#EDMA3%E9%85%8D%E7%BD%AE"><span class="toc-number">5.</span> <span class="toc-text">EDMA3配置</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2025/01/01/summary-2024/" title="2024年终总结"><img src="/2025/01/01/summary-2024/2025-01-01-21-54-27.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="2024年终总结"/></a><div class="content"><a class="title" href="/2025/01/01/summary-2024/" title="2024年终总结">2024年终总结</a><time datetime="2025-01-01T09:19:27.000Z" title="发表于 2025-01-01 17:19:27">2025-01-01</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2024/04/17/learn-cuda/" title="CUDA优化入门"><img src="/2024/04/17/learn-cuda/2024-04-16-15-52-38.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="CUDA优化入门"/></a><div class="content"><a class="title" href="/2024/04/17/learn-cuda/" title="CUDA优化入门">CUDA优化入门</a><time datetime="2024-04-17T12:00:00.000Z" title="发表于 2024-04-17 20:00:00">2024-04-17</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2024/04/04/bipartite-match/" title="二分图的判断与匹配"><img src="/2024/04/04/bipartite-match/2024-04-05-00-11-55.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="二分图的判断与匹配"/></a><div class="content"><a class="title" href="/2024/04/04/bipartite-match/" title="二分图的判断与匹配">二分图的判断与匹配</a><time datetime="2024-04-04T13:43:47.000Z" title="发表于 2024-04-04 21:43:47">2024-04-04</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2024/01/19/summary/" title="长风破浪会有时"><img src="/2024/01/19/summary/wrapped2023.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="长风破浪会有时"/></a><div class="content"><a class="title" href="/2024/01/19/summary/" title="长风破浪会有时">长风破浪会有时</a><time datetime="2024-01-19T13:15:25.000Z" title="发表于 2024-01-19 21:15:25">2024-01-19</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/06/05/remote-vivado/" title="Vivado远程开发探索"><img src="/2023/06/05/remote-vivado/2023-06-15-16-22-13.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Vivado远程开发探索"/></a><div class="content"><a class="title" href="/2023/06/05/remote-vivado/" title="Vivado远程开发探索">Vivado远程开发探索</a><time datetime="2023-06-05T09:52:47.000Z" title="发表于 2023-06-05 17:52:47">2023-06-05</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2025 By 裘剑东</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.js"></script><div class="js-pjax"><script>(() => {
+  const $mermaidWrap = document.querySelectorAll('#article-container .mermaid-wrap')
+  if ($mermaidWrap.length) {
+    window.runMermaid = () => {
+      window.loadMermaid = true
+      const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default'
+
+      Array.from($mermaidWrap).forEach((item, index) => {
+        const mermaidSrc = item.firstElementChild
+        const mermaidThemeConfig = '%%{init:{ \'theme\':\'' + theme + '\'}}%%\n'
+        const mermaidID = 'mermaid-' + index
+        const mermaidDefinition = mermaidThemeConfig + mermaidSrc.textContent
+        mermaid.mermaidAPI.render(mermaidID, mermaidDefinition, (svgCode) => {
+          mermaidSrc.insertAdjacentHTML('afterend', svgCode)
+        })
+      })
+    }
+
+    const loadMermaid = () => {
+      window.loadMermaid ? runMermaid() : getScript('https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js').then(runMermaid)
+    }
+
+    window.pjax ? loadMermaid() : document.addEventListener('DOMContentLoaded', loadMermaid)
+  }
+})()</script></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

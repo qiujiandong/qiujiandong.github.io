@@ -1,0 +1,238 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>DSP与FPGA的SRIO通信实现 | 小裘控制系统</title><meta name="keywords" content="FPGA,DSP,6455,SRIO"><meta name="author" content="裘剑东"><meta name="copyright" content="裘剑东"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="DSP与FPGA的SRIO通信实现">
+<meta property="og:type" content="article">
+<meta property="og:title" content="DSP与FPGA的SRIO通信实现">
+<meta property="og:url" content="http://qjdxmy.com/2022/02/27/srio-dsp-fpga/">
+<meta property="og:site_name" content="小裘控制系统">
+<meta property="og:description" content="DSP与FPGA的SRIO通信实现">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://qjdxmy.com/2022/02/27/srio-dsp-fpga/2022-02-27-12-14-52.png">
+<meta property="article:published_time" content="2022-02-27T03:18:58.000Z">
+<meta property="article:modified_time" content="2024-04-17T12:40:48.577Z">
+<meta property="article:author" content="裘剑东">
+<meta property="article:tag" content="DSP">
+<meta property="article:tag" content="6455">
+<meta property="article:tag" content="FPGA">
+<meta property="article:tag" content="SRIO">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://qjdxmy.com/2022/02/27/srio-dsp-fpga/2022-02-27-12-14-52.png"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="http://qjdxmy.com/2022/02/27/srio-dsp-fpga/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '天',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery@2/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery@2/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'DSP与FPGA的SRIO通信实现',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2024-04-17 20:40:48'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 6.0.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/me.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data is-center"><div class="data-item"><a href="/archives/"><div class="headline">文章</div><div class="length-num">84</div></a></div><div class="data-item"><a href="/tags/"><div class="headline">标签</div><div class="length-num">101</div></a></div><div class="data-item"><a href="/categories/"><div class="headline">分类</div><div class="length-num">18</div></a></div></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/download/"><i class="fa-fw fas fa-download"></i><span> 下载</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 链接</span></a></div><div class="menus_item"><a class="site-page" href="/resume/"><i class="fa-fw fas fa-heart"></i><span> 个人简历</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="not-top-img" id="page-header"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">小裘控制系统</a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/download/"><i class="fa-fw fas fa-download"></i><span> 下载</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 链接</span></a></div><div class="menus_item"><a class="site-page" href="/resume/"><i class="fa-fw fas fa-heart"></i><span> 个人简历</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav></header><main class="layout" id="content-inner"><div id="post"><div id="post-info"><h1 class="post-title">DSP与FPGA的SRIO通信实现</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2022-02-27T03:18:58.000Z" title="发表于 2022-02-27 11:18:58">2022-02-27</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2024-04-17T12:40:48.577Z" title="更新于 2024-04-17 20:40:48">2024-04-17</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E9%AB%98%E9%80%9F%E9%93%BE%E8%B7%AF/">高速链路</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E9%AB%98%E9%80%9F%E9%93%BE%E8%B7%AF/SRIO/">SRIO</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="DSP与FPGA的SRIO通信实现"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"></span></span></div></div></div><article class="post-content" id="article-container"><p>  本文主要介绍在FPGA和DSP之间实现SRIO通信的过程。FPGA和DSP的型号分别为JFM7VX690T80-AS（XC7VX690T）和TMS320C6455。目前实现的是两者互相交替发送门铃事务，系统功能示意图如下图：</p>
+<img src="/2022/02/27/srio-dsp-fpga/2022-02-27-12-14-52.png" class="">
+<p>参考资料：</p>
+<ul>
+<li>SPRAA89A - <a target="_blank" rel="noopener" href="https://www.ti.com/lit/an/spraa89a/spraa89a.pdf">TMS320C6455 Design Guide and Comparisons to TMS320TC6416T</a></li>
+<li>DS183 - <a target="_blank" rel="noopener" href="https://www.xilinx.com/support/documentation/data_sheets/ds183_Virtex_7_Data_Sheet.pdf">Virtex‐7 T and XT FPGAs Data Sheet:DC and AC Switching Characteristics</a></li>
+<li>ANTC206 - <a target="_blank" rel="noopener" href="https://ww1.microchip.com/downloads/en/DeviceDoc/Differential%20Clock.pdf">Differential Clock Translation</a></li>
+<li>PG007 - <a target="_blank" rel="noopener" href="https://www.xilinx.com/support/documentation/ip_documentation/srio_gen2/v3_1/pg007_srio_gen2.pdf">Serial RapidIO Gen2 Endpoint v4.1 LogiCORE IP Product Guide</a></li>
+<li>SPRU976E - <a target="_blank" rel="noopener" href="https://www.ti.com/lit/ug/spru976e/spru976e.pdf">TMS320C645x DSP Serial RapidIO (SRIO)</a></li>
+</ul>
+<h2 id="硬件连接">硬件连接</h2>
+<p>  链路之间的连接采用100nF电容耦合，主要是不同的器件需要的时钟类型可能不同，需要注意。TMS320C6455需要采用LVDS或者LVPECL逻辑电平标准的差分时钟。而当时我们整个系统里的另一个处理器需要的是HCSL类型的时钟，两者不能直接兼容，需要在电路上做一些处理。</p>
+<img src="/2022/02/27/srio-dsp-fpga/2022-02-27-12-15-23.png" class="">
+<p>  HCSL类型时钟转LVDS类型时钟，参考ANTC206，用的是下图中的电路。原理是另外引入3.3V，并用电阻分压，得到LVDS类型时钟的1.2V的共模电压，实际测试时发现，TMS320C6455的差分输入阻抗已经是100Ω，因此外面不需要再挂100Ω。</p>
+<img src="/2022/02/27/srio-dsp-fpga/2022-02-27-12-15-42.png" class="">
+<p>  FPGA的GTX和GTH对参考时钟输入的电气要求比较松，只需要是电容耦合，并且差分电压的峰峰值在350mV~2000mV之间即可。HCSL类型的差分时钟电压峰峰值为1400mV（单端700mV），因此满足输入条件。</p>
+<img src="/2022/02/27/srio-dsp-fpga/2022-02-27-12-16-07.png" class="">
+<h2 id="FPGA端实现">FPGA端实现</h2>
+<p>  FPGA端实现SRIO主要参考PG007这个文档。SRIO的IP的配置可以很简单，主要就是把链路数量、链路的速率和参考时钟频率配置一下，记住它的Device ID即可。</p>
+<img src="/2022/02/27/srio-dsp-fpga/2022-02-27-12-16-27.png" class="">
+<p>  IP实例化的时候，信号非常多，但是比较有用的就是四个AXI4-Stream端口，ireq，iresp，treq和tresp。用来发送和接收事务包。其余的都是IP的输出信号，方便观察调试，查找问题。下面是SRIO实例化代码的一部分，sys_clk是外部输入的参考时钟，IP能够输出log_clk给用户实现自己的逻辑。</p>
+<figure class="highlight verilog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">.sys_clkp</span>(sys_clkp),                            <span class="comment">// input wire sys_clkp</span></span><br><span class="line"><span class="variable">.sys_clkn</span>(sys_clkn),                            <span class="comment">// input wire sys_clkn</span></span><br><span class="line"><span class="variable">.sys_rst</span>(~sys_rst),                             <span class="comment">// input wire sys_rst</span></span><br><span class="line"></span><br><span class="line"><span class="variable">.log_clk_out</span>(log_clk),                          <span class="comment">// output wire log_clk_out</span></span><br><span class="line"><span class="variable">.log_rst_out</span>(log_rst),                          <span class="comment">// output wire log_rst_out</span></span><br><span class="line"><span class="variable">.clk_lock_out</span>(clk_lock_out),                    <span class="comment">// output wire clk_lock_out</span></span><br><span class="line"><span class="variable">.mode_1x</span>(mode_1x),                              <span class="comment">// output wire mode_1x</span></span><br><span class="line"><span class="variable">.port_error</span>(port_error),                        <span class="comment">// output wire port_error</span></span><br><span class="line"><span class="variable">.gtrx_disperr_or</span>(gtrx_disperr_or),              <span class="comment">// output wire gtrx_disperr_or</span></span><br><span class="line"><span class="variable">.gtrx_notintable_or</span>(gtrx_notintable_or),        <span class="comment">// output wire gtrx_notintable_or</span></span><br><span class="line"><span class="variable">.deviceid</span>(deviceid),                            <span class="comment">// output wire [15 : 0] deviceid</span></span><br><span class="line"><span class="variable">.port_decode_error</span>(port_decode_error),          <span class="comment">// output wire port_decode_error</span></span><br><span class="line"><span class="variable">.link_initialized</span>(link_initialized),            <span class="comment">// output wire link_initialized</span></span><br><span class="line"><span class="variable">.port_initialized</span>(port_initialized),            <span class="comment">// output wire port_initialized</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>link_initialized和port_initialized指示链路和端口是否初始化完成</li>
+<li>deviceid就是我们在IP配置中设置的值，会用在事务包的发送和接收中。</li>
+<li>mode_1x指示当前工作在1x模式</li>
+<li>port_error，port_decode_error，gtrx_disperr_or，gtrx_notintable_or用来指示是否出现错误。具体错误信息可以查PG007。</li>
+</ul>
+<figure class="highlight verilog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">.sim_train_en</span>(<span class="number">1&#x27;b0</span>),                            <span class="comment">// input wire sim_train_en</span></span><br><span class="line"><span class="variable">.phy_mce</span>(<span class="number">1&#x27;b0</span>),                                 <span class="comment">// input wire phy_mce</span></span><br><span class="line"><span class="variable">.phy_link_reset</span>(<span class="number">1&#x27;b0</span>),                          <span class="comment">// input wire phy_link_reset</span></span><br><span class="line"><span class="variable">.force_reinit</span>(<span class="number">1&#x27;b0</span>),                            <span class="comment">// input wire force_reinit</span></span><br></pre></td></tr></table></figure>
+<p>  另外有这四根线是输入，可以给常量。一开始我直接把仿真例程搬过来用的时候没有给sim_train_en置零，导致链路一直有问题。其余的输出信号都可以悬空，<br>
+  还有一个我遇到的问题是，当时没注意到这个sys_rst是高电平复位，我直接把接了外部复位按键的Pin接到了sys_rst上，而电路上做的是低电平复位，导致没有按键按下的时候IP一直处在复位状态。所以这里对外部输入的复位取反（~sys_rst）。<br>
+  FPGA的实现总体来说比较简单，就只要发送门铃后等待门铃，接收门铃的时候发送响应，再接着发送门铃就行。发送事务的过程都是通过AXI4-Steam的接口，基本不会有问题。<br>
+  只是在工程最后输出bitstream文件的时候出了问题，提示需要购买license，参考<a target="_blank" rel="noopener" href="https://blog.csdn.net/QQ_1500930061/article/details/100001416">这篇文章</a>即可解决。</p>
+<h2 id="DSP端实现">DSP端实现</h2>
+<p>DSP端的软件流程图如下图所示。程序的编写和调试主要是参考SPRU976E。</p>
+<img src="/2022/02/27/srio-dsp-fpga/2022-02-27-12-17-47.png" class="">
+<h3 id="初始化">初始化</h3>
+<p>  从SRIO的初始化开始，只要能建立链路连接，就成功了一大半。<br>
+  首先要弄清楚C6455的SRIO的工作模式。下面的表格里给出了它有两种工作模式。</p>
+<ul>
+<li>1x/4x：工作在1条或者4条链路的模式，其中1条链路的情况下，可以是lane0或者lane2。也就是0~3四条链路中只有0和2两条链路作为单条链路进行通信；</li>
+<li>1x/1x：只能工作在1x模式，就是四条链路都是独立的。</li>
+</ul>
+<img src="/2022/02/27/srio-dsp-fpga/2022-02-27-12-18-08.png" class="">
+<p>  然后具体到代码配置过程中，下面的1x/4p让我误以为是4个端口都工作在1x模式，而实际上这里的1x/4p就是前面的1x/4x模式。我们的需求是把四条链路都独立使用，因此需要按照1x/1x的方式进行配置。</p>
+<img src="/2022/02/27/srio-dsp-fpga/2022-02-27-12-18-25.png" class="">
+<p>  工作模式配置在PER_SET_CNTL寄存器中的BOOT_COMPLETE置一的时候就生效。就是当这一位置一时，C6455就开始对端口进行初始化。而后就不能再去修改工作模式了。CSL中自带的CSL_srioHwSetup函数上来就对BOOT_COMPLETE进行写入（写0或是写1取决于用户的配置）<br>
+  一般情况下，如果直接写“1”，那么它就直接工作在1x/4x模式了；如果直接写“0”，那就是不起作用，同时可以对其它的寄存器做修改，如果想让其它的配置生效，就需要再写一次“1”，如此两次先后调用CSL_srioHwSetup才能将它的工作模式正确配置为1x/1x模式。<br>
+  因此需要对这部分函数做修改，为此我将SRIO的配置分为两个阶段，一个是“预设置”，CSL_srioHwPresetup完成工作模式以及其他的一些配置；另一个CSL_srioFlowCtrlEnable是对BOOT_COMPLETE置一，并且在最后启动“流控制”（PCR寄存器中的PEREN需要最后置一）。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">CSL_srioHwPresetup(hSrio, &amp;setup);</span><br><span class="line">CSL_srioDbIntrRoute(hSrio, &amp;DbInfo, CSL_SRIO_INTR0);</span><br><span class="line">status = CSL_srioFlowCtrlEnable(hSrio, &amp;setup);</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (status != CSL_SOK) &#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;SRIO: ... Hardwrae setup, failed\n&quot;</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>  如何判断是否初始化完成？可以通过SPn_ERR_STAT寄存器中的第1位，PORT_OK来判断。只有当PORT_OK为1时，端口之间的链路才建立起来。在调试过程中我发现通过CCS的“Registers”窗口看到的值和真实值是有区别的。我通过读取SPn_ERR_STAT寄存器中的数据，并打印到控制台上才发现虽然窗口中显示的没有变化，端口似乎还是没有初始化，但是读取数据之后打印的结果却是表明链路已经建立连接了。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span>(i = <span class="number">0</span>; i&lt;<span class="number">4</span>; i++)&#123;</span><br><span class="line">    rdata = hSrio-&gt;regs-&gt;PORT[i].SP_ERR_STAT;</span><br><span class="line">    rdata = (rdata &amp; <span class="number">0x00000002</span>) &gt;&gt; <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">if</span>(i == <span class="number">3</span>) <span class="built_in">printf</span>(<span class="string">&quot;port %d OK = %d\n&quot;</span>, i, rdata);</span><br><span class="line">    <span class="keyword">else</span> <span class="built_in">printf</span>(<span class="string">&quot;port %d OK = %d, &quot;</span>, i, rdata);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>  如何判断当前链路工作在什么模式？可以通过SPn_CTL寄存器中的最高两位来判断，如果为“00”则表示当前这个端口是单链路的模式；如果为“01”，则当前是四条链路构成一个端口，而且只对于SP0_CTL有效。这里同样也会有类似上面的一样的毛病。就是CCS的Registers页面看到的值和实际值不符，需要打印输出才能看到正确的实际就结果。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span>(i = <span class="number">0</span>; i&lt;<span class="number">4</span>; i++)&#123;</span><br><span class="line">    rdata = hSrio-&gt;regs-&gt;PORT[i].SP_CTL;</span><br><span class="line">    rdata = (rdata &amp; <span class="number">0xC0000000</span>) &gt;&gt; <span class="number">30</span>;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;port %d Port Width = %d\n&quot;</span>, i, rdata);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>  一般只要配置没问题，这个链路就能建立起来。FPGA用ILA可以看到port_initialized和link_initialized都变高，DSP可以看到PORT_OK那一位置一就没问题了。</p>
+<h3 id="门铃中断">门铃中断</h3>
+<p>  因为中断经常要用到，所以关于中断的配置这一块一定要非常熟悉才行。一个IntcObj把12个处理器中断源（VectID4~15）之一和128个Event之一联系起来，hIntc指向是IntcObj的指针。context和record是管理整个中断系统的全局变量，其中记录了所有中断服务函数的数量和函数地址。<br>
+  初始化中断控制器，首先对context初始化赋值，调用CSL_intcInit即初始化了中断向量表，但这是中断服务函数都是空的。接着使能全局中断，使能不可屏蔽中断，以上操作在整个程序中只需执行一次。而后的CSL_intcOpen则是对单个中断源进行设置，如果系统中有多个中断源，则需要类似地执行多次。CSL_intcOpen初始化了IntcObj，将128个Event之一和12个CPU中断源之一联系在一起，本质上是修改了INTMUX寄存器。CSL_intcPlugEventHandler将中断服务函数和特定的中断联系在一起，最后再使能中断（实质上是将IER寄存器中的特定bit置一），即完成了中断的配置。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line">CSL_IntcObj IntcObj;</span><br><span class="line">CSL_IntcHandle hIntc;</span><br><span class="line">CSL_IntcContext context;</span><br><span class="line">CSL_IntcEventHandlerRecord record[<span class="number">1</span>];</span><br><span class="line"><span class="type">void</span> <span class="title function_">IntcConfig</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">    CSL_IntcParam vectID;</span><br><span class="line">    CSL_Status status;</span><br><span class="line">    CSL_IntcEventHandlerRecord isr_doorbell;</span><br><span class="line"></span><br><span class="line">    context.numEvtEntries = <span class="number">1</span>;</span><br><span class="line">    context.eventhandlerRecord = record;</span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">    * contex include a record, isr invoked from this record</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    CSL_intcInit(&amp;context);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">    * global enable and nmi enable</span></span><br><span class="line"><span class="comment">    * interrupt will be enabled until enable the correspond bit in ier</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    CSL_intcGlobalEnable(&amp;state);</span><br><span class="line">    CSL_intcGlobalNmiEnable();</span><br><span class="line"></span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">    * set intmux register bounding vectID and eventID</span></span><br><span class="line"><span class="comment">    * when interrupt occure, cpu check intmux to determin witch interrupt occured</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    vectID = CSL_INTC_VECTID_10;</span><br><span class="line">    hIntc = CSL_intcOpen(&amp;IntcObj, CSL_INTC_EVENTID_RIOINT0, &amp;vectID, &amp;status);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">    * isr_doorbell is a temp variable</span></span><br><span class="line"><span class="comment">    * the value will copied to record</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    isr_doorbell.handler = (CSL_IntcEventHandler)&amp;Rio0InterruptHandler;</span><br><span class="line">    isr_doorbell.arg = hSrio;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">    * plug interrupt handler into record</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    CSL_intcPlugEventHandler(hIntc, &amp;isr_doorbell);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">    * enable interrupt</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    CSL_intcHwControl(hIntc, CSL_INTC_CMD_EVTCLEAR, <span class="literal">NULL</span>);</span><br><span class="line">    CSL_intcHwControl(hIntc, CSL_INTC_CMD_EVTENABLE, <span class="literal">NULL</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>  一般的中断配置流程就像上面说的那样，但是SRIO实际上有很多中断源，但分给它的只有3个Event（3/128），分别是INTDST0、INTDST1、INTDST4。所以实际上从门铃中断到Event还有一次映射。</p>
+<img src="/2022/02/27/srio-dsp-fpga/2022-02-27-12-19-47.png" class="">
+<p>  这里需要配置SRIO的门铃的中断路由寄存器（ICRR），因为门铃共有64个中断源，这每个中断源都可以连接到以上三个Event之一，每次有中断发生时，用户可以通过查询的方式进一步确定发生中断的具体事件。为此，我专门写了CSL_srioDbIntrRoute函数，用于设置门铃的ICRR寄存器。而且由因为SRIO的寄存器只有在使能SRIO外设之后才能读写，所以这个函数需要在CSL_srioHwPresetup之后调用。</p>
+<h3 id="中断服务函数">中断服务函数</h3>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">Rio0InterruptHandler</span><span class="params">(</span></span><br><span class="line"><span class="params">    <span class="type">void</span> *arg</span></span><br><span class="line"><span class="params">)</span></span><br><span class="line">&#123;</span><br><span class="line">    CSL_SrioPortData sdata;</span><br><span class="line"></span><br><span class="line">    sdata.index = <span class="number">0</span>;</span><br><span class="line">    sdata.data = <span class="number">0x00000001</span>;</span><br><span class="line"></span><br><span class="line">    flag += <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">    CSL_srioHwControl(hSrio, CSL_SRIO_CMD_DOORBELL_INTR_CLEAR, (<span class="type">void</span> *)&amp;sdata);</span><br><span class="line">    CSL_srioIntrRateCtrl(hSrio,CSL_SRIO_INTR0,<span class="number">0x0000FFFF</span>);</span><br><span class="line">    CSL_intcHwControl(hIntc, CSL_INTC_CMD_EVTCLEAR, <span class="literal">NULL</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>  以上是一个简单的中断服务函数，主要就是令flag自增1。每次中断产生时，有三处地方产生了中断标志，SRIO的ICSR，中断控制器的EVTFLAG和CPU的IFR。其中CPU的IFR会在每次中断服务函数被调用时自动清除，而另外两处中断标志则需要由软件手动清除。以上代码中的CSL_srioHwControl和CSL_intcHwControl就是实现这么目的。<br>
+  另外SRIO还有一个中断速率控制寄存器，这个在每次中断发生后都需要向它写入一个数，<strong>即使不做中断速率控制也要写0</strong>。不然如果第二次中断标识产生了也进不了中断。调试的过程中发现，如果直接往中断速率控制寄存器中写0，程序就会反复进入这个中断服务函数。因此需要写一个较大的值，或者在中断服务函数外调用CSL_srioIntrRateCtrl。</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="mailto:undefined">裘剑东</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="http://qjdxmy.com/2022/02/27/srio-dsp-fpga/">http://qjdxmy.com/2022/02/27/srio-dsp-fpga/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="http://qjdxmy.com" target="_blank">小裘控制系统</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/DSP/">DSP</a><a class="post-meta__tags" href="/tags/6455/">6455</a><a class="post-meta__tags" href="/tags/FPGA/">FPGA</a><a class="post-meta__tags" href="/tags/SRIO/">SRIO</a></div><div class="post_share"><div class="social-share" data-image="/2022/02/27/srio-dsp-fpga/2022-02-27-12-14-52.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/social-share.js/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2022/02/27/aligned-malloc/"><img class="prev-cover" src="/2022/02/27/aligned-malloc/extra_space.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">分配对齐的内存空间</div></div></a></div><div class="next-post pull-right"><a href="/2022/02/27/srio-dsp-fpga-test/"><img class="next-cover" src="/2022/02/27/srio-dsp-fpga-test/2022-02-27-12-29-59.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">基于SRIO的FPGA与DSP间高速数据传输</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/2022/02/27/srio-dsp-fpga-test/" title="基于SRIO的FPGA与DSP间高速数据传输"><img class="cover" src="/2022/02/27/srio-dsp-fpga-test/2022-02-27-12-29-59.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-02-27</div><div class="title">基于SRIO的FPGA与DSP间高速数据传输</div></div></a></div><div><a href="/2022/06/14/bios-srio/" title="SYS/BIOS与SRIO应用实例"><img class="cover" src="/2022/06/14/bios-srio/2022-06-14-11-16-30.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-06-14</div><div class="title">SYS/BIOS与SRIO应用实例</div></div></a></div><div><a href="/2022/03/09/phase-review-1/" title="近期C6000 DSP开发小结"><img class="cover" src="/2022/03/09/phase-review-1/2022-03-09-22-40-16.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-03-09</div><div class="title">近期C6000 DSP开发小结</div></div></a></div><div><a href="/2022/02/27/c6455-1/" title="TMS320C6455入门实践（一）"><img class="cover" src="/2022/02/27/c6455-1/2022-02-27-16-54-12.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-02-27</div><div class="title">TMS320C6455入门实践（一）</div></div></a></div><div><a href="/2022/02/27/c6455-10/" title="TMS320C6455入门实践（十）"><img class="cover" src="/2022/02/27/c6455-10/2022-02-27-19-49-41.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-02-27</div><div class="title">TMS320C6455入门实践（十）</div></div></a></div><div><a href="/2022/02/27/c6455-2/" title="TMS320C6455入门实践（二）"><img class="cover" src="/2022/02/27/c6455-2/2022-02-27-17-27-11.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-02-27</div><div class="title">TMS320C6455入门实践（二）</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/me.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">裘剑东</div><div class="author-info__description">芯来科技基础软件开发工程师，嵌入式开发爱好者</div></div><div class="card-info-data is-center"><div class="card-info-data-item"><a href="/archives/"><div class="headline">文章</div><div class="length-num">84</div></a></div><div class="card-info-data-item"><a href="/tags/"><div class="headline">标签</div><div class="length-num">101</div></a></div><div class="card-info-data-item"><a href="/categories/"><div class="headline">分类</div><div class="length-num">18</div></a></div></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/qiujiandong"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/qiujiandong" target="_blank" title="Github"><i class="fab fa-github"></i></a><a class="social-icon" href="mailto:1335521934@qq.com" target="_blank" title="Email"><i class="fas fa-envelope"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">最好的程序员做自己的硬件！</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content is-expand"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%A1%AC%E4%BB%B6%E8%BF%9E%E6%8E%A5"><span class="toc-number">1.</span> <span class="toc-text">硬件连接</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#FPGA%E7%AB%AF%E5%AE%9E%E7%8E%B0"><span class="toc-number">2.</span> <span class="toc-text">FPGA端实现</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#DSP%E7%AB%AF%E5%AE%9E%E7%8E%B0"><span class="toc-number">3.</span> <span class="toc-text">DSP端实现</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%88%9D%E5%A7%8B%E5%8C%96"><span class="toc-number">3.1.</span> <span class="toc-text">初始化</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%97%A8%E9%93%83%E4%B8%AD%E6%96%AD"><span class="toc-number">3.2.</span> <span class="toc-text">门铃中断</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%AD%E6%96%AD%E6%9C%8D%E5%8A%A1%E5%87%BD%E6%95%B0"><span class="toc-number">3.3.</span> <span class="toc-text">中断服务函数</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2025/01/01/summary-2024/" title="2024年终总结"><img src="/2025/01/01/summary-2024/2025-01-01-21-54-27.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="2024年终总结"/></a><div class="content"><a class="title" href="/2025/01/01/summary-2024/" title="2024年终总结">2024年终总结</a><time datetime="2025-01-01T09:19:27.000Z" title="发表于 2025-01-01 17:19:27">2025-01-01</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2024/04/17/learn-cuda/" title="CUDA优化入门"><img src="/2024/04/17/learn-cuda/2024-04-16-15-52-38.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="CUDA优化入门"/></a><div class="content"><a class="title" href="/2024/04/17/learn-cuda/" title="CUDA优化入门">CUDA优化入门</a><time datetime="2024-04-17T12:00:00.000Z" title="发表于 2024-04-17 20:00:00">2024-04-17</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2024/04/04/bipartite-match/" title="二分图的判断与匹配"><img src="/2024/04/04/bipartite-match/2024-04-05-00-11-55.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="二分图的判断与匹配"/></a><div class="content"><a class="title" href="/2024/04/04/bipartite-match/" title="二分图的判断与匹配">二分图的判断与匹配</a><time datetime="2024-04-04T13:43:47.000Z" title="发表于 2024-04-04 21:43:47">2024-04-04</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2024/01/19/summary/" title="长风破浪会有时"><img src="/2024/01/19/summary/wrapped2023.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="长风破浪会有时"/></a><div class="content"><a class="title" href="/2024/01/19/summary/" title="长风破浪会有时">长风破浪会有时</a><time datetime="2024-01-19T13:15:25.000Z" title="发表于 2024-01-19 21:15:25">2024-01-19</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/06/05/remote-vivado/" title="Vivado远程开发探索"><img src="/2023/06/05/remote-vivado/2023-06-15-16-22-13.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Vivado远程开发探索"/></a><div class="content"><a class="title" href="/2023/06/05/remote-vivado/" title="Vivado远程开发探索">Vivado远程开发探索</a><time datetime="2023-06-05T09:52:47.000Z" title="发表于 2023-06-05 17:52:47">2023-06-05</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2025 By 裘剑东</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.js"></script><div class="js-pjax"><script>(() => {
+  const $mermaidWrap = document.querySelectorAll('#article-container .mermaid-wrap')
+  if ($mermaidWrap.length) {
+    window.runMermaid = () => {
+      window.loadMermaid = true
+      const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default'
+
+      Array.from($mermaidWrap).forEach((item, index) => {
+        const mermaidSrc = item.firstElementChild
+        const mermaidThemeConfig = '%%{init:{ \'theme\':\'' + theme + '\'}}%%\n'
+        const mermaidID = 'mermaid-' + index
+        const mermaidDefinition = mermaidThemeConfig + mermaidSrc.textContent
+        mermaid.mermaidAPI.render(mermaidID, mermaidDefinition, (svgCode) => {
+          mermaidSrc.insertAdjacentHTML('afterend', svgCode)
+        })
+      })
+    }
+
+    const loadMermaid = () => {
+      window.loadMermaid ? runMermaid() : getScript('https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js').then(runMermaid)
+    }
+
+    window.pjax ? loadMermaid() : document.addEventListener('DOMContentLoaded', loadMermaid)
+  }
+})()</script></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

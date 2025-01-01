@@ -1,0 +1,215 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>输入输出延时的时序约束 | 小裘控制系统</title><meta name="keywords" content="Vivado,时序约束,延时"><meta name="author" content="裘剑东"><meta name="copyright" content="裘剑东"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="输入输出延时的时序约束">
+<meta property="og:type" content="article">
+<meta property="og:title" content="输入输出延时的时序约束">
+<meta property="og:url" content="http://qjdxmy.com/2022/02/27/logic-inout-delay/">
+<meta property="og:site_name" content="小裘控制系统">
+<meta property="og:description" content="输入输出延时的时序约束">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://qjdxmy.com/2022/02/27/logic-inout-delay/2022-02-27-14-36-39.png">
+<meta property="article:published_time" content="2022-02-27T06:27:34.000Z">
+<meta property="article:modified_time" content="2024-04-17T12:40:48.549Z">
+<meta property="article:author" content="裘剑东">
+<meta property="article:tag" content="Vivado">
+<meta property="article:tag" content="时序约束">
+<meta property="article:tag" content="延时">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://qjdxmy.com/2022/02/27/logic-inout-delay/2022-02-27-14-36-39.png"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="http://qjdxmy.com/2022/02/27/logic-inout-delay/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '天',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery@2/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery@2/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '输入输出延时的时序约束',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2024-04-17 20:40:48'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 6.0.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/me.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data is-center"><div class="data-item"><a href="/archives/"><div class="headline">文章</div><div class="length-num">84</div></a></div><div class="data-item"><a href="/tags/"><div class="headline">标签</div><div class="length-num">101</div></a></div><div class="data-item"><a href="/categories/"><div class="headline">分类</div><div class="length-num">18</div></a></div></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/download/"><i class="fa-fw fas fa-download"></i><span> 下载</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 链接</span></a></div><div class="menus_item"><a class="site-page" href="/resume/"><i class="fa-fw fas fa-heart"></i><span> 个人简历</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="not-top-img" id="page-header"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">小裘控制系统</a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/download/"><i class="fa-fw fas fa-download"></i><span> 下载</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 链接</span></a></div><div class="menus_item"><a class="site-page" href="/resume/"><i class="fa-fw fas fa-heart"></i><span> 个人简历</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav></header><main class="layout" id="content-inner"><div id="post"><div id="post-info"><h1 class="post-title">输入输出延时的时序约束</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2022-02-27T06:27:34.000Z" title="发表于 2022-02-27 14:27:34">2022-02-27</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2024-04-17T12:40:48.549Z" title="更新于 2024-04-17 20:40:48">2024-04-17</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E6%95%B0%E5%AD%97%E9%80%BB%E8%BE%91/">数字逻辑</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="输入输出延时的时序约束"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"></span></span></div></div></div><article class="post-content" id="article-container"><p>  关于FPGA设计时的输入延时、输出延时的基本概念，网上已经有很多文章进行了介绍。<br>
+  文章链接：<a target="_blank" rel="noopener" href="https://www.cnblogs.com/linjie-swust/archive/2012/03/01/FPGA.html">FPGA静态时序分析</a><br>
+  我主要也是通过上面这篇文章进行学习的。但是文章中对于最大输入延时的推导有一点小错误，而且整体上看比较复杂，为此本文进行了适当总结。<br>
+  在很多文章的分析中，常常引入时钟抖动（jitter），时钟偏斜（skew），因此常常会显得比较复杂。为了便于分析，时钟的这部分不确定性我们可以暂时不考虑，即把发射（launch）和捕获（capture）的时钟看作完全相同的时钟。</p>
+<h2 id="建立时间与保持时间">建立时间与保持时间</h2>
+<p>  在讨论输入输出延时之前，一定要对建立时间和保持时间有足够的理解。</p>
+<ul>
+<li>建立时间是否满足，需要考虑发射沿和捕获沿之间的关系，是<strong>前后两个时钟沿</strong>。从发射沿开始，经过一定的延时，数据在捕获端稳定。在捕获沿到来前，数据至少要稳定一定的时间，这一段时间称为建立时间。</li>
+<li>保持时间是否满足可以仅考虑捕获沿，即<strong>同一个时钟沿</strong>。捕获端在捕获数据时，数据需要保持一段时间，而有可能因为发射端数据来得太快导致保持时间不满足。</li>
+</ul>
+<h2 id="输入延时">输入延时</h2>
+<img src="/2022/02/27/logic-inout-delay/2022-02-27-14-36-39.png" class="">
+<p>  输入延时即图中红色弧线表示，DFF1的时钟端到FPGA的PAD的时间。具体包括DFF1的Tco和PCB走线延时。<br>
+  输入延时会有一个范围，即最大输入延时和最小输入延时，明确这两个限制有什么用呢？</p>
+<h3 id="最大输入延时">最大输入延时</h3>
+<p>  考虑最大输入延时，如果这个延时越来越大，会造成什么后果？可能会造成DFF2因为建立时间无法满足导致无法采到输入的数据。<br>
+  因此一个最大输入延时的约束，实际上是对DFF2的建立时间和图中的Net Delay之和进行了限制。建立时间和线网的延时之和不能太大。</p>
+<img src="/2022/02/27/logic-inout-delay/2022-02-27-14-36-58.png" class="">
+<h3 id="最小输入延时">最小输入延时</h3>
+<p>  同样考虑最小输入延时，如果这个输入延时特别小，会造成什么后果？输入延时很小的话，对满足建立时间自然是非常有利的，但是会对满足保持时间提出更高的要求。因为输入延时如果太小，数据会更快地来到DFF2的输入端，很可能导致上一个数据的保持时间不满足。</p>
+<img src="/2022/02/27/logic-inout-delay/2022-02-27-14-37-15.png" class="">
+<p>  图中红色线段表示输入延时，蓝色部分表示FPGA内部的Net Delay和Hold Time，当Input Delay非常小时，可能需要通过增加Net Delay来满足保持时间的要求。</p>
+<h2 id="输出延时">输出延时</h2>
+<img src="/2022/02/27/logic-inout-delay/2022-02-27-14-37-33.png" class="">
+<p>  输出延时包括两部分，如上图蓝色部分所示，一部分是输出寄存器的Tco，另一部分是寄存器输出后的Net Delay。<br>
+  与输入延时不同，输入延时是人为设置的提供给FPGA设计工具的一个外部条件；而输出延时则是FPGA内的一个性质，我们需要给出外部条件，也就是给出PCB走线延时和捕获寄存器的建立时间与保持时间。FPGA设计工具会根据这些条件来调整输出延时。</p>
+<h3 id="最大输出延时">最大输出延时</h3>
+<p>  有个规律，关于这个最大或最小输入输出延时。凡是“最大”，都是通过建立时间得出的。</p>
+<img src="/2022/02/27/logic-inout-delay/2022-02-27-14-37-52.png" class="">
+<p>  最大输出延时可以根据<strong>最大的PCB走线延时</strong>和<strong>捕获寄存器的建立时间</strong>得出，再结合时钟周期即可计算最大输出延时。因为输出延时如果更大，就有可能导致捕获寄存器的建立时间不能满足。</p>
+<h3 id="最小输出延时">最小输出延时</h3>
+<img src="/2022/02/27/logic-inout-delay/2022-02-27-14-38-12.png" class="">
+<p>  最小输出延时同样根据捕获寄存器的保持时间来得出。最小输出延时是<strong>最小的PCB走线延时减去捕获寄存器的保持时间</strong>。可以从图中看出，这一计算结果有可能是负值，而这部分负值则需要FPGA的输出延时来提供。<br>
+  比如我们计算得到的PCB走线延时减去保持时间是“-2ns”，那么Tco + Net Delay就需要至少为2ns才可以满足捕获寄存器的保持时间要求。</p>
+<h2 id="Vivado时序约束">Vivado时序约束</h2>
+<p>  在vivado里添加关于输出延时的时序约束，我一般都用那个Constraints Wizard。不管是在Synthesized Design里还是在Implementation Design里都有这个功能。<br>
+  在关于输出延时的设置里面，选择需要设置的信号后，右侧有输入框，如下图所示。</p>
+<img src="/2022/02/27/logic-inout-delay/2022-02-27-14-38-26.png" class="">
+<p>  时钟周期时根据信号所在时钟域已经确定了的。下面的tsu（建立时间）和thd（保持时间）就是捕获寄存器的建立时间和保持时间。trce_dly_max和trce_dly_min就是PCB的线路延时最大值和最小值。<br>
+  图中下方的计算公式也和我上面的分析相印证，在这里设置好之后保存至一个xdc文件，内容类似下面这样的</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">set_output_delay -clock [get_clocks clk_fpga_1] -min -add_delay 0.000 [get_ports hs_0]</span><br><span class="line">set_output_delay -clock [get_clocks clk_fpga_1] -max -add_delay 1.500 [get_ports hs_0]</span><br></pre></td></tr></table></figure>
+<p>  这里有一点容易误导人，就是这里的设置最大输出延时，给的数字实际上是最大PCB走线延时加上捕获寄存器的建立时间。实际上输出延时是指FPGA内的Tco + Net Delay。只是FPGA设计工具可以根据我们设置的这个条件去推断最大输出延时，也就是</p>
+<div class="note info flat"><p>最大输出延时 = 时钟周期减去 - (最大PCB走线延时+捕获寄存器的建立时间)</p>
+</div>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="mailto:undefined">裘剑东</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="http://qjdxmy.com/2022/02/27/logic-inout-delay/">http://qjdxmy.com/2022/02/27/logic-inout-delay/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="http://qjdxmy.com" target="_blank">小裘控制系统</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/Vivado/">Vivado</a><a class="post-meta__tags" href="/tags/%E6%97%B6%E5%BA%8F%E7%BA%A6%E6%9D%9F/">时序约束</a><a class="post-meta__tags" href="/tags/%E5%BB%B6%E6%97%B6/">延时</a></div><div class="post_share"><div class="social-share" data-image="/2022/02/27/logic-inout-delay/2022-02-27-14-36-39.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/social-share.js/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2022/02/27/pcie-test/"><img class="prev-cover" src="/2022/02/27/pcie-test/2022-02-27-14-04-46.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">基于PCIe的FPGA与DSP间高速数据传输测试</div></div></a></div><div class="next-post pull-right"><a href="/2022/02/27/vivado-tcl/"><img class="next-cover" src="/2022/02/27/vivado-tcl/2022-02-27-14-50-59.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">用于Vivado工程管理的Tcl语法学习</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/2022/02/26/logic-axi/" title="AXI协议与自定义AXI4-Lite外设"><img class="cover" src="/2022/02/26/logic-axi/2022-02-26-18-05-43.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-02-26</div><div class="title">AXI协议与自定义AXI4-Lite外设</div></div></a></div><div><a href="/2022/02/27/vivado-git/" title="基于Git和Tcl脚本的Vivado工程管理"><img class="cover" src="/2022/02/27/vivado-git/2022-02-27-14-46-05.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-02-27</div><div class="title">基于Git和Tcl脚本的Vivado工程管理</div></div></a></div><div><a href="/2022/02/27/vivado-modelsim/" title="Vivado与Modelsim联合仿真"><img class="cover" src="/2022/02/27/vivado-modelsim/2022-02-27-14-59-20.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-02-27</div><div class="title">Vivado与Modelsim联合仿真</div></div></a></div><div><a href="/2022/02/27/vivado-tcl/" title="用于Vivado工程管理的Tcl语法学习"><img class="cover" src="/2022/02/27/vivado-tcl/2022-02-27-14-50-59.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-02-27</div><div class="title">用于Vivado工程管理的Tcl语法学习</div></div></a></div><div><a href="/2023/06/05/remote-vivado/" title="Vivado远程开发探索"><img class="cover" src="/2023/06/05/remote-vivado/2023-06-15-16-22-13.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-06-05</div><div class="title">Vivado远程开发探索</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/me.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">裘剑东</div><div class="author-info__description">芯来科技基础软件开发工程师，嵌入式开发爱好者</div></div><div class="card-info-data is-center"><div class="card-info-data-item"><a href="/archives/"><div class="headline">文章</div><div class="length-num">84</div></a></div><div class="card-info-data-item"><a href="/tags/"><div class="headline">标签</div><div class="length-num">101</div></a></div><div class="card-info-data-item"><a href="/categories/"><div class="headline">分类</div><div class="length-num">18</div></a></div></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/qiujiandong"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/qiujiandong" target="_blank" title="Github"><i class="fab fa-github"></i></a><a class="social-icon" href="mailto:1335521934@qq.com" target="_blank" title="Email"><i class="fas fa-envelope"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">最好的程序员做自己的硬件！</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content is-expand"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%BB%BA%E7%AB%8B%E6%97%B6%E9%97%B4%E4%B8%8E%E4%BF%9D%E6%8C%81%E6%97%B6%E9%97%B4"><span class="toc-number">1.</span> <span class="toc-text">建立时间与保持时间</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%BE%93%E5%85%A5%E5%BB%B6%E6%97%B6"><span class="toc-number">2.</span> <span class="toc-text">输入延时</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9C%80%E5%A4%A7%E8%BE%93%E5%85%A5%E5%BB%B6%E6%97%B6"><span class="toc-number">2.1.</span> <span class="toc-text">最大输入延时</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9C%80%E5%B0%8F%E8%BE%93%E5%85%A5%E5%BB%B6%E6%97%B6"><span class="toc-number">2.2.</span> <span class="toc-text">最小输入延时</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%BE%93%E5%87%BA%E5%BB%B6%E6%97%B6"><span class="toc-number">3.</span> <span class="toc-text">输出延时</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9C%80%E5%A4%A7%E8%BE%93%E5%87%BA%E5%BB%B6%E6%97%B6"><span class="toc-number">3.1.</span> <span class="toc-text">最大输出延时</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9C%80%E5%B0%8F%E8%BE%93%E5%87%BA%E5%BB%B6%E6%97%B6"><span class="toc-number">3.2.</span> <span class="toc-text">最小输出延时</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Vivado%E6%97%B6%E5%BA%8F%E7%BA%A6%E6%9D%9F"><span class="toc-number">4.</span> <span class="toc-text">Vivado时序约束</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2025/01/01/summary-2024/" title="2024年终总结"><img src="/2025/01/01/summary-2024/2025-01-01-21-54-27.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="2024年终总结"/></a><div class="content"><a class="title" href="/2025/01/01/summary-2024/" title="2024年终总结">2024年终总结</a><time datetime="2025-01-01T09:19:27.000Z" title="发表于 2025-01-01 17:19:27">2025-01-01</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2024/04/17/learn-cuda/" title="CUDA优化入门"><img src="/2024/04/17/learn-cuda/2024-04-16-15-52-38.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="CUDA优化入门"/></a><div class="content"><a class="title" href="/2024/04/17/learn-cuda/" title="CUDA优化入门">CUDA优化入门</a><time datetime="2024-04-17T12:00:00.000Z" title="发表于 2024-04-17 20:00:00">2024-04-17</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2024/04/04/bipartite-match/" title="二分图的判断与匹配"><img src="/2024/04/04/bipartite-match/2024-04-05-00-11-55.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="二分图的判断与匹配"/></a><div class="content"><a class="title" href="/2024/04/04/bipartite-match/" title="二分图的判断与匹配">二分图的判断与匹配</a><time datetime="2024-04-04T13:43:47.000Z" title="发表于 2024-04-04 21:43:47">2024-04-04</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2024/01/19/summary/" title="长风破浪会有时"><img src="/2024/01/19/summary/wrapped2023.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="长风破浪会有时"/></a><div class="content"><a class="title" href="/2024/01/19/summary/" title="长风破浪会有时">长风破浪会有时</a><time datetime="2024-01-19T13:15:25.000Z" title="发表于 2024-01-19 21:15:25">2024-01-19</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/06/05/remote-vivado/" title="Vivado远程开发探索"><img src="/2023/06/05/remote-vivado/2023-06-15-16-22-13.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Vivado远程开发探索"/></a><div class="content"><a class="title" href="/2023/06/05/remote-vivado/" title="Vivado远程开发探索">Vivado远程开发探索</a><time datetime="2023-06-05T09:52:47.000Z" title="发表于 2023-06-05 17:52:47">2023-06-05</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2025 By 裘剑东</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.js"></script><div class="js-pjax"><script>(() => {
+  const $mermaidWrap = document.querySelectorAll('#article-container .mermaid-wrap')
+  if ($mermaidWrap.length) {
+    window.runMermaid = () => {
+      window.loadMermaid = true
+      const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default'
+
+      Array.from($mermaidWrap).forEach((item, index) => {
+        const mermaidSrc = item.firstElementChild
+        const mermaidThemeConfig = '%%{init:{ \'theme\':\'' + theme + '\'}}%%\n'
+        const mermaidID = 'mermaid-' + index
+        const mermaidDefinition = mermaidThemeConfig + mermaidSrc.textContent
+        mermaid.mermaidAPI.render(mermaidID, mermaidDefinition, (svgCode) => {
+          mermaidSrc.insertAdjacentHTML('afterend', svgCode)
+        })
+      })
+    }
+
+    const loadMermaid = () => {
+      window.loadMermaid ? runMermaid() : getScript('https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js').then(runMermaid)
+    }
+
+    window.pjax ? loadMermaid() : document.addEventListener('DOMContentLoaded', loadMermaid)
+  }
+})()</script></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

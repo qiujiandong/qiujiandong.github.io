@@ -1,0 +1,195 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>C++运算符重载与返回值优化 | 小裘控制系统</title><meta name="keywords" content="重载,C++"><meta name="author" content="裘剑东"><meta name="copyright" content="裘剑东"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="今天遇到的是内存释放错误的问题。原因是没写拷贝构造函数，奇怪的是我之前也没写确实能正常工作的，今天深究了一下发现是编译器做了返回值优化。 问题背景   编译环境还是针对C6455 DSP，为了做一些简单的图像直方图的处理，并且尽可能不用模板类，我自己写了一个简单的类用来存放带长度信息的数组，并且可以做一些简单的运算。重载了减法运算符，从而可以对两个直方图求差。 具体问题   当类中有那种需要动">
+<meta property="og:type" content="article">
+<meta property="og:title" content="C++运算符重载与返回值优化">
+<meta property="og:url" content="http://qjdxmy.com/2022/04/22/cpp-rvo/">
+<meta property="og:site_name" content="小裘控制系统">
+<meta property="og:description" content="今天遇到的是内存释放错误的问题。原因是没写拷贝构造函数，奇怪的是我之前也没写确实能正常工作的，今天深究了一下发现是编译器做了返回值优化。 问题背景   编译环境还是针对C6455 DSP，为了做一些简单的图像直方图的处理，并且尽可能不用模板类，我自己写了一个简单的类用来存放带长度信息的数组，并且可以做一些简单的运算。重载了减法运算符，从而可以对两个直方图求差。 具体问题   当类中有那种需要动">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://qjdxmy.com/2022/04/22/cpp-rvo/2022-04-22-20-56-51.png">
+<meta property="article:published_time" content="2022-04-22T11:48:11.000Z">
+<meta property="article:modified_time" content="2024-04-17T12:40:48.597Z">
+<meta property="article:author" content="裘剑东">
+<meta property="article:tag" content="重载">
+<meta property="article:tag" content="C++">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://qjdxmy.com/2022/04/22/cpp-rvo/2022-04-22-20-56-51.png"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="http://qjdxmy.com/2022/04/22/cpp-rvo/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '天',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery@2/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery@2/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'C++运算符重载与返回值优化',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2024-04-17 20:40:48'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 6.0.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/me.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data is-center"><div class="data-item"><a href="/archives/"><div class="headline">文章</div><div class="length-num">84</div></a></div><div class="data-item"><a href="/tags/"><div class="headline">标签</div><div class="length-num">101</div></a></div><div class="data-item"><a href="/categories/"><div class="headline">分类</div><div class="length-num">18</div></a></div></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/download/"><i class="fa-fw fas fa-download"></i><span> 下载</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 链接</span></a></div><div class="menus_item"><a class="site-page" href="/resume/"><i class="fa-fw fas fa-heart"></i><span> 个人简历</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="not-top-img" id="page-header"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">小裘控制系统</a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/download/"><i class="fa-fw fas fa-download"></i><span> 下载</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 链接</span></a></div><div class="menus_item"><a class="site-page" href="/resume/"><i class="fa-fw fas fa-heart"></i><span> 个人简历</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav></header><main class="layout" id="content-inner"><div id="post"><div id="post-info"><h1 class="post-title">C++运算符重载与返回值优化</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2022-04-22T11:48:11.000Z" title="发表于 2022-04-22 19:48:11">2022-04-22</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2024-04-17T12:40:48.597Z" title="更新于 2024-04-17 20:40:48">2024-04-17</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E5%B5%8C%E5%85%A5%E5%BC%8F%E8%BD%AF%E4%BB%B6/">嵌入式软件</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="C++运算符重载与返回值优化"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"></span></span></div></div></div><article class="post-content" id="article-container"><p>  今天遇到的是内存释放错误的问题。原因是没写拷贝构造函数，奇怪的是我之前也没写确实能正常工作的，今天深究了一下发现是编译器做了返回值优化。</p>
+<h2 id="问题背景">问题背景</h2>
+<p>  编译环境还是针对C6455 DSP，为了做一些简单的图像直方图的处理，并且尽可能不用模板类，我自己写了一个简单的类用来存放带长度信息的数组，并且可以做一些简单的运算。重载了减法运算符，从而可以对两个直方图求差。</p>
+<h2 id="具体问题">具体问题</h2>
+<p>  当类中有那种需要动态分配空间的成员的时候，要记得提醒自己重载<strong>拷贝构造函数</strong>和<strong>赋值运算符</strong>，这两者缺一不可。为了举个例子，我定义了下面这个CData类。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">CData</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="type">int</span> *m_pData;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> m_nLen;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">CData</span>();</span><br><span class="line">    <span class="built_in">CData</span>(<span class="type">unsigned</span> <span class="type">int</span> nLen);</span><br><span class="line">    <span class="comment">/* There is no copy constructor at the very begining */</span></span><br><span class="line">    <span class="built_in">CData</span>(<span class="type">const</span> CData &amp;data);</span><br><span class="line">    ~<span class="built_in">CData</span>();</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="type">int</span> &amp;<span class="title">at</span><span class="params">(<span class="type">unsigned</span> <span class="type">int</span> i)</span></span>;</span><br><span class="line">    <span class="function"><span class="type">int</span> &amp;<span class="title">at</span><span class="params">(<span class="type">unsigned</span> <span class="type">int</span> i)</span> <span class="type">const</span></span>;</span><br><span class="line">    CData <span class="keyword">operator</span>-(<span class="type">const</span> CData &amp;data);</span><br><span class="line">    CData &amp;<span class="keyword">operator</span>=(<span class="type">const</span> CData &amp;data);</span><br><span class="line">    CData &amp;<span class="keyword">operator</span>-=(<span class="type">const</span> CData &amp;data);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>  在CData中，有两个成员，分别是一个int类型的指针和一个unsigned int类型的变量代表数据的个数。<br>
+  我重载了一个减法运算符，为的是将两个CData类型的数据长度相同的对象中的每个对应位置的int类型数据直接相减。而在调用减法运算的时候势必会用到拷贝构造函数和赋值运算符，因此也需要对它们重载。<br>
+  顺带一提的是，在上面我还声明了一个“-=”运算符的重载，为的是突出“-=”在一定场合会更加高效，但因为我在实际应用中不能直接覆盖“被减数”中的数据，所以不能用“-=”运算符，只能通过减法运算符来实现。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">CData CData::<span class="keyword">operator</span>-(<span class="type">const</span> CData &amp;data)</span><br><span class="line">&#123;</span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;entering subtract&quot;</span> &lt;&lt; endl;</span><br><span class="line">    <span class="built_in">assert</span>(m_nLen == data.m_nLen);</span><br><span class="line">    <span class="function">CData <span class="title">ret</span><span class="params">(data.m_nLen)</span></span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; m_nLen; i++)&#123;</span><br><span class="line">        ret.<span class="built_in">at</span>(i) = <span class="built_in">at</span>(i) - data.<span class="built_in">at</span>(i);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> ret;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>  减法运算重载，返回值是一个类的对象。函数返回后，这个类的对象就已经被析构了，所以在它被析构之前一般会先调用一个拷贝构造函数，将这个类的对象拷贝给一个新的临时的对象。默认拷贝构造函数采用浅拷贝，这在遇到类中包含指针类型的成员时很可能造成对同一块内存区域的重复释放。所以我们需要重载拷贝构造函数，为指针成员申请新的内存空间。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">CData CData::&amp;<span class="keyword">operator</span>=(<span class="type">const</span> CData &amp;data)</span><br><span class="line">&#123;</span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;entering assign&quot;</span> &lt;&lt; endl;</span><br><span class="line">    <span class="built_in">assert</span>(m_nLen == data.m_nLen);</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; m_nLen; i++)</span><br><span class="line">        <span class="built_in">at</span>(i) = data.<span class="built_in">at</span>(i);</span><br><span class="line">    <span class="keyword">return</span> *<span class="keyword">this</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>  减法运算返回的临时对象如果不给新的对象接收，它就没了。所以我们还需要重载赋值运算符，用来接收这个临时对象中的数据，这一临时对象被接收后，也会被析构。分析整个过程可以看到，从减法运算返回的类对象，其中的数据先要被复制到一个临时对象里，再要从临时对象复制到真正的赋值目标对象里，浪费了很多时间。<br>
+  有的编译器就会对这样的情况进行优化，<strong>省略对拷贝构造函数的调用</strong>，直接赋值。<br>
+  我今天遇到的问题是因为，我之前不知道在这个过程中会调用拷贝构造函数，所以没有重写拷贝构造函数。意外的是，之前我这么做也是能用的，但我现在觉得不管怎样还是得把拷贝构造函数写上，不能偷懒。</p>
+<h2 id="测试代码">测试代码</h2>
+<p>  为了便于验证这一过程，我写了一部分测试代码，可以用g++编译。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;assert.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">CData</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="type">int</span> *m_pData;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> m_nLen;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">CData</span>(): <span class="built_in">m_nLen</span>(<span class="number">0</span>), <span class="built_in">m_pData</span>(<span class="literal">nullptr</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        cout &lt;&lt; <span class="string">&quot;construct without arg&quot;</span> &lt;&lt; endl;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">CData</span>(<span class="type">unsigned</span> <span class="type">int</span> nLen): <span class="built_in">m_nLen</span>(nLen)</span><br><span class="line">    &#123;</span><br><span class="line">        cout &lt;&lt; <span class="string">&quot;construct with arg&quot;</span> &lt;&lt; endl;</span><br><span class="line">        m_pData = <span class="keyword">new</span> <span class="type">int</span>[nLen];</span><br><span class="line">        <span class="built_in">assert</span>(m_pData != <span class="literal">NULL</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">CData</span>(<span class="type">const</span> CData &amp;data)</span><br><span class="line">    &#123;</span><br><span class="line">        cout &lt;&lt; <span class="string">&quot;copy construct&quot;</span> &lt;&lt; endl;</span><br><span class="line">        m_nLen = data.m_nLen;</span><br><span class="line">        m_pData = <span class="keyword">new</span> <span class="type">int</span>[data.m_nLen];</span><br><span class="line">        <span class="built_in">assert</span>(m_pData != <span class="literal">nullptr</span>);</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; m_nLen; i++)&#123;</span><br><span class="line">            <span class="built_in">at</span>(i) = data.<span class="built_in">at</span>(i);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    ~<span class="built_in">CData</span>()</span><br><span class="line">    &#123;</span><br><span class="line">        cout &lt;&lt; <span class="string">&quot;destruct&quot;</span> &lt;&lt; endl;</span><br><span class="line">        <span class="keyword">if</span>(m_pData)&#123;</span><br><span class="line">            <span class="keyword">delete</span>[] m_pData;</span><br><span class="line">            m_pData = <span class="literal">nullptr</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="type">int</span> &amp;<span class="title">at</span><span class="params">(<span class="type">unsigned</span> <span class="type">int</span> i)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="built_in">assert</span>(i &lt; m_nLen);</span><br><span class="line">        <span class="keyword">return</span> *(m_pData + i);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="type">int</span> &amp;<span class="title">at</span><span class="params">(<span class="type">unsigned</span> <span class="type">int</span> i)</span> <span class="type">const</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="built_in">assert</span>(i &lt; m_nLen);</span><br><span class="line">        <span class="keyword">return</span> *(m_pData + i);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    CData <span class="keyword">operator</span>-(<span class="type">const</span> CData &amp;data)</span><br><span class="line">    &#123;</span><br><span class="line">        cout &lt;&lt; <span class="string">&quot;entering subtract&quot;</span> &lt;&lt; endl;</span><br><span class="line">        <span class="built_in">assert</span>(m_nLen == data.m_nLen);</span><br><span class="line">        <span class="function">CData <span class="title">ret</span><span class="params">(data.m_nLen)</span></span>;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; m_nLen; i++)&#123;</span><br><span class="line">            ret.<span class="built_in">at</span>(i) = <span class="built_in">at</span>(i) - data.<span class="built_in">at</span>(i);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> ret;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    CData &amp;<span class="keyword">operator</span>=(<span class="type">const</span> CData &amp;data)</span><br><span class="line">    &#123;</span><br><span class="line">        cout &lt;&lt; <span class="string">&quot;entering assign&quot;</span> &lt;&lt; endl;</span><br><span class="line">        <span class="built_in">assert</span>(m_nLen == data.m_nLen);</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; m_nLen; i++)</span><br><span class="line">            <span class="built_in">at</span>(i) = data.<span class="built_in">at</span>(i);</span><br><span class="line">        <span class="keyword">return</span> *<span class="keyword">this</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    CData &amp;<span class="keyword">operator</span>-=(<span class="type">const</span> CData &amp;data)</span><br><span class="line">    &#123;</span><br><span class="line">        cout &lt;&lt; <span class="string">&quot;entering subtract and assign&quot;</span> &lt;&lt; endl;</span><br><span class="line">        <span class="built_in">assert</span>(m_nLen == data.m_nLen);</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; m_nLen; i++)</span><br><span class="line">            <span class="built_in">at</span>(i) -= data.<span class="built_in">at</span>(i);</span><br><span class="line">        <span class="keyword">return</span> *<span class="keyword">this</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;---------- start construct ----------&quot;</span> &lt;&lt; endl;</span><br><span class="line">    <span class="function">CData <span class="title">dataA</span><span class="params">(<span class="number">10</span>)</span></span>;</span><br><span class="line">    <span class="function">CData <span class="title">dataB</span><span class="params">(<span class="number">10</span>)</span></span>;</span><br><span class="line">    <span class="function">CData <span class="title">dataC</span><span class="params">(<span class="number">10</span>)</span></span>;</span><br><span class="line"></span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;---------- start subtract ----------&quot;</span> &lt;&lt; endl;</span><br><span class="line">    dataC = dataA - dataB;</span><br><span class="line"></span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;---------- start subtract and assign ----------&quot;</span> &lt;&lt; endl;</span><br><span class="line">    dataA -= dataB;</span><br><span class="line"></span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;---------- end of program ----------&quot;</span> &lt;&lt; endl;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>  g++编译的程序，返回类对象的时候，默认是会省略拷贝构造函数的，加上“-fno-elide-constructors”的编译选项后可以让它不省略。</p>
+<img src="/2022/04/22/cpp-rvo/2022-04-22-20-56-51.png" class="">
+<p>  上图是在加上了“-fno-elide-constructors”编译选项后的运行结果，可以看到执行了两次析构，对应减法重载函数内的对象和拷贝构造函数生成的临时对象被析构。</p>
+<img src="/2022/04/22/cpp-rvo/2022-04-22-21-00-35.png" class="">
+<p>  而没有“-fno-elide-constructors”选项的时候，就只会有一次析构，因为没有调用拷贝构造函数。</p>
+<img src="/2022/04/22/cpp-rvo/2022-04-22-21-05-18.png" class="">
+<p>  如果加了这个选项，但是没有重写拷贝构造函数，就会在第二次析构的时候产生重复释放内存的问题。</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="mailto:undefined">裘剑东</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="http://qjdxmy.com/2022/04/22/cpp-rvo/">http://qjdxmy.com/2022/04/22/cpp-rvo/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="http://qjdxmy.com" target="_blank">小裘控制系统</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E9%87%8D%E8%BD%BD/">重载</a><a class="post-meta__tags" href="/tags/C/">C++</a></div><div class="post_share"><div class="social-share" data-image="/2022/04/22/cpp-rvo/2022-04-22-20-56-51.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/social-share.js/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2022/04/21/about-inc/"><img class="prev-cover" src="/2022/04/21/about-inc/2022-04-21-20-11-30.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">关于C/C++的include顺序问题</div></div></a></div><div class="next-post pull-right"><a href="/2022/04/23/rtsc-xdctools/"><img class="next-cover" src="/2022/04/23/rtsc-xdctools/2022-04-23-17-53-34.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">RTSC与XDCTools</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/2022/04/30/cpp-stm32/" title="C++开发STM32 FreeRTOS工程与添加DSP库"><img class="cover" src="/2022/04/30/cpp-stm32/2022-04-30-09-44-59.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-04-30</div><div class="title">C++开发STM32 FreeRTOS工程与添加DSP库</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/me.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">裘剑东</div><div class="author-info__description">芯来科技基础软件开发工程师，嵌入式开发爱好者</div></div><div class="card-info-data is-center"><div class="card-info-data-item"><a href="/archives/"><div class="headline">文章</div><div class="length-num">84</div></a></div><div class="card-info-data-item"><a href="/tags/"><div class="headline">标签</div><div class="length-num">101</div></a></div><div class="card-info-data-item"><a href="/categories/"><div class="headline">分类</div><div class="length-num">18</div></a></div></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/qiujiandong"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/qiujiandong" target="_blank" title="Github"><i class="fab fa-github"></i></a><a class="social-icon" href="mailto:1335521934@qq.com" target="_blank" title="Email"><i class="fas fa-envelope"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">最好的程序员做自己的硬件！</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content is-expand"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%97%AE%E9%A2%98%E8%83%8C%E6%99%AF"><span class="toc-number">1.</span> <span class="toc-text">问题背景</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%B7%E4%BD%93%E9%97%AE%E9%A2%98"><span class="toc-number">2.</span> <span class="toc-text">具体问题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%B5%8B%E8%AF%95%E4%BB%A3%E7%A0%81"><span class="toc-number">3.</span> <span class="toc-text">测试代码</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2025/01/01/summary-2024/" title="2024年终总结"><img src="/2025/01/01/summary-2024/2025-01-01-21-54-27.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="2024年终总结"/></a><div class="content"><a class="title" href="/2025/01/01/summary-2024/" title="2024年终总结">2024年终总结</a><time datetime="2025-01-01T09:19:27.000Z" title="发表于 2025-01-01 17:19:27">2025-01-01</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2024/04/17/learn-cuda/" title="CUDA优化入门"><img src="/2024/04/17/learn-cuda/2024-04-16-15-52-38.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="CUDA优化入门"/></a><div class="content"><a class="title" href="/2024/04/17/learn-cuda/" title="CUDA优化入门">CUDA优化入门</a><time datetime="2024-04-17T12:00:00.000Z" title="发表于 2024-04-17 20:00:00">2024-04-17</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2024/04/04/bipartite-match/" title="二分图的判断与匹配"><img src="/2024/04/04/bipartite-match/2024-04-05-00-11-55.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="二分图的判断与匹配"/></a><div class="content"><a class="title" href="/2024/04/04/bipartite-match/" title="二分图的判断与匹配">二分图的判断与匹配</a><time datetime="2024-04-04T13:43:47.000Z" title="发表于 2024-04-04 21:43:47">2024-04-04</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2024/01/19/summary/" title="长风破浪会有时"><img src="/2024/01/19/summary/wrapped2023.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="长风破浪会有时"/></a><div class="content"><a class="title" href="/2024/01/19/summary/" title="长风破浪会有时">长风破浪会有时</a><time datetime="2024-01-19T13:15:25.000Z" title="发表于 2024-01-19 21:15:25">2024-01-19</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/06/05/remote-vivado/" title="Vivado远程开发探索"><img src="/2023/06/05/remote-vivado/2023-06-15-16-22-13.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Vivado远程开发探索"/></a><div class="content"><a class="title" href="/2023/06/05/remote-vivado/" title="Vivado远程开发探索">Vivado远程开发探索</a><time datetime="2023-06-05T09:52:47.000Z" title="发表于 2023-06-05 17:52:47">2023-06-05</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2025 By 裘剑东</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.js"></script><div class="js-pjax"><script>(() => {
+  const $mermaidWrap = document.querySelectorAll('#article-container .mermaid-wrap')
+  if ($mermaidWrap.length) {
+    window.runMermaid = () => {
+      window.loadMermaid = true
+      const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default'
+
+      Array.from($mermaidWrap).forEach((item, index) => {
+        const mermaidSrc = item.firstElementChild
+        const mermaidThemeConfig = '%%{init:{ \'theme\':\'' + theme + '\'}}%%\n'
+        const mermaidID = 'mermaid-' + index
+        const mermaidDefinition = mermaidThemeConfig + mermaidSrc.textContent
+        mermaid.mermaidAPI.render(mermaidID, mermaidDefinition, (svgCode) => {
+          mermaidSrc.insertAdjacentHTML('afterend', svgCode)
+        })
+      })
+    }
+
+    const loadMermaid = () => {
+      window.loadMermaid ? runMermaid() : getScript('https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js').then(runMermaid)
+    }
+
+    window.pjax ? loadMermaid() : document.addEventListener('DOMContentLoaded', loadMermaid)
+  }
+})()</script></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

@@ -1,0 +1,295 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>TMS320C6455入门实践（九） | 小裘控制系统</title><meta name="keywords" content="DSP,6455,DDR"><meta name="author" content="裘剑东"><meta name="copyright" content="裘剑东"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="将程序放到DDR上运行的方法">
+<meta property="og:type" content="article">
+<meta property="og:title" content="TMS320C6455入门实践（九）">
+<meta property="og:url" content="http://qjdxmy.com/2022/02/27/c6455-9/">
+<meta property="og:site_name" content="小裘控制系统">
+<meta property="og:description" content="将程序放到DDR上运行的方法">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://qjdxmy.com/2022/02/27/c6455-9/2022-02-27-19-44-39.png">
+<meta property="article:published_time" content="2022-02-27T07:49:19.000Z">
+<meta property="article:modified_time" content="2024-04-17T12:40:48.533Z">
+<meta property="article:author" content="裘剑东">
+<meta property="article:tag" content="DSP">
+<meta property="article:tag" content="6455">
+<meta property="article:tag" content="DDR">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://qjdxmy.com/2022/02/27/c6455-9/2022-02-27-19-44-39.png"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="http://qjdxmy.com/2022/02/27/c6455-9/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '天',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery@2/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery@2/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'TMS320C6455入门实践（九）',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2024-04-17 20:40:48'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 6.0.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/me.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data is-center"><div class="data-item"><a href="/archives/"><div class="headline">文章</div><div class="length-num">84</div></a></div><div class="data-item"><a href="/tags/"><div class="headline">标签</div><div class="length-num">101</div></a></div><div class="data-item"><a href="/categories/"><div class="headline">分类</div><div class="length-num">18</div></a></div></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/download/"><i class="fa-fw fas fa-download"></i><span> 下载</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 链接</span></a></div><div class="menus_item"><a class="site-page" href="/resume/"><i class="fa-fw fas fa-heart"></i><span> 个人简历</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="not-top-img" id="page-header"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">小裘控制系统</a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/download/"><i class="fa-fw fas fa-download"></i><span> 下载</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 链接</span></a></div><div class="menus_item"><a class="site-page" href="/resume/"><i class="fa-fw fas fa-heart"></i><span> 个人简历</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav></header><main class="layout" id="content-inner"><div id="post"><div id="post-info"><h1 class="post-title">TMS320C6455入门实践（九）</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2022-02-27T07:49:19.000Z" title="发表于 2022-02-27 15:49:19">2022-02-27</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2024-04-17T12:40:48.533Z" title="更新于 2024-04-17 20:40:48">2024-04-17</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/DSP%E5%BC%80%E5%8F%91/">DSP开发</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/DSP%E5%BC%80%E5%8F%91/C6455/">C6455</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="TMS320C6455入门实践（九）"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"></span></span></div></div></div><article class="post-content" id="article-container"><p>本系列文章链接</p>
+<ul>
+<li>
+<a href="/2022/02/27/c6455-1/" title="TMS320C6455入门实践（一）——编译CSL静态库">TMS320C6455入门实践（一）——编译CSL静态库</a>
+</li>
+<li>
+<a href="/2022/02/27/c6455-2/" title="TMS320C6455入门实践（二）——中断相关">TMS320C6455入门实践（二）——中断相关</a>
+</li>
+<li>
+<a href="/2022/02/27/c6455-3/" title="TMS320C6455入门实践（三）——PLL相关">TMS320C6455入门实践（三）——PLL相关</a>
+</li>
+<li>
+<a href="/2022/02/27/c6455-4/" title="TMS320C6455入门实践（四）——GPIO与定时器">TMS320C6455入门实践（四）——GPIO与定时器</a>
+</li>
+<li>
+<a href="/2022/02/27/c6455-5/" title="TMS320C6455入门实践（五）——cmd链接脚本">TMS320C6455入门实践（五）——cmd链接脚本</a>
+</li>
+<li>
+<a href="/2022/02/27/c6455-6/" title="TMS320C6455入门实践（六）——编写boot程序">TMS320C6455入门实践（六）——编写boot程序</a>
+</li>
+<li>
+<a href="/2022/02/27/c6455-7/" title="TMS320C6455入门实践（七）——生成启动镜像">TMS320C6455入门实践（七）——生成启动镜像</a>
+</li>
+<li>
+<a href="/2022/02/27/c6455-8/" title="TMS320C6455入门实践（八）——Flash驱动与程序固化">TMS320C6455入门实践（八）——Flash驱动与程序固化</a>
+</li>
+<li>
+<a href="/2022/02/27/c6455-9/" title="TMS320C6455入门实践（九）——DDR上运行代码">TMS320C6455入门实践（九）——DDR上运行代码</a>
+</li>
+<li>
+<a href="/2022/02/27/c6455-10/" title="TMS320C6455入门实践（十）——EDMA3相关">TMS320C6455入门实践（十）——EDMA3相关</a>
+</li>
+</ul>
+<hr>
+<p>本文主要介绍将程序放到DDR上运行的方法，参考文档为：</p>
+<ul>
+<li>SPRAA74A - <a target="_blank" rel="noopener" href="https://www.ti.com.cn/cn/lit/an/spraa74a/spraa74a.pdf">Creating Device Initialization GEL Files</a></li>
+<li>SPRU970G - <a target="_blank" rel="noopener" href="https://www.ti.com/lit/ug/spru970g/spru970g.pdf">TMS320C6455/C6454 DSP DDR2 Memory Controller User’s Guide</a></li>
+<li>DDR数据手册 - <a target="_blank" rel="noopener" href="https://media-www.micron.com/-/media/client/global/documents/products/data-sheet/dram/ddr2/2gb_ddr2_ait_aat.pdf">Micron Automotive DDR2 SDRAM 2Gb: x4, x8, x16 DDR2 SDRAM</a></li>
+<li>SPRUE56 - <a target="_blank" rel="noopener" href="https://www.ti.com.cn/cn/lit/ug/sprue56/sprue56.pdf">TMS320C645x DSP Software-Programmable Phase-Locked Loop (PLL) Controller</a></li>
+<li>SPRS276M - <a target="_blank" rel="noopener" href="https://www.ti.com.cn/cn/lit/ds/symlink/tms320c6455.pdf">TMS320C6455 Fixed-Point Digital Signal Processor</a></li>
+</ul>
+<h2 id="使用仿真器将程序载入DDR">使用仿真器将程序载入DDR</h2>
+<p>  在仿真器将程序载入DDR运行前，如果DDR控制器未被初始化，DSP就无法对DDR进行读写操作。而这部分初始化的工作需要在程序下载之前运行，因此需要仿真器提供相应的支持。</p>
+<img src="/2022/02/27/c6455-9/2022-02-27-19-44-39.png" class="">
+<p>  在仿真器配置的“.ccxml”文件中，可以按照上图，选择一个“.gel”文件作为初始化脚本。记得点“Save”。在这个脚本文件中可以实现程序下载前的初始化。</p>
+<h3 id="调试配置">调试配置</h3>
+<img src="/2022/02/27/c6455-9/2022-02-27-19-45-06.png" class="">
+<p>  在一个workspace下有多个工程，所以可以创建多个调试配置文件，但因为大部分情况下待调试的设备是相同的，所以可以都用一个公用的“.ccxml”调试配置文件。</p>
+<img src="/2022/02/27/c6455-9/2022-02-27-19-45-21.png" class="">
+<p>  在第二个标签“Program”下面，首先要选Device，记得选下面的C64XP_0，这才是待调试的CPU核，上面那个IcePick_C_0好像是调试器的核。在选中IcePick_C_0的情况下，不要在线面选工程，否则会在调试的时候报错，虽然不影响调试但是很难受；只有在选择C64XP_0的情况下，选择对应的工程才是正确的配置。</p>
+<h3 id="DDR的参数配置">DDR的参数配置</h3>
+<p>  感觉DDR的时序要求特别复杂，所以我一直没仔细去看，但这并不影响使用，只需要有基本的概念就好了。DDR有行地址、列地址和Bank地址，我们采用的DDR型号为MT47H128M16RT-25E，如果用的是镁光的芯片，在不知道具体型号的情况下，可以在镁光的官网用丝印查询具体型号（<a target="_blank" rel="noopener" href="https://www.micron.com/support/tools-and-utilities/fbga">链接</a>）。后面的“-25E”代表DDR的速度等级，可以在手册中查到，它表示时钟周期最快为2.5ns；CL，CAS Latency为5个时钟周期。</p>
+<img src="/2022/02/27/c6455-9/2022-02-27-19-45-37.png" class="">
+<p>  DDR存储器本身有两个寄存器，MRS（Mode Register）和EMRS（Extended Mode Register）,这两个寄存器控制DDR的一些参数比如突发类型、突发长度、CL等。修改DDR中这两个寄存器的参数就是DDR初始化的过程，这个初始化会发生在DSP复位之后或者配置完DDR控制器的寄存器之后。具体的参数改写需要修改对应的DDR控制器相关的寄存器。<br>
+  我们总不能指望那个复位后的初始化过程能够直接得到我们想要的结果，所以需要对相关的DDR控制器的寄存器进行配置。在SPRU970G的2.11.3中给出了DDR初始化的顺序：</p>
+<ol>
+<li>令SDCFG中的BOOT_UNLOCK有效，这样就可以修改SDCFG中的DDR_DRIVE，DDR_DRIVE是用来控制驱动强度的，默认就是正常的驱动强度，一般保持默认就行，所以可以省略这个第一步。</li>
+<li>令SDCFG中的TIMUNLOCK有效，同时把其它的一些参数也设置为所需要的值，其它参数包括CL、Bank数量、每个Bank中的列地址位数。</li>
+<li>根据DDR存储器的数据手册修改SDTIM1和SDTIM2寄存器中的参数，控制DDR访问的时序。</li>
+<li>根据DDR存储器的数据手册修改SDRFC寄存器中的参数，控制DDR的刷新速率。</li>
+<li>令SDCFG中的TIMULOCK无效（即上锁），这时DDR控制器就会按照前面的配置对DDR的MRS和EMRS寄存器进行修改。</li>
+<li>修改DMCCTL寄存器中的RL，RL为“CL+1”。</li>
+</ol>
+<p>  具体的配置过程，在SPRU970G的3.2节中给出了一个例子，可以参考其中的参数计算过程。</p>
+<h3 id="DDR的地址映射">DDR的地址映射</h3>
+<p>  我们在编程时用到的DDR地址就是一个32bit的逻辑地址。但实际访问DDR是需要行列地址和Bank地址的。在我们顺序访问一块地址空间时，DDR实际的访问过程也有必要了解。</p>
+<img src="/2022/02/27/c6455-9/2022-02-27-19-45-51.png" class="">
+<p>  上图就是在顺序访问DDR地址过程中的DDR实际访问过程。32位地址中，列地址在最低位，其次是Bank地址，行地址在高位。每次地址自增时，首先增加的是列地址，列地址满后增加Bank地址，Bank地址满后增加行地址。</p>
+<h3 id="仿真器初始化脚本“-gel”文件">仿真器初始化脚本“.gel”文件</h3>
+<p>  “.gel”文件的后缀是General Extended Language，它是用类C语言写的，除了函数没有返回值，没有其它的很明显的区别。SPRAA74A文档中有对GEL文件相关的介绍，但对函数和一些关键字没有详细的介绍。我后来发现，其实可以在CCS的的“Help”菜单中找到一些说明。</p>
+<img src="/2022/02/27/c6455-9/2022-02-27-19-46-02.png" class="">
+<p>  直接搜索gel、hotmenu或者meneitem这类词，只要是不知道的都可以试着搜一下，可能就能找到答案。最普遍遇到的问题就是一些GEL函数的参数不知道需要给什么，这些都能搜到。<br>
+  我之前自己摸索着写，就是在OnTargetConnect()和OnPreFileLoaded()里面写相应的初始化函数，包括PLL的初始化和DDR的初始化。这里为什么也要对PLL初始化是因为之前也试过没有在一开始初始化PLL，而是初始化DDR之后再使能PLL，将工作频率提上去，就导致程序崩溃。所以要用DDR的话就要注意不能在DDR初始化完成之后再对PLL进行修改（经验结论，没有依据）。<br>
+但  自己写的也是一直出问题，后来还是找了官方开发板TMDSDSK6455配套的一个GEL文件，稍微改一下就能用，<a href="/download/dsk6455.gel">下载链接</a>。<br>
+  需要注意的是，官方的这个GEL文件中有一些CPLD相关的和自测试相关的代码并没有普适性，在自行开发的TMS320C6455板级设计中如果没有相应的那些外设是不适用的，需要注释或删除这部分代码。另外PLLC、EMIF和DDR的参数设置也需要检查是否符合设计。我之前一直出问题应该是没有做清空缓存的操作，缓存这部分还没仔细看，下次再去了解……<br>
+  在调试配置文件中加入这个GEL文件后，就可以在代码的链接脚本中将代码段“.text”和中断向量表“.csl_vect”都放到DDR的存储空间。</p>
+<h2 id="将Flash中程序搬到DDR上运行">将Flash中程序搬到DDR上运行</h2>
+<h3 id="PLL初始化">PLL初始化</h3>
+<p>  要将程序载入到DDR上，就如同前面的用仿真器一样，需要先对DDR进行初始化，再搬数据。所以需要在原先的“boot.asm”的基础上进行修改，实现与GEL文件相同的功能，即先对PLL进行初始化，再对DDR进行初始化。以前我们在C环境下，调用CSL的函数对PLL进行初始化，只需要设置一些倍频、分频系数就行。但如果用汇编对PLL进行初始化，就需要在配置过程中引入一些延时，来满足时序要求。具体的PLL的初始化过程在SPRUE56的3.1.1中有介绍。在配置之前我们要先找到关于PLL的一些参数，SPRS276M的7.7.1.3中有对PLL的相关介绍。</p>
+<img src="/2022/02/27/c6455-9/2022-02-27-19-46-19.png" class="">
+<p>  根据上面表格中的一些要求，我们就可以写相应的初始化过程。</p>
+<ol>
+<li>
+<p>上电后等待PLL稳定，为了确保PLL已经稳定，我们就需要至少等待150us，而在PLL还未初始化时，系统时钟频率还是从外部输入的CLKIN1的时钟频率，我们的板上是50MHz，简单计算可以得到，需要等待至少7500个时钟周期。所以我写了下面这样一个循环，每次循环需要执行7条指令，总共循环一千多次就可以。为了简单起见我直接将_LOOP_CNT1设置为2000。循环结束后我们就能够确保PLL是稳定的了。</p>
+ <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">        mvkl _LOOP_CNT1, a0</span><br><span class="line">        mvkh _LOOP_CNT1, a0</span><br><span class="line">LOOP1:  sub a0,1,a0</span><br><span class="line">[a0] bnop LOOP1, 5</span><br></pre></td></tr></table></figure>
+</li>
+<li>
+<p>令PLLCTL寄存器中的PLLRST有效，使PLL复位。</p>
+</li>
+<li>
+<p>修改PLL的预分频系数、倍频系数。</p>
+</li>
+<li>
+<p>（可选）修改PLLDIV4和PLLDIV5的分频系数。</p>
+</li>
+<li>
+<p>将PLLCMD寄存器中的GOSET位置一，确认调整分频系数。</p>
+</li>
+<li>
+<p>等待PLLSTAT寄存器中的GOSTAT位清零，表示操作完成。</p>
+</li>
+<li>
+<p>等待128时钟周期确保复位完成。</p>
+</li>
+<li>
+<p>令PLLCTL寄存器中的PLLRST无效，释放复位。</p>
+</li>
+<li>
+<p>最后等待2000个时钟周期，确保PLL稳定。</p>
+</li>
+<li>
+<p>使能PLLCTL中的PLLEN，完成时钟切换。</p>
+</li>
+</ol>
+<h3 id="DDR和EMIF初始化">DDR和EMIF初始化</h3>
+<p>  DDR和EMIF用汇编进行初始化相对于PLL的初始化就比较简单。只需要往相应的寄存器写值就行。下面是GEL文件中对EMIF和DDR的配置：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> EMIFA_BASE_ADDR (0x70000000) </span></span><br><span class="line"> </span><br><span class="line"><span class="meta">#<span class="keyword">define</span> EMIFA_MIDR     (*(int*)(EMIFA_BASE_ADDR + 0x00000000)) </span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> EMIFA_STAT     (*(int*)(EMIFA_BASE_ADDR + 0x00000004)) </span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> EMIFA_BPRIO    (*(int*)(EMIFA_BASE_ADDR + 0x00000020)) </span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> EMIFA_CE2CFG   (*(int*)(EMIFA_BASE_ADDR + 0x00000080)) </span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> EMIFA_CE3CFG   (*(int*)(EMIFA_BASE_ADDR + 0x00000084)) </span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> EMIFA_CE4CFG   (*(int*)(EMIFA_BASE_ADDR + 0x00000088)) </span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> EMIFA_CE5CFG   (*(int*)(EMIFA_BASE_ADDR + 0x0000008C)) </span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> EMIFA_AWCC     (*(int*)(EMIFA_BASE_ADDR + 0x000000A0)) </span></span><br><span class="line"> </span><br><span class="line"><span class="meta">#<span class="keyword">define</span> DDR_BASE_ADDR (0x78000000) </span></span><br><span class="line"> </span><br><span class="line"><span class="meta">#<span class="keyword">define</span> DDR_MIDR     (*(int*)(DDR_BASE_ADDR + 0x00000000)) </span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> DDR_SDCFG    (*(int*)(DDR_BASE_ADDR + 0x00000008)) </span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> DDR_SDRFC    (*(int*)(DDR_BASE_ADDR + 0x0000000C)) </span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> DDR_SDTIM1   (*(int*)(DDR_BASE_ADDR + 0x00000010)) </span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> DDR_SDRIM2   (*(int*)(DDR_BASE_ADDR + 0x00000014)) </span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> DDR_DDRPHYC  (*(int*)(DDR_BASE_ADDR + 0x000000E4)) </span></span><br><span class="line"> </span><br><span class="line">init_emif() </span><br><span class="line">&#123; </span><br><span class="line">    <span class="comment">/* Enable the async EMIF and the DDR2 Memory Controller */</span> </span><br><span class="line">    *(<span class="type">int</span> *)PERCFG1 = <span class="number">0x00000003</span>; </span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Configure async EMIF */</span> </span><br><span class="line">    EMIFA_CE3CFG = <span class="number">0x0F7BFBBC</span>; <span class="comment">/* 8-bit async, 30 cycle read/write strobe */</span> </span><br><span class="line">    EMIFA_BPRIO  = <span class="number">0x000000FE</span>; <span class="comment">/* Enable priority based starvation control SPRU971A sec. 7.2 */</span> </span><br><span class="line"> </span><br><span class="line">    <span class="comment">/* Configure DDR for 500MHz operation (sequence is order dependent) */</span> </span><br><span class="line">    DDR_SDCFG    = <span class="number">0x00008A32</span>; <span class="comment">/* Unlock boot + timing, CAS5, 8 banks, 10 bit column */</span> </span><br><span class="line">    DDR_SDRFC    = <span class="number">0x0000079E</span>; <span class="comment">/* Refresh */</span> </span><br><span class="line">    DDR_SDTIM1   = <span class="number">0xA0DB5391</span>; <span class="comment">/* Timing 1 */</span> </span><br><span class="line">    DDR_SDRIM2   = <span class="number">0x0155C722</span>; <span class="comment">/* Timing 2 */</span> </span><br><span class="line">    DDR_DDRPHYC  = <span class="number">0x00000005</span>; <span class="comment">/* PHY read latency for CAS 5 is 5 + 2 - 1 */</span> </span><br><span class="line">    DDR_SDCFG    = <span class="number">0x00000A32</span>; <span class="comment">/* Lock, CAS5, 8 banks, 10 bit column, lock timing */</span> </span><br><span class="line">&#125; </span><br></pre></td></tr></table></figure>
+<p>  参考GEL文件中的配置，在用汇编实现时，也是用类似的方法，就是调用mvkl和mvkh往寄存器中写立即数，然后用stw命令往指定的寄存器写值。如果我们只是用EMIF进行启动的话，甚至不需要对EMIF做额外的设置，因为我们就是设置为从EMIF启动，内部的Bootloader在得知从EMIF启动后，在上电时就已经使能了EMIF访问。而EMIF的CE3CFG寄存器中的默认配置值是最大的时钟周期长度，也就是对于异步访问来说条件最宽松，访问速度最慢，但是最可靠。如果对程序的加载速度没有什么特殊的要求，就不需要进行额外设置，只要使能PERCFG1中的EMIF使能就可以，这个使能也已经由内部的Bootloader完成了。<br>
+  <a href="/download/boot.asm">相应的汇编代码</a></p>
+<h3 id="关于链接命令文件的一些新的理解">关于链接命令文件的一些新的理解</h3>
+<p>  我们的.boot_load是放在Flash中的，在仿真的时候不会用到，因此可以在“.cmd”文件中直接把它分配到Flash的起始一段的地址空间中。但如果只是这样做，仿真器就会在我们调试的时候尝试把这部分代码加载到Flash中，但是Flash是不能直接写的，要写Flash必须要有一定的命令序列。所以仿真调试的时候就会有报错，不知道有没有什么好的解决办法。<br>
+  我后来发现可以把这部分section定义为NOLOAD的类型，这样子这部分代码就不会被下载下去。而在需要把程序写到Flash中去时，把这个NOLOAD的属性删除后再编译，这样得到的“.out”文件就可以用来按照写入Flash的流程来用于Flash烧录。</p>
+<figure class="highlight cmd"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">MEMORY</span><br><span class="line">&#123;</span><br><span class="line"><span class="function">    L2:        <span class="title">origin</span> = 0<span class="title">x00800000</span>    <span class="title">length</span> = 0<span class="title">x00200000</span></span></span><br><span class="line"><span class="function">    <span class="title">L1PRAM</span>:      <span class="title">origin</span> = 0<span class="title">x00E00000</span>    <span class="title">length</span> = 0<span class="title">x00008000</span>  /* 32<span class="title">kB</span> <span class="title">L1</span> <span class="title">Program</span> <span class="title">SRAM</span>/<span class="title">CACHE</span> */</span></span><br><span class="line"><span class="function">    <span class="title">L1DRAM</span>:      <span class="title">origin</span> = 0<span class="title">x00F00000</span>    <span class="title">length</span> = 0<span class="title">x00008000</span>  /* 32<span class="title">kB</span> <span class="title">L1</span> <span class="title">Data</span> <span class="title">SRAM</span>/<span class="title">CACHE</span> */</span></span><br><span class="line"><span class="function">    <span class="title">BOOT_FLASH</span>:  <span class="title">origin</span> = 0<span class="title">xB0000000</span>  <span class="title">length</span> = 0<span class="title">x00800000</span></span></span><br><span class="line"><span class="function">    <span class="title">DDR2_CE0</span>:           <span class="title">origin</span> = 0<span class="title">xE0000000</span>             <span class="title">length</span> = 0<span class="title">x20000000</span>  /* 512<span class="title">MB</span> <span class="title">EMIFB</span> <span class="title">CE0</span> */</span></span><br><span class="line"><span class="function">&#125;</span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function"><span class="title">SECTIONS</span></span></span><br><span class="line"><span class="function">&#123;</span></span><br><span class="line"><span class="function">    .<span class="title">boot_load</span>    <span class="title">load</span> = <span class="title">BOOT_FLASH</span>, <span class="title">type</span> = <span class="title">NOLOAD</span> </span></span><br><span class="line"><span class="function">    /* <span class="title">delete</span> &#x27;<span class="title">type</span> = <span class="title">NOLOAD</span>&#x27; <span class="title">when</span> <span class="title">need</span> <span class="title">to</span> <span class="title">download</span> <span class="title">code</span> <span class="title">to</span> <span class="title">Flash</span>*/</span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function">    .<span class="title">csl_vect</span>    <span class="title">load</span> = <span class="title">DDR2_CE0</span></span></span><br><span class="line"><span class="function">    .<span class="title">text</span>          <span class="title">load</span> = <span class="title">DDR2_CE0</span></span></span><br><span class="line"><span class="function">    .<span class="title">data</span>          <span class="title">load</span> = <span class="title">L2</span></span></span><br><span class="line"><span class="function">    .<span class="title">const</span>         <span class="title">load</span> = <span class="title">L2</span></span></span><br><span class="line"><span class="function">    .<span class="title">switch</span>        <span class="title">load</span> = <span class="title">L2</span></span></span><br><span class="line"><span class="function"> .<span class="title">cinit</span>         <span class="title">load</span> = <span class="title">L2</span></span></span><br><span class="line"><span class="function">    .<span class="title">stack</span>         <span class="title">load</span> = <span class="title">L2</span>(<span class="title">HIGH</span>)</span></span><br><span class="line"><span class="function">    .<span class="title">bss</span>           <span class="title">load</span> = <span class="title">L2</span></span></span><br><span class="line"><span class="function">    .<span class="title">sysmem</span>        <span class="title">load</span> = <span class="title">L2</span></span></span><br><span class="line"><span class="function">    .<span class="title">far</span>           <span class="title">load</span> = <span class="title">L2</span></span></span><br><span class="line"><span class="function">    .<span class="title">cio</span>           <span class="title">load</span> = <span class="title">L2</span></span></span><br><span class="line"><span class="function">&#125;</span></span><br></pre></td></tr></table></figure>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="mailto:undefined">裘剑东</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="http://qjdxmy.com/2022/02/27/c6455-9/">http://qjdxmy.com/2022/02/27/c6455-9/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="http://qjdxmy.com" target="_blank">小裘控制系统</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/DSP/">DSP</a><a class="post-meta__tags" href="/tags/6455/">6455</a><a class="post-meta__tags" href="/tags/DDR/">DDR</a></div><div class="post_share"><div class="social-share" data-image="/2022/02/27/c6455-9/2022-02-27-19-44-39.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/social-share.js/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2022/02/27/c6455-8/"><img class="prev-cover" src="/2022/02/27/c6455-8/2022-02-27-18-50-48.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">TMS320C6455入门实践（八）</div></div></a></div><div class="next-post pull-right"><a href="/2022/02/27/c6455-10/"><img class="next-cover" src="/2022/02/27/c6455-10/2022-02-27-19-49-41.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">TMS320C6455入门实践（十）</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/2022/03/09/phase-review-1/" title="近期C6000 DSP开发小结"><img class="cover" src="/2022/03/09/phase-review-1/2022-03-09-22-40-16.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-03-09</div><div class="title">近期C6000 DSP开发小结</div></div></a></div><div><a href="/2022/02/27/c6455-1/" title="TMS320C6455入门实践（一）"><img class="cover" src="/2022/02/27/c6455-1/2022-02-27-16-54-12.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-02-27</div><div class="title">TMS320C6455入门实践（一）</div></div></a></div><div><a href="/2022/02/27/c6455-10/" title="TMS320C6455入门实践（十）"><img class="cover" src="/2022/02/27/c6455-10/2022-02-27-19-49-41.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-02-27</div><div class="title">TMS320C6455入门实践（十）</div></div></a></div><div><a href="/2022/02/27/c6455-2/" title="TMS320C6455入门实践（二）"><img class="cover" src="/2022/02/27/c6455-2/2022-02-27-17-27-11.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-02-27</div><div class="title">TMS320C6455入门实践（二）</div></div></a></div><div><a href="/2022/02/27/c6455-3/" title="TMS320C6455入门实践（三）"><img class="cover" src="/2022/02/27/c6455-3/2022-02-27-17-33-45.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-02-27</div><div class="title">TMS320C6455入门实践（三）</div></div></a></div><div><a href="/2022/02/27/c6455-4/" title="TMS320C6455入门实践（四）"><img class="cover" src="/2022/02/27/c6455-4/2022-02-27-17-36-28.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-02-27</div><div class="title">TMS320C6455入门实践（四）</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/me.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">裘剑东</div><div class="author-info__description">芯来科技基础软件开发工程师，嵌入式开发爱好者</div></div><div class="card-info-data is-center"><div class="card-info-data-item"><a href="/archives/"><div class="headline">文章</div><div class="length-num">84</div></a></div><div class="card-info-data-item"><a href="/tags/"><div class="headline">标签</div><div class="length-num">101</div></a></div><div class="card-info-data-item"><a href="/categories/"><div class="headline">分类</div><div class="length-num">18</div></a></div></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/qiujiandong"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/qiujiandong" target="_blank" title="Github"><i class="fab fa-github"></i></a><a class="social-icon" href="mailto:1335521934@qq.com" target="_blank" title="Email"><i class="fas fa-envelope"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">最好的程序员做自己的硬件！</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content is-expand"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8%E4%BB%BF%E7%9C%9F%E5%99%A8%E5%B0%86%E7%A8%8B%E5%BA%8F%E8%BD%BD%E5%85%A5DDR"><span class="toc-number">1.</span> <span class="toc-text">使用仿真器将程序载入DDR</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%B0%83%E8%AF%95%E9%85%8D%E7%BD%AE"><span class="toc-number">1.1.</span> <span class="toc-text">调试配置</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#DDR%E7%9A%84%E5%8F%82%E6%95%B0%E9%85%8D%E7%BD%AE"><span class="toc-number">1.2.</span> <span class="toc-text">DDR的参数配置</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#DDR%E7%9A%84%E5%9C%B0%E5%9D%80%E6%98%A0%E5%B0%84"><span class="toc-number">1.3.</span> <span class="toc-text">DDR的地址映射</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%BF%E7%9C%9F%E5%99%A8%E5%88%9D%E5%A7%8B%E5%8C%96%E8%84%9A%E6%9C%AC%E2%80%9C-gel%E2%80%9D%E6%96%87%E4%BB%B6"><span class="toc-number">1.4.</span> <span class="toc-text">仿真器初始化脚本“.gel”文件</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%B0%86Flash%E4%B8%AD%E7%A8%8B%E5%BA%8F%E6%90%AC%E5%88%B0DDR%E4%B8%8A%E8%BF%90%E8%A1%8C"><span class="toc-number">2.</span> <span class="toc-text">将Flash中程序搬到DDR上运行</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#PLL%E5%88%9D%E5%A7%8B%E5%8C%96"><span class="toc-number">2.1.</span> <span class="toc-text">PLL初始化</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#DDR%E5%92%8CEMIF%E5%88%9D%E5%A7%8B%E5%8C%96"><span class="toc-number">2.2.</span> <span class="toc-text">DDR和EMIF初始化</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%B3%E4%BA%8E%E9%93%BE%E6%8E%A5%E5%91%BD%E4%BB%A4%E6%96%87%E4%BB%B6%E7%9A%84%E4%B8%80%E4%BA%9B%E6%96%B0%E7%9A%84%E7%90%86%E8%A7%A3"><span class="toc-number">2.3.</span> <span class="toc-text">关于链接命令文件的一些新的理解</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2025/01/01/summary-2024/" title="2024年终总结"><img src="/2025/01/01/summary-2024/2025-01-01-21-54-27.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="2024年终总结"/></a><div class="content"><a class="title" href="/2025/01/01/summary-2024/" title="2024年终总结">2024年终总结</a><time datetime="2025-01-01T09:19:27.000Z" title="发表于 2025-01-01 17:19:27">2025-01-01</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2024/04/17/learn-cuda/" title="CUDA优化入门"><img src="/2024/04/17/learn-cuda/2024-04-16-15-52-38.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="CUDA优化入门"/></a><div class="content"><a class="title" href="/2024/04/17/learn-cuda/" title="CUDA优化入门">CUDA优化入门</a><time datetime="2024-04-17T12:00:00.000Z" title="发表于 2024-04-17 20:00:00">2024-04-17</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2024/04/04/bipartite-match/" title="二分图的判断与匹配"><img src="/2024/04/04/bipartite-match/2024-04-05-00-11-55.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="二分图的判断与匹配"/></a><div class="content"><a class="title" href="/2024/04/04/bipartite-match/" title="二分图的判断与匹配">二分图的判断与匹配</a><time datetime="2024-04-04T13:43:47.000Z" title="发表于 2024-04-04 21:43:47">2024-04-04</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2024/01/19/summary/" title="长风破浪会有时"><img src="/2024/01/19/summary/wrapped2023.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="长风破浪会有时"/></a><div class="content"><a class="title" href="/2024/01/19/summary/" title="长风破浪会有时">长风破浪会有时</a><time datetime="2024-01-19T13:15:25.000Z" title="发表于 2024-01-19 21:15:25">2024-01-19</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/06/05/remote-vivado/" title="Vivado远程开发探索"><img src="/2023/06/05/remote-vivado/2023-06-15-16-22-13.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Vivado远程开发探索"/></a><div class="content"><a class="title" href="/2023/06/05/remote-vivado/" title="Vivado远程开发探索">Vivado远程开发探索</a><time datetime="2023-06-05T09:52:47.000Z" title="发表于 2023-06-05 17:52:47">2023-06-05</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2025 By 裘剑东</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.js"></script><div class="js-pjax"><script>(() => {
+  const $mermaidWrap = document.querySelectorAll('#article-container .mermaid-wrap')
+  if ($mermaidWrap.length) {
+    window.runMermaid = () => {
+      window.loadMermaid = true
+      const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default'
+
+      Array.from($mermaidWrap).forEach((item, index) => {
+        const mermaidSrc = item.firstElementChild
+        const mermaidThemeConfig = '%%{init:{ \'theme\':\'' + theme + '\'}}%%\n'
+        const mermaidID = 'mermaid-' + index
+        const mermaidDefinition = mermaidThemeConfig + mermaidSrc.textContent
+        mermaid.mermaidAPI.render(mermaidID, mermaidDefinition, (svgCode) => {
+          mermaidSrc.insertAdjacentHTML('afterend', svgCode)
+        })
+      })
+    }
+
+    const loadMermaid = () => {
+      window.loadMermaid ? runMermaid() : getScript('https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js').then(runMermaid)
+    }
+
+    window.pjax ? loadMermaid() : document.addEventListener('DOMContentLoaded', loadMermaid)
+  }
+})()</script></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

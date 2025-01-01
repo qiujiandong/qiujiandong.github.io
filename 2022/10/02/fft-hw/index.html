@@ -1,0 +1,283 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>硬件FFT加速模块的应用 | 小裘控制系统</title><meta name="keywords" content="DSP,FFT"><meta name="author" content="裘剑东"><meta name="copyright" content="裘剑东"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="软硬件FFT性能测试   FFT在很多算法中都有应用，M6678 DSP支持软件FFT（调用DSP库），和硬件FFT（有一个独立的FFT硬件加速模块）。 测试条件  操作系统 Win11 CCS 6.2.0 CGT-Tools 7.4.4 XDCTools 3.25.5.94 SYS&#x2F;BIOS 6.33.6.50 DSPLIB C66x 3.4.0.4 MATHLIB C66x 3.1.2.4 2">
+<meta property="og:type" content="article">
+<meta property="og:title" content="硬件FFT加速模块的应用">
+<meta property="og:url" content="http://qjdxmy.com/2022/10/02/fft-hw/">
+<meta property="og:site_name" content="小裘控制系统">
+<meta property="og:description" content="软硬件FFT性能测试   FFT在很多算法中都有应用，M6678 DSP支持软件FFT（调用DSP库），和硬件FFT（有一个独立的FFT硬件加速模块）。 测试条件  操作系统 Win11 CCS 6.2.0 CGT-Tools 7.4.4 XDCTools 3.25.5.94 SYS&#x2F;BIOS 6.33.6.50 DSPLIB C66x 3.4.0.4 MATHLIB C66x 3.1.2.4 2">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://qjdxmy.com/2022/10/02/fft-hw/2022-10-02-17-54-54.png">
+<meta property="article:published_time" content="2022-10-02T07:09:56.000Z">
+<meta property="article:modified_time" content="2024-04-17T12:40:48.609Z">
+<meta property="article:author" content="裘剑东">
+<meta property="article:tag" content="DSP">
+<meta property="article:tag" content="FFT">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://qjdxmy.com/2022/10/02/fft-hw/2022-10-02-17-54-54.png"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="http://qjdxmy.com/2022/10/02/fft-hw/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '天',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery@2/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery@2/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '硬件FFT加速模块的应用',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2024-04-17 20:40:48'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 6.0.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/me.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data is-center"><div class="data-item"><a href="/archives/"><div class="headline">文章</div><div class="length-num">84</div></a></div><div class="data-item"><a href="/tags/"><div class="headline">标签</div><div class="length-num">101</div></a></div><div class="data-item"><a href="/categories/"><div class="headline">分类</div><div class="length-num">18</div></a></div></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/download/"><i class="fa-fw fas fa-download"></i><span> 下载</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 链接</span></a></div><div class="menus_item"><a class="site-page" href="/resume/"><i class="fa-fw fas fa-heart"></i><span> 个人简历</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="not-top-img" id="page-header"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">小裘控制系统</a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/download/"><i class="fa-fw fas fa-download"></i><span> 下载</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 链接</span></a></div><div class="menus_item"><a class="site-page" href="/resume/"><i class="fa-fw fas fa-heart"></i><span> 个人简历</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav></header><main class="layout" id="content-inner"><div id="post"><div id="post-info"><h1 class="post-title">硬件FFT加速模块的应用</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2022-10-02T07:09:56.000Z" title="发表于 2022-10-02 15:09:56">2022-10-02</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2024-04-17T12:40:48.609Z" title="更新于 2024-04-17 20:40:48">2024-04-17</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/DSP%E5%BC%80%E5%8F%91/">DSP开发</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="硬件FFT加速模块的应用"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"></span></span></div></div></div><article class="post-content" id="article-container"><h2 id="软硬件FFT性能测试">软硬件FFT性能测试</h2>
+<p>  FFT在很多算法中都有应用，M6678 DSP支持软件FFT（调用DSP库），和硬件FFT（有一个独立的FFT硬件加速模块）。</p>
+<h3 id="测试条件">测试条件</h3>
+<ul>
+<li>操作系统 Win11</li>
+<li>CCS 6.2.0</li>
+<li>CGT-Tools 7.4.4</li>
+<li>XDCTools 3.25.5.94</li>
+<li>SYS/BIOS 6.33.6.50</li>
+<li>DSPLIB C66x 3.4.0.4</li>
+<li>MATHLIB C66x 3.1.2.4</li>
+<li>256kB L2 Cache, 32kB L1P/D Cache</li>
+<li>堆区放在DDR，待处理数据与结果数据都在堆区开辟；</li>
+<li>待处理的数据均为单精度浮点数，实部虚部交叉存储；</li>
+<li>处理器主时钟 1GHz</li>
+</ul>
+<h3 id="测试结果-4">测试结果</h3>
+<p>1、 单次运算<br>
+  软件FFT以调用FFT函数开始计时，Cache写回之后结束计时。硬件FFT以启动FFT计算开始，收到FFT完成中断后结束计时。</p>
+<table>
+<thead>
+<tr>
+<th>FFT点数</th>
+<th>软件FFT</th>
+<th>硬件FFT</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>32</td>
+<td>1327 ns</td>
+<td>5292 ns</td>
+</tr>
+<tr>
+<td>64</td>
+<td>1840 ns</td>
+<td>5828 ns</td>
+</tr>
+<tr>
+<td>128</td>
+<td>3078 ns</td>
+<td>6372 ns</td>
+</tr>
+<tr>
+<td>256</td>
+<td>3956 ns</td>
+<td>6918 ns</td>
+</tr>
+</tbody>
+</table>
+<p>  可以看到单次FFT运算，软件FFT更快，我猜测可能是中断开销比较大，或者是硬件FFT在数据传输的时候有一个固有的开销。</p>
+<p>2、连续多次运算<br>
+  我目前有一个二维FFT计算的需求，对MxN的二维数据，需要连续对M行数据分别进行N点FFT计算再转置，再进行M点N行FFT计算和转置。以同样的起始和结束条件进行测试，得到以下平均每次FFT计算的时间开销：</p>
+<table>
+<thead>
+<tr>
+<th>测试条件</th>
+<th>软件FFT平均每次耗时</th>
+<th>硬件FFT平均每次耗时</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>32次32点</td>
+<td>696 ns</td>
+<td>180 ns</td>
+</tr>
+<tr>
+<td>64次64点</td>
+<td>806 ns</td>
+<td>163 ns</td>
+</tr>
+<tr>
+<td>128次128点</td>
+<td>3219 ns</td>
+<td>271 ns</td>
+</tr>
+<tr>
+<td>256次256点</td>
+<td>5113 ns</td>
+<td>563 ns</td>
+</tr>
+</tbody>
+</table>
+<p><a href="/download/m6678-fft-test.zip">相关测试工程</a></p>
+<h2 id="二维FFT计算分解">二维FFT计算分解</h2>
+<p>  对二维FFT运算的使用，最普适的就是从复数到复数的变换。即使我想对一个二维的实数矩阵进行FFT，也可以将实数转换成复数表示然后做FFT。<br>
+  但这样做的效率不太高，结合实际的应用场景，我最近想做二维FFT是为了加速卷积运算，“<strong>时域卷积等于频域相乘</strong>”。因此FFT的源数据是实数，而且在这种应用场景下IFFT的结果数据也是实数。<br>
+  综合了一些考虑之后，我设计了一个用于调用硬件FFT的类。它主要支持下面这些功能：</p>
+<img src="/2022/10/02/fft-hw/2022-10-02-17-54-54.png" class="">
+<h3 id="FFT2d-R2R">FFT2d_R2R</h3>
+<p>  有些实数数据我们先验地知道它是中心对称的，那么它做FFT的结果也会是实数，这个在我之前KCF算法推导的第三篇文章中有提到，因为旋转因子是中心对称的，只要实数也满足同样的对称性，那么计算中的虚部就会都抵消只剩下实数。<br>
+  “FFT_R2R_T”表示从实数到实数的变换，并且会进行转置。只要连续调用改函数两次就能实现二维的实数到实数的FFT变换。虽然这里命名是“R2R”，但实际上中间的计算结果是有可能有虚数存在的。只有输入数据不光在二维上中心对称，而且在一维上也中心对称才只有实数。若仅仅满足二维的中心对称，第一次FFT之后得到的结果中是有虚数的，然后在完成第二次FFT之后才只剩实数。</p>
+<img src="/2022/10/02/fft-hw/2022-10-02-20-30-10.png" class="">
+<p>  用户给定需要进行FFT的实数数据SRC，结果可以存放到SRC中，也可以存放到另外的DST空间。<br>
+  由CFftManager类管理两块临时空间TempR和TempI用于存放FFT的结果，再由DMA将FFT结果搬运到目的空间，并进行转置。TempR空间不仅仅是用来存放FFT结果中的实数，也起到了存放输入的虚数的作用。因此一个完整的二维FFT2d_R2R的计算，<strong>第一步需要先将TempR清零</strong>。然后连续调用两次FFT_R2R_T即可得到正确结果。</p>
+<h3 id="FFT2d-R2C">FFT2d_R2C</h3>
+<p>  由CFftManager类管理的TempR和TempI是连续的两块存储空间。一般的实数到复数的二维FFT的计算过程如下图所示：</p>
+<img src="/2022/10/02/fft-hw/2022-10-02-20-35-02.png" class="">
+<p>  首先计算由一维的实数到复数的FFT，此时输入的数据的实部和虚部是分开存储的，可以在第一次转置的时候顺便将存储方式改为交叉存储。而后需要进行第二次FFT，然后再进行第二次转置。<br>
+  为什么要交叉存储？交叉存储能够方便处理器从存储器中取操作数。比如取一个复数，这个复数如果是连续存放的，很可能就只需要一条指令就能够完成取操作数。这个在我的前面的文章里由提到关于复数乘法运算时，如果复数存放方式是[imag, real, imag, …]，那么每次就只需要一条LDDW指令就可以完成取操作数，并且接着就可以进行复数乘法计算。<br>
+  但是硬件FFT所支持的复数交叉存放方式是[real, imag, real, …]的形式。为了应对不同的需求我写了两个FFT_C2C_T的函数，它们<strong>都是完成FFT复数到复数的变换，只是最后一步的转置有一点点区别。</strong>“FFT_C2C_T”输出结果是按照[imag, real, imag, …]的方式存放的，更适合后续需要进行复数乘法的应用场景；“FFT_C2C_TN”结尾的“N”取自Normal，结果是按照[real, imag, real, …]的方式存放的，更加符合一般的用法。</p>
+<h3 id="IFFT2d-C2R">IFFT2d_C2R</h3>
+<p>  IFFT没有什么特殊的地方，在确定输出一定为实数的情况下，我只是将最后计算的结果中的实数部分进行了提取并转置后存放到指定的DST空间中。</p>
+<img src="/2022/10/02/fft-hw/2022-10-02-20-35-13.png" class="">
+<h3 id="CFftManager类定义">CFftManager类定义</h3>
+<p>  每次计算二维的FFT都需要从两个维度分别计算一维的FFT，每次都需要等待一维的FFT计算完成，即接收到完成中断才能进行下一步。这部分前后衔接的工作涉及中断，所以不适合放到类里去实现。我把前面提到的计算步骤分别写成几个独立的成员函数，在实际应用过程中进行组合即可。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * @brief Hardware FFT caculation manager</span></span><br><span class="line"><span class="comment"> * </span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">CFftManager</span>&#123;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    CSL_Edma3ChannelHandle m_hCha;</span><br><span class="line">    CSL_Edma3ChannelObj m_ChaObj;</span><br><span class="line">    <span class="type">float</span> *m_pTempR;</span><br><span class="line">    <span class="type">float</span> *m_pTempI;</span><br><span class="line">    <span class="type">float</span> *m_pMid1;</span><br><span class="line">    <span class="type">float</span> *m_pMid2;</span><br><span class="line">    Bool m_bInitDone;</span><br><span class="line">    <span class="type">int</span> m_nCicId;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="type">uint8_t</span> <span class="title">getPowOfLen</span><span class="params">(<span class="type">uint16_t</span> nLength)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">CFftManager</span>();</span><br><span class="line">    ~<span class="built_in">CFftManager</span>();</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * @brief allocate temp space， TempR and TempI.</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * @param maxWidth max FFT length</span></span><br><span class="line"><span class="comment">     * @param maxHeight max FFT lines</span></span><br><span class="line"><span class="comment">     * @return int</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="type">int</span> <span class="title">init</span><span class="params">(<span class="type">int</span> maxWidth, <span class="type">int</span> maxHeight)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * @brief attach FFT finish interrupt to EDMA channel and enable EDMA interrupt</span></span><br><span class="line"><span class="comment">     * user should setup a Hwi for the event</span></span><br><span class="line"><span class="comment">     * </span></span><br><span class="line"><span class="comment">     * @param coreId core ID</span></span><br><span class="line"><span class="comment">     * @return int</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="type">int</span> <span class="title">HwInit</span><span class="params">(<span class="type">int</span> coreId)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * @brief do FFT and transpose. </span></span><br><span class="line"><span class="comment">     * source data is central symmetry real data</span></span><br><span class="line"><span class="comment">     * pSrc and pDst can point to the same space</span></span><br><span class="line"><span class="comment">     * using m_pTempR as input imag data and output imag data</span></span><br><span class="line"><span class="comment">     * </span></span><br><span class="line"><span class="comment">     * @param pSrc input only real part data</span></span><br><span class="line"><span class="comment">     * @param pDst output only real part data</span></span><br><span class="line"><span class="comment">     * @param nLen FFT points</span></span><br><span class="line"><span class="comment">     * @param nRows number of rows</span></span><br><span class="line"><span class="comment">     * @return int </span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="type">int</span> <span class="title">FFT_R2R_T</span><span class="params">(<span class="type">float</span> *pSrc, <span class="type">float</span> *pDst, <span class="type">int</span> nLen, <span class="type">int</span> nRows)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * @brief do FFT and transpose</span></span><br><span class="line"><span class="comment">     * source data is half size of dst data(dst data is complex)</span></span><br><span class="line"><span class="comment">     * when pSrc and pDst is same, carefully check if source data space is large enough</span></span><br><span class="line"><span class="comment">     * </span></span><br><span class="line"><span class="comment">     * @param pSrc input only real part data</span></span><br><span class="line"><span class="comment">     * @param pDst output real part and imaginary part data, cross storeage stratagy</span></span><br><span class="line"><span class="comment">     * @param nLen FFT points</span></span><br><span class="line"><span class="comment">     * @param nRows number of rows</span></span><br><span class="line"><span class="comment">     * @return int </span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="type">int</span> <span class="title">FFT_R2C_T</span><span class="params">(<span class="type">float</span> *pSrc, <span class="type">float</span> *pDst, <span class="type">int</span> nLen, <span class="type">int</span> nRows)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * @brief do FFT and transpose</span></span><br><span class="line"><span class="comment">     *  real is in high address, imag is in low address</span></span><br><span class="line"><span class="comment">     * [imag, real, imag, real , ...]</span></span><br><span class="line"><span class="comment">     * </span></span><br><span class="line"><span class="comment">     * @param pSrc </span></span><br><span class="line"><span class="comment">     * @param pDst </span></span><br><span class="line"><span class="comment">     * @param nLen FFT points</span></span><br><span class="line"><span class="comment">     * @param nRows number of rows</span></span><br><span class="line"><span class="comment">     * @return int </span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="type">int</span> <span class="title">FFT_C2C_T</span><span class="params">(<span class="type">float</span> *pSrc, <span class="type">float</span> *pDst, <span class="type">int</span> nLen, <span class="type">int</span> nRows)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * @brief do FFT and transpose normal mode</span></span><br><span class="line"><span class="comment">     * real is in low address, imag is in high address</span></span><br><span class="line"><span class="comment">     * [real, imag, real, imag , ...]</span></span><br><span class="line"><span class="comment">     * </span></span><br><span class="line"><span class="comment">     * @param pSrc </span></span><br><span class="line"><span class="comment">     * @param pDst </span></span><br><span class="line"><span class="comment">     * @param nLen FFT points</span></span><br><span class="line"><span class="comment">     * @param nRows number of rows</span></span><br><span class="line"><span class="comment">     * @return int </span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="type">int</span> <span class="title">FFT_C2C_TN</span><span class="params">(<span class="type">float</span> *pSrc, <span class="type">float</span> *pDst, <span class="type">int</span> nLen, <span class="type">int</span> nRows)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="type">int</span> <span class="title">IFFT_C2C_T</span><span class="params">(<span class="type">float</span> *pSrc, <span class="type">float</span> *pDst, <span class="type">int</span> nLen, <span class="type">int</span> nRows)</span></span>;</span><br><span class="line">    <span class="function"><span class="type">int</span> <span class="title">IFFT_C2R_T</span><span class="params">(<span class="type">float</span> *pSrc, <span class="type">float</span> *pDst, <span class="type">int</span> nLen, <span class="type">int</span> nRows)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">ClearInterruptFlag</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">ClearTempR</span><span class="params">(<span class="type">size_t</span> nSize)</span></span>;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<h2 id="具体应用方式">具体应用方式</h2>
+<p>  创建一个专门用来执行FFT的Task，其他Task可以通过命令队列将要执行的FFT计算发送到队列里，同时需要发送一个启动信号。FFTTask收到启动信号后读取命令队列，然后执行，完成之后发送FFT完成的信号量。<br>
+  在调用FFT硬件进行计算的过程中，MainTask仍然可以进行一些其它的计算。MainTask也可以一股脑儿地将要进行计算地任务都发送到命令队列里，处理完其它事情后再回过头来检查FFT完成的信号量的个数是否达到预期，然后进行后续处理，这样可以最大限度地利用硬件FFT的加速功能。</p>
+<img src="/2022/10/02/fft-hw/2022-10-02-20-17-31.png" class="">
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="keyword">enum</span> <span class="title class_">FFT2dType</span></span><br><span class="line">&#123;</span><br><span class="line">    FFT2d_R2R = <span class="number">0</span>,</span><br><span class="line">    FFT2d_R2C,</span><br><span class="line">    FFT2d_R2C_N,</span><br><span class="line">    IFFT2d_C2R</span><br><span class="line">&#125; FFT2dType;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span> <span class="title class_">FFTCmd</span>&#123;</span><br><span class="line">    Queue_Elem _elem;</span><br><span class="line">    FFT2dType eType;</span><br><span class="line">    <span class="type">float</span> *pSrc;</span><br><span class="line">    <span class="type">float</span> *pDst;</span><br><span class="line">    <span class="type">int</span> nWidth;</span><br><span class="line">    <span class="type">int</span> nHeight;</span><br><span class="line">&#125; FFTCmd;</span><br><span class="line"></span><br><span class="line"><span class="function">Void <span class="title">FFTTskFxn</span><span class="params">(UArg a0, UArg a1)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    FFTCmd *pCmd = <span class="literal">NULL</span>;</span><br><span class="line">    <span class="type">int</span> nWidth, nHeight;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// init in main</span></span><br><span class="line">    <span class="comment">// FftMgr.init(FFT_POINT, FFT_POINT);</span></span><br><span class="line">    <span class="comment">// FftMgr.HwInit(0);</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (;;)&#123;</span><br><span class="line">        <span class="built_in">Semaphore_pend</span>(hFFTStartSem, BIOS_WAIT_FOREVER);</span><br><span class="line"></span><br><span class="line">        pCmd = (FFTCmd *)<span class="built_in">Queue_dequeue</span>(hFFTQue);</span><br><span class="line">        nWidth = pCmd-&gt;nWidth;</span><br><span class="line">        nHeight = pCmd-&gt;nHeight;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">switch</span> (pCmd-&gt;eType)</span><br><span class="line">        &#123;</span><br><span class="line">        <span class="keyword">case</span> FFT2d_R2R:</span><br><span class="line">            FftMgr.<span class="built_in">ClearTempR</span>(<span class="built_in">sizeof</span>(<span class="type">float</span>) * pCmd-&gt;nWidth * pCmd-&gt;nHeight);</span><br><span class="line">            FftMgr.<span class="built_in">FFT_R2R_T</span>(pCmd-&gt;pSrc, pCmd-&gt;pDst, nWidth, nHeight);</span><br><span class="line">            <span class="built_in">Semaphore_pend</span>(hFFTHwiSem, BIOS_WAIT_FOREVER);</span><br><span class="line">            FftMgr.<span class="built_in">FFT_R2R_T</span>(pCmd-&gt;pDst, pCmd-&gt;pDst, nHeight, nWidth);</span><br><span class="line">            <span class="built_in">Semaphore_pend</span>(hFFTHwiSem, BIOS_WAIT_FOREVER);</span><br><span class="line">            <span class="comment">// TODO check result</span></span><br><span class="line">            <span class="built_in">Cache_inv</span>(pCmd-&gt;pDst, <span class="built_in">sizeof</span>(<span class="type">float</span>) * nWidth * nHeight, Cache_Type_ALLD, <span class="number">1</span>);</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        <span class="keyword">case</span> FFT2d_R2C:</span><br><span class="line">            FftMgr.<span class="built_in">FFT_R2C_T</span>(pCmd-&gt;pSrc, pCmd-&gt;pDst, nWidth, nHeight);</span><br><span class="line">            <span class="built_in">Semaphore_pend</span>(hFFTHwiSem, BIOS_WAIT_FOREVER);</span><br><span class="line">            FftMgr.<span class="built_in">FFT_C2C_T</span>(pCmd-&gt;pDst, pCmd-&gt;pDst, nHeight, nWidth);</span><br><span class="line">            <span class="built_in">Semaphore_pend</span>(hFFTHwiSem, BIOS_WAIT_FOREVER);</span><br><span class="line"></span><br><span class="line">            <span class="built_in">Cache_inv</span>(pCmd-&gt;pDst, <span class="built_in">sizeof</span>(<span class="type">float</span>) * nWidth * nHeight * <span class="number">2</span>, Cache_Type_ALLD, <span class="number">1</span>);</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        <span class="keyword">case</span> FFT2d_R2C_N:</span><br><span class="line">            FftMgr.<span class="built_in">FFT_R2C_T</span>(pCmd-&gt;pSrc, pCmd-&gt;pDst, nWidth, nHeight);</span><br><span class="line">            <span class="built_in">Semaphore_pend</span>(hFFTHwiSem, BIOS_WAIT_FOREVER);</span><br><span class="line">            FftMgr.<span class="built_in">FFT_C2C_TN</span>(pCmd-&gt;pDst, pCmd-&gt;pDst, nHeight, nWidth);</span><br><span class="line">            <span class="built_in">Semaphore_pend</span>(hFFTHwiSem, BIOS_WAIT_FOREVER);</span><br><span class="line"></span><br><span class="line">            <span class="built_in">Cache_inv</span>(pCmd-&gt;pDst, <span class="built_in">sizeof</span>(<span class="type">float</span>) * nWidth * nHeight * <span class="number">2</span>, Cache_Type_ALLD, <span class="number">1</span>);</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        <span class="keyword">case</span> IFFT2d_C2R:</span><br><span class="line">            FftMgr.<span class="built_in">IFFT_C2C_T</span>(pCmd-&gt;pSrc, pCmd-&gt;pSrc, nWidth, nHeight);</span><br><span class="line">            <span class="built_in">Semaphore_pend</span>(hFFTHwiSem, BIOS_WAIT_FOREVER);</span><br><span class="line">            FftMgr.<span class="built_in">IFFT_C2R_T</span>(pCmd-&gt;pSrc, pCmd-&gt;pDst, nHeight, nWidth);</span><br><span class="line">            <span class="built_in">Semaphore_pend</span>(hFFTHwiSem, BIOS_WAIT_FOREVER);</span><br><span class="line"></span><br><span class="line">            <span class="built_in">Cache_inv</span>(pCmd-&gt;pDst, <span class="built_in">sizeof</span>(<span class="type">float</span>) * nWidth * nHeight, Cache_Type_ALLD, <span class="number">1</span>);</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        <span class="keyword">default</span>:</span><br><span class="line">            <span class="built_in">assert</span>(<span class="number">0</span>); <span class="comment">// FFT type error</span></span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="built_in">Semaphore_post</span>(hFFTDoneSem);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="mailto:undefined">裘剑东</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="http://qjdxmy.com/2022/10/02/fft-hw/">http://qjdxmy.com/2022/10/02/fft-hw/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="http://qjdxmy.com" target="_blank">小裘控制系统</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/DSP/">DSP</a><a class="post-meta__tags" href="/tags/FFT/">FFT</a></div><div class="post_share"><div class="social-share" data-image="/2022/10/02/fft-hw/2022-10-02-17-54-54.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/social-share.js/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2022/10/01/phase-review-2/"><img class="prev-cover" src="/2022/10/01/phase-review-2/2022-10-01-12-21-52.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">近期C6000 DSP开发小结</div></div></a></div><div class="next-post pull-right"><a href="/2022/10/02/dsp-opt/"><img class="next-cover" src="/2022/10/02/dsp-opt/2022-10-02-22-20-37.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">C6000 DSP优化技术入门</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/2022/02/27/c6455-fft2/" title="TMS320C6455二维FFT和IFFT实现"><img class="cover" src="/2022/02/27/c6455-fft2/2022-02-27-19-57-18.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-02-27</div><div class="title">TMS320C6455二维FFT和IFFT实现</div></div></a></div><div><a href="/2022/03/09/phase-review-1/" title="近期C6000 DSP开发小结"><img class="cover" src="/2022/03/09/phase-review-1/2022-03-09-22-40-16.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-03-09</div><div class="title">近期C6000 DSP开发小结</div></div></a></div><div><a href="/2022/04/30/cpp-stm32/" title="C++开发STM32 FreeRTOS工程与添加DSP库"><img class="cover" src="/2022/04/30/cpp-stm32/2022-04-30-09-44-59.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-04-30</div><div class="title">C++开发STM32 FreeRTOS工程与添加DSP库</div></div></a></div><div><a href="/2022/05/26/c6678-openmp/" title="OpenMP在多核DSP上的应用"><img class="cover" src="/2022/05/26/c6678-openmp/2022-05-26-10-31-10.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-05-26</div><div class="title">OpenMP在多核DSP上的应用</div></div></a></div><div><a href="/2022/02/27/c6455-1/" title="TMS320C6455入门实践（一）"><img class="cover" src="/2022/02/27/c6455-1/2022-02-27-16-54-12.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-02-27</div><div class="title">TMS320C6455入门实践（一）</div></div></a></div><div><a href="/2022/02/27/c6455-10/" title="TMS320C6455入门实践（十）"><img class="cover" src="/2022/02/27/c6455-10/2022-02-27-19-49-41.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-02-27</div><div class="title">TMS320C6455入门实践（十）</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/me.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">裘剑东</div><div class="author-info__description">芯来科技基础软件开发工程师，嵌入式开发爱好者</div></div><div class="card-info-data is-center"><div class="card-info-data-item"><a href="/archives/"><div class="headline">文章</div><div class="length-num">84</div></a></div><div class="card-info-data-item"><a href="/tags/"><div class="headline">标签</div><div class="length-num">101</div></a></div><div class="card-info-data-item"><a href="/categories/"><div class="headline">分类</div><div class="length-num">18</div></a></div></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/qiujiandong"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/qiujiandong" target="_blank" title="Github"><i class="fab fa-github"></i></a><a class="social-icon" href="mailto:1335521934@qq.com" target="_blank" title="Email"><i class="fas fa-envelope"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">最好的程序员做自己的硬件！</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content is-expand"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%BD%AF%E7%A1%AC%E4%BB%B6FFT%E6%80%A7%E8%83%BD%E6%B5%8B%E8%AF%95"><span class="toc-number">1.</span> <span class="toc-text">软硬件FFT性能测试</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B5%8B%E8%AF%95%E6%9D%A1%E4%BB%B6"><span class="toc-number">1.1.</span> <span class="toc-text">测试条件</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B5%8B%E8%AF%95%E7%BB%93%E6%9E%9C-4"><span class="toc-number">1.2.</span> <span class="toc-text">测试结果</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C%E7%BB%B4FFT%E8%AE%A1%E7%AE%97%E5%88%86%E8%A7%A3"><span class="toc-number">2.</span> <span class="toc-text">二维FFT计算分解</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#FFT2d-R2R"><span class="toc-number">2.1.</span> <span class="toc-text">FFT2d_R2R</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#FFT2d-R2C"><span class="toc-number">2.2.</span> <span class="toc-text">FFT2d_R2C</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#IFFT2d-C2R"><span class="toc-number">2.3.</span> <span class="toc-text">IFFT2d_C2R</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#CFftManager%E7%B1%BB%E5%AE%9A%E4%B9%89"><span class="toc-number">2.4.</span> <span class="toc-text">CFftManager类定义</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%B7%E4%BD%93%E5%BA%94%E7%94%A8%E6%96%B9%E5%BC%8F"><span class="toc-number">3.</span> <span class="toc-text">具体应用方式</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2025/01/01/summary-2024/" title="2024年终总结"><img src="/2025/01/01/summary-2024/2025-01-01-21-54-27.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="2024年终总结"/></a><div class="content"><a class="title" href="/2025/01/01/summary-2024/" title="2024年终总结">2024年终总结</a><time datetime="2025-01-01T09:19:27.000Z" title="发表于 2025-01-01 17:19:27">2025-01-01</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2024/04/17/learn-cuda/" title="CUDA优化入门"><img src="/2024/04/17/learn-cuda/2024-04-16-15-52-38.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="CUDA优化入门"/></a><div class="content"><a class="title" href="/2024/04/17/learn-cuda/" title="CUDA优化入门">CUDA优化入门</a><time datetime="2024-04-17T12:00:00.000Z" title="发表于 2024-04-17 20:00:00">2024-04-17</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2024/04/04/bipartite-match/" title="二分图的判断与匹配"><img src="/2024/04/04/bipartite-match/2024-04-05-00-11-55.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="二分图的判断与匹配"/></a><div class="content"><a class="title" href="/2024/04/04/bipartite-match/" title="二分图的判断与匹配">二分图的判断与匹配</a><time datetime="2024-04-04T13:43:47.000Z" title="发表于 2024-04-04 21:43:47">2024-04-04</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2024/01/19/summary/" title="长风破浪会有时"><img src="/2024/01/19/summary/wrapped2023.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="长风破浪会有时"/></a><div class="content"><a class="title" href="/2024/01/19/summary/" title="长风破浪会有时">长风破浪会有时</a><time datetime="2024-01-19T13:15:25.000Z" title="发表于 2024-01-19 21:15:25">2024-01-19</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/06/05/remote-vivado/" title="Vivado远程开发探索"><img src="/2023/06/05/remote-vivado/2023-06-15-16-22-13.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Vivado远程开发探索"/></a><div class="content"><a class="title" href="/2023/06/05/remote-vivado/" title="Vivado远程开发探索">Vivado远程开发探索</a><time datetime="2023-06-05T09:52:47.000Z" title="发表于 2023-06-05 17:52:47">2023-06-05</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2025 By 裘剑东</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.js"></script><div class="js-pjax"><script>(() => {
+  const $mermaidWrap = document.querySelectorAll('#article-container .mermaid-wrap')
+  if ($mermaidWrap.length) {
+    window.runMermaid = () => {
+      window.loadMermaid = true
+      const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default'
+
+      Array.from($mermaidWrap).forEach((item, index) => {
+        const mermaidSrc = item.firstElementChild
+        const mermaidThemeConfig = '%%{init:{ \'theme\':\'' + theme + '\'}}%%\n'
+        const mermaidID = 'mermaid-' + index
+        const mermaidDefinition = mermaidThemeConfig + mermaidSrc.textContent
+        mermaid.mermaidAPI.render(mermaidID, mermaidDefinition, (svgCode) => {
+          mermaidSrc.insertAdjacentHTML('afterend', svgCode)
+        })
+      })
+    }
+
+    const loadMermaid = () => {
+      window.loadMermaid ? runMermaid() : getScript('https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js').then(runMermaid)
+    }
+
+    window.pjax ? loadMermaid() : document.addEventListener('DOMContentLoaded', loadMermaid)
+  }
+})()</script></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

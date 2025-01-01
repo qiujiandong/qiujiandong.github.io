@@ -1,0 +1,240 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>SYS/BIOS与SRIO应用实例 | 小裘控制系统</title><meta name="keywords" content="FPGA,DSP,6455,SRIO"><meta name="author" content="裘剑东"><meta name="copyright" content="裘剑东"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="SYS&#x2F;BIOS与SRIO应用实例">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SYS&#x2F;BIOS与SRIO应用实例">
+<meta property="og:url" content="http://qjdxmy.com/2022/06/14/bios-srio/">
+<meta property="og:site_name" content="小裘控制系统">
+<meta property="og:description" content="SYS&#x2F;BIOS与SRIO应用实例">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://qjdxmy.com/2022/06/14/bios-srio/2022-06-14-11-16-30.png">
+<meta property="article:published_time" content="2022-06-14T01:53:19.000Z">
+<meta property="article:modified_time" content="2024-04-17T12:40:48.601Z">
+<meta property="article:author" content="裘剑东">
+<meta property="article:tag" content="DSP">
+<meta property="article:tag" content="6455">
+<meta property="article:tag" content="FPGA">
+<meta property="article:tag" content="SRIO">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://qjdxmy.com/2022/06/14/bios-srio/2022-06-14-11-16-30.png"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="http://qjdxmy.com/2022/06/14/bios-srio/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '天',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery@2/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery@2/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'SYS/BIOS与SRIO应用实例',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2024-04-17 20:40:48'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 6.0.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/me.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data is-center"><div class="data-item"><a href="/archives/"><div class="headline">文章</div><div class="length-num">84</div></a></div><div class="data-item"><a href="/tags/"><div class="headline">标签</div><div class="length-num">101</div></a></div><div class="data-item"><a href="/categories/"><div class="headline">分类</div><div class="length-num">18</div></a></div></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/download/"><i class="fa-fw fas fa-download"></i><span> 下载</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 链接</span></a></div><div class="menus_item"><a class="site-page" href="/resume/"><i class="fa-fw fas fa-heart"></i><span> 个人简历</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="not-top-img" id="page-header"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">小裘控制系统</a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/download/"><i class="fa-fw fas fa-download"></i><span> 下载</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 链接</span></a></div><div class="menus_item"><a class="site-page" href="/resume/"><i class="fa-fw fas fa-heart"></i><span> 个人简历</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav></header><main class="layout" id="content-inner"><div id="post"><div id="post-info"><h1 class="post-title">SYS/BIOS与SRIO应用实例</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2022-06-14T01:53:19.000Z" title="发表于 2022-06-14 09:53:19">2022-06-14</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2024-04-17T12:40:48.601Z" title="更新于 2024-04-17 20:40:48">2024-04-17</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E9%AB%98%E9%80%9F%E9%93%BE%E8%B7%AF/">高速链路</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E9%AB%98%E9%80%9F%E9%93%BE%E8%B7%AF/SRIO/">SRIO</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="SYS/BIOS与SRIO应用实例"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"></span></span></div></div></div><article class="post-content" id="article-container"><ul>
+<li>
+<a href="/2022/04/23/rtsc-xdctools/" title="RTSC与XDCTools">RTSC与XDCTools</a>
+</li>
+<li>
+<a href="/2022/02/27/srio-dsp-fpga-test/" title="基于SRIO的FPGA与DSP间高速数据传输">基于SRIO的FPGA与DSP间高速数据传输</a>
+</li>
+<li>
+<a href="/2022/02/27/srio-ctrl/" title="AXI Memory-Mapped SRIO收发控制器">AXI Memory-Mapped SRIO收发控制器</a>
+</li>
+</ul>
+<p>  SYS/BIOS是TI的实时内核，也叫做TI-RTOS，它是RTSC中的一个软件包，可以使DSP的软件设计更加方便。SRIO是适用于嵌入式系统中的高速接口，之前我也写过一些相关的文章，这次做了一些完善。</p>
+<h2 id="系统功能">系统功能</h2>
+<img src="/2022/06/14/bios-srio/2022-06-14-11-16-30.png" class="">
+<p>  整个系统实现的功能大概如上图所示。DSP外接的DDR中存放有两张640×512的图片，DSP与FPGA通过一条1x的SRIO链路相连。DSP周期性地向FPGA发送门铃事务包，由FPGA内的MicroBlaze软核解析后，FPGA端发送相应的多个SRIO NREAD事务包，从DSP外接的DDR中读取特定地址区域的图片，然后通过VGA交替显示两张图片。<br>
+  DSP采用的是TMS320C6455，FPGA端实例化MicroBlaze软核处理器，由它向SRIO收发控制器发送命令。</p>
+<h2 id="SYS-BIOS的使用">SYS/BIOS的使用</h2>
+<p>  自从开始使用它以来，我觉得大部分情况下，我们都可以在这个实时内核的框架下来完成应用的设计。它的主要优势在于<strong>灵活</strong>，相较于传统的裸核程序运行在一个死循环里，它能够更快地添加一些功能，只要创建几个新的Task就行。在使用之后发现，它能够更方便地管理中断，更精确地控制延时。</p>
+<h3 id="文档查阅">文档查阅</h3>
+<p>  查询相关文档的方法在之前的文章中也已经介绍过了，在Help-&gt;Help Contents里，可以找到所有RTSC的软件包的API的介绍，SYS/BIOS自然也不例外，而且非常详细。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;ti/sysbios/BIOS.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;ti/sysbios/knl/Task.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;ti/sysbios/knl/Semaphore.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;xdc/cfg/global.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;xdc/runtime/System.h&gt;</span></span></span><br></pre></td></tr></table></figure>
+<p>  上面这些是一些常用的头文件。&quot;BIOS.h&quot;是最基本的，里面的BIOS_start()就相当于是FreeRTOS里的vTaskStartScheduler()。<br>
+  Task和Semaphore是最常用的，必要时还可能会用到Hwi、Cache、Event、Queue、Clock、Timer等API。<br>
+  include &quot;global.h&quot;主要是让C/C++源文件能够获取到XDCTools配置文件中创建的句柄，比如Task、Semaphore的句柄等。<br>
+  &quot;System.h&quot;主要用来实现打印输出。</p>
+<h3 id="UIA的使用">UIA的使用</h3>
+<p>  UIA(Unified Instrumentation Architecture)，是一个调试用的工具。我觉得它最棒的功能就是它能够把几个任务之间的切换通过下面这种图的方式表现出来。</p>
+<img src="/2022/06/14/bios-srio/2022-06-14-14-42-15.png" class="">
+<p>  只需要根据“SPRUH43F-System Analyzer User’s Guide”这个文档进行配置就行，这个文档在UIA的安装目录下就有。主要是在XDCTools的配置文件中添加下面这行代码，然后也就有相应的图形界面可以设置。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">var LoggingSetup = xdc.useModule(&#x27;ti.uia.sysbios.LoggingSetup&#x27;);</span><br></pre></td></tr></table></figure>
+<h3 id="时间片调度">时间片调度</h3>
+<p>  SYS/BIOS是没有直接的时间片调度的，也就是说如果有两个相同优先级的Task，那就是哪个Task先创建就先执行哪个。如果想要进行时间片调度，就需要自己添加一个Clock的实例，并周期地执行&quot;Task_yield()&quot;，让执行中的Task主动放弃CPU资源。这在SYS/BIOS的User’s Guide里的3.5.6中举了个例子。</p>
+<h3 id="精确控制延时">精确控制延时</h3>
+<p>  使用SYS/BIOS能够精确地控制延时。Clock能够用来创建软件中断（Swi）层面的thread。<strong>Clock tick是计时的基本单位</strong>，包括在等待Semaphore或者Event时，也都是这个统一的单位。默认的一个Clock tick是1ms，这个可以在Clock的配置页面看到。<br>
+  而这个准确的计时是由硬件定时器Timer来完成的，每次Timer定时1ms都会自动调用Clock_tick()，使Clock的计数值加一。</p>
+<img src="/2022/06/14/bios-srio/2022-06-14-15-17-54.png" class="">
+<p>  在Task中利用Task_sleep(delay)函数可以使Task休眠delay个Clock tick。在Clock tick是1ms的情况下，Task_sleep(1000)就可以让Task休眠1s。</p>
+<h3 id="中断管理">中断管理</h3>
+<p>  在使用CSL库的时候，中断的配置是挺头疼的，需要创建好几个全局变量，需要一开始就确定中断的个数。但在SYS/BIOS里，就可以在XDCTools的配置脚本中完成，而且可以直接通过图形化界面配置。</p>
+<img src="/2022/06/14/bios-srio/2022-06-14-15-29-28.png" class="">
+<p>  在C/C++的源文件中我们就只需要写相应的中断服务函数就行了。</p>
+<h2 id="关于RTSC工程">关于RTSC工程</h2>
+<h3 id="添加Section">添加Section</h3>
+<p>  在创建了RTSC工程工程之后，不管是有没有用SYS/BIOS，原先的链接脚本文件基本上已经没用了，RTSC工程会自己产生一个链接脚本文件。如果仍然保留原先的链接脚本，很可能就会产生冲突，所以不建议再添加链接脚本。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Program.sectMap[&quot;.image&quot;] = new Program.SectionSpec();</span><br><span class="line">Program.sectMap[&quot;.image&quot;].loadSegment = &quot;DDR2&quot;;</span><br></pre></td></tr></table></figure>
+<p>  如果想要添加一个新的Section，需要在XDCTools的配置脚本中用类似上面的代码将Section分配到Memory中。上面的代码是将叫做&quot;.image&quot;的Section放到叫做&quot;DDR2&quot;的Memory中。</p>
+<h3 id="打印输出">打印输出</h3>
+<p>  打印输出采用的是System_printf()，默认不支持打印输出浮点数，如果想打印输出浮点数，需要在XDCTools的配置脚本中加上下面这行设置。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">System.extendedFormats = &quot;%f&quot;;</span><br></pre></td></tr></table></figure>
+<h3 id="保留数据">保留数据</h3>
+<p>  我将两幅图的数据定义成数组的形式，并存放到特定的地址空间里。等待FPGA端的SRIO来读这部分数据。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">pragma</span> DATA_SECTION(nIrDst, <span class="string">&quot;.image&quot;</span>);</span></span><br><span class="line"><span class="type">const</span> Uint8 nIrDst[] = &#123;……&#125;;</span><br></pre></td></tr></table></figure>
+<p>  然而因为我没有在其它地方对这部分数据进行读写，所以编译器在编译之后就把这部分数据省略了。</p>
+<img src="/2022/06/14/bios-srio/2022-06-14-15-47-22.png" class="">
+<p>  为了解决这个问题，可以在linker的配置中显式的告诉linker这个变量不能省略。</p>
+<h2 id="FPGA端设计">FPGA端设计</h2>
+<p>  实例化了一个SRIO接收控制器用于接收门铃中断，实例化了一个SRIO收发控制器用于发送NREAD事务包，从DSP读取图像数据，并发送至VGA显示模块中的显存。</p>
+<img src="/2022/06/14/bios-srio/2022-06-14-15-09-52.png" class="">
+<h3 id="Local-Memory与固化">Local Memory与固化</h3>
+<p>  MicroBlaze要实现的功能非常少，只要接收门铃中断，然后配置SRIO收发控制器，发起NREAD事务就行，所以我一开始就想可以把代码都放在Local Memory上，选了8kB的大小，以为足够了。但事实证明，如果要打印很多东西，8kB是不够的，后来我把那些打印的函数都去掉才勉强把代码都放在8kB的空间里。以后应该把Local Memory选大一点，16kB应该差不多，再不行就把代码放DDR上去，那样就需要加一个bootloader的工程。<br>
+  因为代码都是存在BRAM中的，所以它可以和bitsteam一起固化，相当于把BRAM初始化为代码。</p>
+<img src="/2022/06/14/bios-srio/2022-06-14-14-59-20.png" class="">
+<p>  右键点击BlockDesign，选择“Associate ELF Files”，再选择Vitis中编译并且调试好的elf文件。重新生成bitstream，再将新生成的bitstream固化即可。</p>
+<h2 id="测试结果-3">测试结果</h2>
+<img src="/2022/06/14/bios-srio/2022-06-14-15-17-35.png" class="">
+<p>  依靠SRIO读确实挺慢的，因为我只用了单条链路，而且一包NREAD最多读256字节，一帧640×512的8bit位深度图像就需要1280包。每次FPGA发出请求，到DSP响应也需要很长的时间。所以如果追求传输速率的话，最好还是DSP主动向FPGA发数据。现在这么做的好处只是能够让DSP可以不干预数据的传输。</p>
+<img src="/2022/06/14/bios-srio/2022-06-14-15-20-52.png" class="">
+<img src="/2022/06/14/bios-srio/2022-06-14-15-21-07.png" class="">
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="mailto:undefined">裘剑东</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="http://qjdxmy.com/2022/06/14/bios-srio/">http://qjdxmy.com/2022/06/14/bios-srio/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="http://qjdxmy.com" target="_blank">小裘控制系统</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/DSP/">DSP</a><a class="post-meta__tags" href="/tags/6455/">6455</a><a class="post-meta__tags" href="/tags/FPGA/">FPGA</a><a class="post-meta__tags" href="/tags/SRIO/">SRIO</a></div><div class="post_share"><div class="social-share" data-image="/2022/06/14/bios-srio/2022-06-14-11-16-30.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/social-share.js/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2022/05/26/c6678-openmp/"><img class="prev-cover" src="/2022/05/26/c6678-openmp/2022-05-26-10-31-10.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">OpenMP在多核DSP上的应用</div></div></a></div><div class="next-post pull-right"><a href="/2022/06/28/stm32-adc/"><img class="next-cover" src="/2022/06/28/stm32-adc/2022-07-01-20-46-34.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">基于STM32的ADC采样序列频谱分析</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/2022/02/27/srio-dsp-fpga-test/" title="基于SRIO的FPGA与DSP间高速数据传输"><img class="cover" src="/2022/02/27/srio-dsp-fpga-test/2022-02-27-12-29-59.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-02-27</div><div class="title">基于SRIO的FPGA与DSP间高速数据传输</div></div></a></div><div><a href="/2022/02/27/srio-dsp-fpga/" title="DSP与FPGA的SRIO通信实现"><img class="cover" src="/2022/02/27/srio-dsp-fpga/2022-02-27-12-14-52.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-02-27</div><div class="title">DSP与FPGA的SRIO通信实现</div></div></a></div><div><a href="/2022/03/09/phase-review-1/" title="近期C6000 DSP开发小结"><img class="cover" src="/2022/03/09/phase-review-1/2022-03-09-22-40-16.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-03-09</div><div class="title">近期C6000 DSP开发小结</div></div></a></div><div><a href="/2022/02/27/c6455-1/" title="TMS320C6455入门实践（一）"><img class="cover" src="/2022/02/27/c6455-1/2022-02-27-16-54-12.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-02-27</div><div class="title">TMS320C6455入门实践（一）</div></div></a></div><div><a href="/2022/02/27/c6455-10/" title="TMS320C6455入门实践（十）"><img class="cover" src="/2022/02/27/c6455-10/2022-02-27-19-49-41.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-02-27</div><div class="title">TMS320C6455入门实践（十）</div></div></a></div><div><a href="/2022/02/27/c6455-2/" title="TMS320C6455入门实践（二）"><img class="cover" src="/2022/02/27/c6455-2/2022-02-27-17-27-11.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-02-27</div><div class="title">TMS320C6455入门实践（二）</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/me.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">裘剑东</div><div class="author-info__description">芯来科技基础软件开发工程师，嵌入式开发爱好者</div></div><div class="card-info-data is-center"><div class="card-info-data-item"><a href="/archives/"><div class="headline">文章</div><div class="length-num">84</div></a></div><div class="card-info-data-item"><a href="/tags/"><div class="headline">标签</div><div class="length-num">101</div></a></div><div class="card-info-data-item"><a href="/categories/"><div class="headline">分类</div><div class="length-num">18</div></a></div></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/qiujiandong"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/qiujiandong" target="_blank" title="Github"><i class="fab fa-github"></i></a><a class="social-icon" href="mailto:1335521934@qq.com" target="_blank" title="Email"><i class="fas fa-envelope"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">最好的程序员做自己的硬件！</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content is-expand"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%B3%BB%E7%BB%9F%E5%8A%9F%E8%83%BD"><span class="toc-number">1.</span> <span class="toc-text">系统功能</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#SYS-BIOS%E7%9A%84%E4%BD%BF%E7%94%A8"><span class="toc-number">2.</span> <span class="toc-text">SYS&#x2F;BIOS的使用</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%96%87%E6%A1%A3%E6%9F%A5%E9%98%85"><span class="toc-number">2.1.</span> <span class="toc-text">文档查阅</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#UIA%E7%9A%84%E4%BD%BF%E7%94%A8"><span class="toc-number">2.2.</span> <span class="toc-text">UIA的使用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%97%B6%E9%97%B4%E7%89%87%E8%B0%83%E5%BA%A6"><span class="toc-number">2.3.</span> <span class="toc-text">时间片调度</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%B2%BE%E7%A1%AE%E6%8E%A7%E5%88%B6%E5%BB%B6%E6%97%B6"><span class="toc-number">2.4.</span> <span class="toc-text">精确控制延时</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%AD%E6%96%AD%E7%AE%A1%E7%90%86"><span class="toc-number">2.5.</span> <span class="toc-text">中断管理</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%B3%E4%BA%8ERTSC%E5%B7%A5%E7%A8%8B"><span class="toc-number">3.</span> <span class="toc-text">关于RTSC工程</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B7%BB%E5%8A%A0Section"><span class="toc-number">3.1.</span> <span class="toc-text">添加Section</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%89%93%E5%8D%B0%E8%BE%93%E5%87%BA"><span class="toc-number">3.2.</span> <span class="toc-text">打印输出</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BF%9D%E7%95%99%E6%95%B0%E6%8D%AE"><span class="toc-number">3.3.</span> <span class="toc-text">保留数据</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#FPGA%E7%AB%AF%E8%AE%BE%E8%AE%A1"><span class="toc-number">4.</span> <span class="toc-text">FPGA端设计</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Local-Memory%E4%B8%8E%E5%9B%BA%E5%8C%96"><span class="toc-number">4.1.</span> <span class="toc-text">Local Memory与固化</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%B5%8B%E8%AF%95%E7%BB%93%E6%9E%9C-3"><span class="toc-number">5.</span> <span class="toc-text">测试结果</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2025/01/01/summary-2024/" title="2024年终总结"><img src="/2025/01/01/summary-2024/2025-01-01-21-54-27.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="2024年终总结"/></a><div class="content"><a class="title" href="/2025/01/01/summary-2024/" title="2024年终总结">2024年终总结</a><time datetime="2025-01-01T09:19:27.000Z" title="发表于 2025-01-01 17:19:27">2025-01-01</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2024/04/17/learn-cuda/" title="CUDA优化入门"><img src="/2024/04/17/learn-cuda/2024-04-16-15-52-38.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="CUDA优化入门"/></a><div class="content"><a class="title" href="/2024/04/17/learn-cuda/" title="CUDA优化入门">CUDA优化入门</a><time datetime="2024-04-17T12:00:00.000Z" title="发表于 2024-04-17 20:00:00">2024-04-17</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2024/04/04/bipartite-match/" title="二分图的判断与匹配"><img src="/2024/04/04/bipartite-match/2024-04-05-00-11-55.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="二分图的判断与匹配"/></a><div class="content"><a class="title" href="/2024/04/04/bipartite-match/" title="二分图的判断与匹配">二分图的判断与匹配</a><time datetime="2024-04-04T13:43:47.000Z" title="发表于 2024-04-04 21:43:47">2024-04-04</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2024/01/19/summary/" title="长风破浪会有时"><img src="/2024/01/19/summary/wrapped2023.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="长风破浪会有时"/></a><div class="content"><a class="title" href="/2024/01/19/summary/" title="长风破浪会有时">长风破浪会有时</a><time datetime="2024-01-19T13:15:25.000Z" title="发表于 2024-01-19 21:15:25">2024-01-19</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/06/05/remote-vivado/" title="Vivado远程开发探索"><img src="/2023/06/05/remote-vivado/2023-06-15-16-22-13.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Vivado远程开发探索"/></a><div class="content"><a class="title" href="/2023/06/05/remote-vivado/" title="Vivado远程开发探索">Vivado远程开发探索</a><time datetime="2023-06-05T09:52:47.000Z" title="发表于 2023-06-05 17:52:47">2023-06-05</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2025 By 裘剑东</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.js"></script><div class="js-pjax"><script>(() => {
+  const $mermaidWrap = document.querySelectorAll('#article-container .mermaid-wrap')
+  if ($mermaidWrap.length) {
+    window.runMermaid = () => {
+      window.loadMermaid = true
+      const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default'
+
+      Array.from($mermaidWrap).forEach((item, index) => {
+        const mermaidSrc = item.firstElementChild
+        const mermaidThemeConfig = '%%{init:{ \'theme\':\'' + theme + '\'}}%%\n'
+        const mermaidID = 'mermaid-' + index
+        const mermaidDefinition = mermaidThemeConfig + mermaidSrc.textContent
+        mermaid.mermaidAPI.render(mermaidID, mermaidDefinition, (svgCode) => {
+          mermaidSrc.insertAdjacentHTML('afterend', svgCode)
+        })
+      })
+    }
+
+    const loadMermaid = () => {
+      window.loadMermaid ? runMermaid() : getScript('https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js').then(runMermaid)
+    }
+
+    window.pjax ? loadMermaid() : document.addEventListener('DOMContentLoaded', loadMermaid)
+  }
+})()</script></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

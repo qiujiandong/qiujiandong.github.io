@@ -1,0 +1,227 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>用于多核DSP开发的核间通信 | 小裘控制系统</title><meta name="keywords" content="DSP,多核,核间通信"><meta name="author" content="裘剑东"><meta name="copyright" content="裘剑东"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="TI的多核DSP以TMS320C6678为例，它是多核同构的处理器，内部是8个相同的C66x CorePac。对其中任意一个核的开发就和单核DSP开发的流程是类似的。   但是如果仅仅只是每个核独立开发，那么很难体现出多核的优势。要充分发挥多核处理器的性能，势必需要涉及核间通信，另外还有许多共享资源的分配的问题需要考虑。   IPC（Inter-Processor Communication）">
+<meta property="og:type" content="article">
+<meta property="og:title" content="用于多核DSP开发的核间通信">
+<meta property="og:url" content="http://qjdxmy.com/2023/01/17/multi-core/">
+<meta property="og:site_name" content="小裘控制系统">
+<meta property="og:description" content="TI的多核DSP以TMS320C6678为例，它是多核同构的处理器，内部是8个相同的C66x CorePac。对其中任意一个核的开发就和单核DSP开发的流程是类似的。   但是如果仅仅只是每个核独立开发，那么很难体现出多核的优势。要充分发挥多核处理器的性能，势必需要涉及核间通信，另外还有许多共享资源的分配的问题需要考虑。   IPC（Inter-Processor Communication）">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://qjdxmy.com/2023/01/17/multi-core/2023-01-19-22-01-50.png">
+<meta property="article:published_time" content="2023-01-17T05:01:29.000Z">
+<meta property="article:modified_time" content="2024-04-17T12:40:48.613Z">
+<meta property="article:author" content="裘剑东">
+<meta property="article:tag" content="DSP">
+<meta property="article:tag" content="多核">
+<meta property="article:tag" content="核间通信">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://qjdxmy.com/2023/01/17/multi-core/2023-01-19-22-01-50.png"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="http://qjdxmy.com/2023/01/17/multi-core/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '天',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery@2/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery@2/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '用于多核DSP开发的核间通信',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2024-04-17 20:40:48'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 6.0.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/me.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data is-center"><div class="data-item"><a href="/archives/"><div class="headline">文章</div><div class="length-num">84</div></a></div><div class="data-item"><a href="/tags/"><div class="headline">标签</div><div class="length-num">101</div></a></div><div class="data-item"><a href="/categories/"><div class="headline">分类</div><div class="length-num">18</div></a></div></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/download/"><i class="fa-fw fas fa-download"></i><span> 下载</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 链接</span></a></div><div class="menus_item"><a class="site-page" href="/resume/"><i class="fa-fw fas fa-heart"></i><span> 个人简历</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="not-top-img" id="page-header"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">小裘控制系统</a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/download/"><i class="fa-fw fas fa-download"></i><span> 下载</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 链接</span></a></div><div class="menus_item"><a class="site-page" href="/resume/"><i class="fa-fw fas fa-heart"></i><span> 个人简历</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav></header><main class="layout" id="content-inner"><div id="post"><div id="post-info"><h1 class="post-title">用于多核DSP开发的核间通信</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2023-01-17T05:01:29.000Z" title="发表于 2023-01-17 13:01:29">2023-01-17</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2024-04-17T12:40:48.613Z" title="更新于 2024-04-17 20:40:48">2024-04-17</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/DSP%E5%BC%80%E5%8F%91/">DSP开发</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="用于多核DSP开发的核间通信"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"></span></span></div></div></div><article class="post-content" id="article-container"><p>  TI的多核DSP以TMS320C6678为例，它是多核同构的处理器，内部是8个相同的C66x CorePac。对其中任意一个核的开发就和单核DSP开发的流程是类似的。<br>
+  但是如果仅仅只是每个核独立开发，那么很难体现出多核的优势。要充分发挥多核处理器的性能，势必需要涉及核间通信，另外还有许多共享资源的分配的问题需要考虑。<br>
+  IPC（Inter-Processor Communication）是RTSC体系下的一个Package，专门用来实现不同核之间的通信。IPC可以在<a target="_blank" rel="noopener" href="http://downloads.ti.com/dsps/dsps_public_sw/sdo_sb/targetcontent/ipc/">这里</a>下载。3.0版本以后的IPC会直接包含在对应的SDK里面，如果要用更早的版本，也可以再下载，只是要注意最好对上XDCTools和SYS/BIOS的版本。</p>
+<table>
+<thead>
+<tr>
+<th>IPC 版本</th>
+<th>3.50.04</th>
+<th>1.25.03</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>XDCTools</td>
+<td>3.55.02</td>
+<td>3.24.05</td>
+</tr>
+<tr>
+<td>SYS/BIOS</td>
+<td>6.76.03</td>
+<td>6.34.04</td>
+</tr>
+</tbody>
+</table>
+<p>  3.50版本的IPC是包含在<a target="_blank" rel="noopener" href="https://www.ti.com.cn/tool/cn/PROCESSOR-SDK-C667X">C667x的PDK</a>里的，但我在安装的时候XDCTools安装失败了，可能是CCS版本比较老的原因，所以我就用的是1.25版本的IPC。虽然这两个版本号有很大差别，但是用起来应该差不多吧，我猜。这个Package的使用主要就看文档就好了，我在这里只做一些简短的记录。<br>
+  IPC Package里有很多module，要使用这些module，需要include的头文件在&lt;ipc_install_dir&gt;/packages/ti/ipc/目录下面，一般都会用到这些：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// type define</span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;xdc/std.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;ti/ipc/Ipc.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;ti/ipc/MultiProc.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;ti/ipc/SharedRegion.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;ti/ipc/Notify.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;ti/ipc/MessageQ.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;ti/ipc/GateMP.h&gt;</span></span></span><br></pre></td></tr></table></figure>
+<p>  不管是用Linux内核还是用SYS/BIOS内核，用到的都是这些头文件。在include这些头文件<strong>之前</strong>要另外include一个关于类型定义的头文件&lt;xdc/std.h&gt;。关于这些头文件里的API的说明在&lt;ipc_install_dir&gt;/docs/doxygen/html/index.html里有，是用doxygen根据源码里的注释生成的文档。<br>
+  由XDCTools编译生成的&lt;ipc_install_dir&gt;/packages/ti/sdo/ipc/目录下的头文件是<strong>不能直接使用</strong>的。这些module可以在.cfg配置文件中进行配置，在C/C++源文件中只需要看上面的头文件里提供的API就可以了。</p>
+<h2 id="核间通信的初始化">核间通信的初始化</h2>
+<p>  核间通信的初始化会用到三个module，分别是Ipc，MultiProc和SharedRegion。Ipc模块可以用ProcSync_ALL属性来设置成自动同步每个核，这样在执行完Ipc_start()之后，每个核之间就同步完成了，不需要手动去调用Ipc_attach()。有时候我们不需要每个核之间都同步时就可以去手动调用Ipc_attach()，让特定的几个核之间建立联系。<br>
+  Ipc_attach()要成功，还需要用到MultiProc模块，它可以设置我们的多核程序需要用到那几个核，当前这个工程是针对哪个核来编写的，例如下面我准备用4个核，然后当前的配置是针对核0来编写的。核0执行Ipc_start()的时候就会尝试去和另外三个核建立联系。<br>
+  核间同步需要用到一块共享的数据区，因此需要用到SharedRegion，SharedRegion0会被用来做这些事，大概会需要用几百个字节吧，剩下的空间用户仍然可以继续使用。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> <span class="title class_">Ipc</span> = xdc.<span class="title function_">useModule</span>(<span class="string">&#x27;ti.sdo.ipc.Ipc&#x27;</span>);</span><br><span class="line"><span class="keyword">var</span> <span class="title class_">MultiProc</span> = xdc.<span class="title function_">useModule</span>(<span class="string">&#x27;ti.sdo.utils.MultiProc&#x27;</span>);</span><br><span class="line"><span class="keyword">var</span> <span class="title class_">SharedRegion</span> = xdc.<span class="title function_">useModule</span>(<span class="string">&#x27;ti.sdo.ipc.SharedRegion&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="title class_">Ipc</span>.<span class="property">procSync</span> = <span class="title class_">Ipc</span>.<span class="property">ProcSync_ALL</span>;</span><br><span class="line"></span><br><span class="line"><span class="title class_">MultiProc</span>.<span class="property">baseIdOfCluster</span> = <span class="number">0</span>;</span><br><span class="line"><span class="title class_">MultiProc</span>.<span class="property">numProcessors</span> = <span class="number">4</span>;</span><br><span class="line"><span class="title class_">MultiProc</span>.<span class="title function_">setConfig</span>(<span class="string">&quot;CORE0&quot;</span>, [<span class="string">&quot;CORE0&quot;</span>, <span class="string">&quot;CORE1&quot;</span>, <span class="string">&quot;CORE2&quot;</span>, <span class="string">&quot;CORE3&quot;</span>]);</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> <span class="variable constant_">SMSMC_BASE</span> = <span class="number">0x0C000000</span>;</span><br><span class="line"><span class="keyword">var</span> <span class="variable constant_">SMSMC_SIZE</span> = <span class="number">0x00080000</span>;</span><br><span class="line"></span><br><span class="line"><span class="title class_">SharedRegion</span>.<span class="property">numEntries</span> = <span class="number">4</span>;</span><br><span class="line"><span class="title class_">SharedRegion</span>.<span class="property">translate</span> = <span class="literal">false</span>;</span><br><span class="line"><span class="title class_">SharedRegion</span>.<span class="title function_">setEntryMeta</span>(<span class="number">0</span>,</span><br><span class="line">    &#123; <span class="attr">base</span>: <span class="variable constant_">SMSMC_BASE</span>, </span><br><span class="line">      <span class="attr">len</span>:  <span class="variable constant_">SMSMC_SIZE</span>,</span><br><span class="line">      <span class="attr">ownerProcId</span>: <span class="number">0</span>,</span><br><span class="line">      <span class="attr">isValid</span>: <span class="literal">true</span>,</span><br><span class="line">      <span class="attr">cacheEnable</span>: <span class="literal">true</span>,</span><br><span class="line">      <span class="attr">cacheLineSize</span>: <span class="number">64</span>,</span><br><span class="line">      <span class="attr">createHeap</span>: <span class="literal">true</span>,</span><br><span class="line">      <span class="attr">name</span>: <span class="string">&quot;MSMC_SHARED&quot;</span>,</span><br><span class="line">    &#125;);</span><br></pre></td></tr></table></figure>
+<p>  上面是一个配置的示例，在这之前，每个核的platform一定要有一块相同物理地址的共享存储区。如果它们在不同核中的逻辑地址不同，那么需要SharedRegion.translate设置成true，进行地址转换。我在MSMC中选择512kB用作SharedRegion0，它在每个核中的地址都是相同的所以可以设置成false，节省资源。SharedRegion的cacheLineSize需要根据实际情况设置，MSMC会被L1D cache，查阅文档可以指导L1D cache的cacheline是64字节。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// IPC initialization</span></span><br><span class="line">status = Ipc_start();</span><br><span class="line"><span class="keyword">if</span>(status &lt; <span class="number">0</span>)&#123;</span><br><span class="line">    System_abort(<span class="string">&quot;Ipc start failed\n&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>  配置完成后，在每个核的main函数中最开始的位置执行Ipc_start()，不出意外每个核之间会完成同步，之后就可以执行其它的IPC模块的API。可以在调试程序，然后通过ROV查看Ipc模块的状态，下图是核0与其它三个核的同步的情况，attached都是true表明核0已经与其它三个和都同步上了。</p>
+<img src="/2023/01/17/multi-core/2023-01-19-14-41-33.png" class="">
+<h2 id="Notify">Notify</h2>
+<p>  Notify适合用来发送简短的信息，因为Notify可以带一个32bit的payload。Notify通信的基础是IPC寄存器，C6678的IPC寄存器中只有4-31共28个事件源。某个核如果想要收到另一个核的Notify，就需要先注册这个Notify，将某个事件源和一个回调函数（callback）绑定。</p>
+<img src="/2023/01/17/multi-core/2023-01-19-14-43-57.png" class="">
+<p>  我没有为核0注册Notify事件，但是它本身就已经有了两个事件Id被注册了。所以用的时候要注意，不要用2号和4号EventId，会产生冲突。用5-31号的EventId应该没问题。提到这个我还想到，DSP的CorePac里4-15的中断Id里，5号中断已经被用来处理IPC中断了，14号中断用来处理定时器中断，因此这两个中断号也是不能用的。</p>
+<h2 id="MessageQ">MessageQ</h2>
+<p>  Notify能够发送的数据有限，但如果只是发送一个数据块，Notify也可以只发送一个数据块的首地址指针。MessageQ可以用来发送批量的数据，而且可以很方便地与任务调度结合起来。比如一个Task如果需要等待另一个核产生的数据，如果用Notify实现，那么需要在Notify的Callback函数里产生一个Semaphore，在Task里等待这个Semaphore。而MessageQ则可以只通过MessageQ_get()函数实现接收数据和Semaphore等待的功能。MessageQ相比于Notify更大的优势在于它是一个队列，可以对收到的消息按照优先级排队，处理器可以依次处理每个消息。</p>
+<img src="/2023/01/17/multi-core/2023-01-19-22-01-50.png" class="">
+<p>  通过MessageQ发送的Message的长度可以是任意的，我们可以根据自己的需求定义数据结构。比如我最近用Core1调用Core3执行FFT，FFT计算完成后Core3通过Notify告知Core1计算完成。那么Core1就需要利用MessageQ将一些必要的参数告诉Core3。因此我定义了以下的数据结构FftMsg，其中包括FFT计算的类型、源数据地址、目的数据地址、二维FFT的长和宽。只要保证这个数据结构最前面是MessageQ_MsgHeader，后面可以随意。header里面本身是由一个replyQueueId的，可以方便接收方将Message返回给发送方。header里面还有一个MessageId，用来区分发往同一个MessageQ的不同类型的Message。我自己又加了一个nReplyCoreId，用来告诉Core3在FFT计算完成后，要向哪个Core发送Notify。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="keyword">enum</span> <span class="title class_">FFT2dType</span></span><br><span class="line">&#123;</span><br><span class="line">    FFT2d_R2R = <span class="number">0</span>,</span><br><span class="line">    FFT2d_R2C,</span><br><span class="line">    FFT2d_R2C_N,</span><br><span class="line">    IFFT2d_C2R</span><br><span class="line">&#125; FFT2dType;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span> <span class="title class_">FftMsg</span>&#123;</span><br><span class="line">    MessageQ_MsgHeader header;</span><br><span class="line">    FFT2dType eType;</span><br><span class="line">    <span class="type">float</span> *pSrc;</span><br><span class="line">    <span class="type">float</span> *pDst;</span><br><span class="line">    <span class="type">int</span> nWidth;</span><br><span class="line">    <span class="type">int</span> nHeight;</span><br><span class="line">    Uint16 nReplyCoreId;</span><br><span class="line">&#125; FftMsg;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> FftMsg *FftMsgHandle;</span><br></pre></td></tr></table></figure>
+<p>  MessageQ是由接收方创建的，Core1要往Core3发送Message，Core1只需要打开Core3创建的MessageQ即可。有可能会打开失败，因为Core3可能一开始还没创建好这个MessageQ，所以做了一个do-while循环。<br>
+  Core1在调用之前一定要确保源数据都已经写回共享的存储区，如果还留在Core1本地的Cache里，那么计算结果就会出错。<br>
+  要发送的Message是动态分配的，一般是动态分配在一个SharedRegion里构建的堆区，每个核都需要为同一个堆区注册一个相同的HeapId，MessageQ_alloc靠HeapId来决定在哪里动态分配数据空间。<br>
+  Mesage可以设置优先级，优先级只有三种，默认是Normal，较高的是MessageQ_HIGHPRI，最高优先级是MessageQ_URGENTPRI。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Core1 code, FFT caller</span></span><br><span class="line">FftMsgHandle hFftCmd;</span><br><span class="line">MessageQ_QueueId fftQueueId;</span><br><span class="line"></span><br><span class="line"><span class="keyword">do</span>&#123;</span><br><span class="line">    status = <span class="built_in">MessageQ_open</span>(MSGQ_FFTCMD_NAME, &amp;fftQueueId);</span><br><span class="line">    <span class="keyword">if</span>(status &lt; <span class="number">0</span>)&#123;</span><br><span class="line">        <span class="built_in">Task_sleep</span>(<span class="number">1</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125; <span class="keyword">while</span> (status &lt; <span class="number">0</span>);</span><br><span class="line"></span><br><span class="line"><span class="built_in">Cache_wbInv</span>(pData, KCF_DFT_SIZE * KCF_DFT_SIZE * <span class="built_in">sizeof</span>(<span class="type">float</span>), Cache_Type_ALLD, TRUE);</span><br><span class="line"><span class="comment">// FFT</span></span><br><span class="line">hFftCmd = (FftMsgHandle)<span class="built_in">MessageQ_alloc</span>(nHeapId, <span class="built_in">sizeof</span>(FftMsg));</span><br><span class="line"><span class="keyword">if</span>(hFftCmd == <span class="literal">NULL</span>)&#123;</span><br><span class="line">    <span class="built_in">System_abort</span>(<span class="string">&quot;Message alloc failed\n&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line">hFftCmd-&gt;eType = FFT2d_R2R;</span><br><span class="line">hFftCmd-&gt;nWidth = <span class="number">32</span>;</span><br><span class="line">hFftCmd-&gt;nHeight = <span class="number">32</span>;</span><br><span class="line">hFftCmd-&gt;pSrc = pData;</span><br><span class="line">hFftCmd-&gt;pDst = pData;</span><br><span class="line">hFftCmd-&gt;nReplyCoreId = <span class="number">1</span>;</span><br><span class="line"><span class="comment">// MessageQ_setMsgId(hFftCmd, MSG_C1FFT_ID);</span></span><br><span class="line"><span class="keyword">if</span>(m_nCoreId == <span class="number">1</span>)&#123;</span><br><span class="line">    <span class="built_in">MessageQ_setMsgPri</span>(hFftCmd, MessageQ_HIGHPRI);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">status = <span class="built_in">MessageQ_put</span>(fftQueueId, (MessageQ_Msg)hFftCmd);</span><br><span class="line"><span class="keyword">if</span>(status &lt; <span class="number">0</span>)&#123;</span><br><span class="line">    <span class="built_in">System_abort</span>(<span class="string">&quot;MessageQ put failed\n&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="built_in">Semaphore_pend</span>(hFFTDoneSem, BIOS_WAIT_FOREVER);</span><br></pre></td></tr></table></figure>
+<p>  Core3是接收方，首先需要创建一个MessageQ来接收Message。然后就可以不停等待Message，就像作为一个服务器不断处理客户端发过来的计算任务。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Core3 code， FFT callee</span></span><br><span class="line">MessageQ_Handle hFftCmdQueue;</span><br><span class="line">FftMsgHandle hFftMsg;</span><br><span class="line"></span><br><span class="line"><span class="comment">// using default synchronizer SyncSem</span></span><br><span class="line">hFftCmdQueue = <span class="built_in">MessageQ_create</span>(MSGQ_FFTCMD_NAME, <span class="literal">NULL</span>);</span><br><span class="line"><span class="keyword">if</span>(hFftCmdQueue == <span class="literal">NULL</span>)&#123;</span><br><span class="line">    <span class="built_in">System_abort</span>(<span class="string">&quot;MessageQ create failed\n&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> (;;)&#123;</span><br><span class="line">    <span class="built_in">MessageQ_get</span>(hFftCmdQueue, (MessageQ_Msg *)&amp;hFftMsg, MessageQ_FOREVER);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// TODO FFT</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// free message</span></span><br><span class="line">    <span class="built_in">MessageQ_free</span>((MessageQ_Msg)hFftMsg);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Send Notify</span></span><br><span class="line">    <span class="keyword">do</span>&#123;</span><br><span class="line">        status = <span class="built_in">Notify_sendEvent</span>(hFftMsg-&gt;nReplyCoreId, NOTIFY_LINEID, FFT_DONE_EVTID, <span class="number">0</span>, TRUE);</span><br><span class="line">    &#125; <span class="keyword">while</span> (status &lt; <span class="number">0</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="GateMP">GateMP</h2>
+<p>  GateMP用来让多核互斥访问某些资源，这个我暂时还没用到，但用起来也挺简单的，文档上也都写得很清楚。</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="mailto:undefined">裘剑东</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="http://qjdxmy.com/2023/01/17/multi-core/">http://qjdxmy.com/2023/01/17/multi-core/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="http://qjdxmy.com" target="_blank">小裘控制系统</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/DSP/">DSP</a><a class="post-meta__tags" href="/tags/%E5%A4%9A%E6%A0%B8/">多核</a><a class="post-meta__tags" href="/tags/%E6%A0%B8%E9%97%B4%E9%80%9A%E4%BF%A1/">核间通信</a></div><div class="post_share"><div class="social-share" data-image="/2023/01/17/multi-core/2023-01-19-22-01-50.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/social-share.js/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2022/11/01/kalman-filter/"><img class="prev-cover" src="/2022/11/01/kalman-filter/2023-02-12-20-47-54.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">卡尔曼滤波器</div></div></a></div><div class="next-post pull-right"><a href="/2023/02/05/kcf-double/"><img class="next-cover" src="/2023/02/05/kcf-double/2023-02-05-20-11-38.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">基于多核DSP的双目标KCF跟踪实现</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/2023/02/05/kcf-double/" title="基于多核DSP的双目标KCF跟踪实现"><img class="cover" src="/2023/02/05/kcf-double/2023-02-05-20-11-38.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-02-05</div><div class="title">基于多核DSP的双目标KCF跟踪实现</div></div></a></div><div><a href="/2022/03/09/phase-review-1/" title="近期C6000 DSP开发小结"><img class="cover" src="/2022/03/09/phase-review-1/2022-03-09-22-40-16.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-03-09</div><div class="title">近期C6000 DSP开发小结</div></div></a></div><div><a href="/2022/04/30/cpp-stm32/" title="C++开发STM32 FreeRTOS工程与添加DSP库"><img class="cover" src="/2022/04/30/cpp-stm32/2022-04-30-09-44-59.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-04-30</div><div class="title">C++开发STM32 FreeRTOS工程与添加DSP库</div></div></a></div><div><a href="/2022/05/26/c6678-openmp/" title="OpenMP在多核DSP上的应用"><img class="cover" src="/2022/05/26/c6678-openmp/2022-05-26-10-31-10.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-05-26</div><div class="title">OpenMP在多核DSP上的应用</div></div></a></div><div><a href="/2022/02/27/c6455-1/" title="TMS320C6455入门实践（一）"><img class="cover" src="/2022/02/27/c6455-1/2022-02-27-16-54-12.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-02-27</div><div class="title">TMS320C6455入门实践（一）</div></div></a></div><div><a href="/2022/02/27/c6455-10/" title="TMS320C6455入门实践（十）"><img class="cover" src="/2022/02/27/c6455-10/2022-02-27-19-49-41.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-02-27</div><div class="title">TMS320C6455入门实践（十）</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/me.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">裘剑东</div><div class="author-info__description">芯来科技基础软件开发工程师，嵌入式开发爱好者</div></div><div class="card-info-data is-center"><div class="card-info-data-item"><a href="/archives/"><div class="headline">文章</div><div class="length-num">84</div></a></div><div class="card-info-data-item"><a href="/tags/"><div class="headline">标签</div><div class="length-num">101</div></a></div><div class="card-info-data-item"><a href="/categories/"><div class="headline">分类</div><div class="length-num">18</div></a></div></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/qiujiandong"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/qiujiandong" target="_blank" title="Github"><i class="fab fa-github"></i></a><a class="social-icon" href="mailto:1335521934@qq.com" target="_blank" title="Email"><i class="fas fa-envelope"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">最好的程序员做自己的硬件！</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content is-expand"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A0%B8%E9%97%B4%E9%80%9A%E4%BF%A1%E7%9A%84%E5%88%9D%E5%A7%8B%E5%8C%96"><span class="toc-number">1.</span> <span class="toc-text">核间通信的初始化</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Notify"><span class="toc-number">2.</span> <span class="toc-text">Notify</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#MessageQ"><span class="toc-number">3.</span> <span class="toc-text">MessageQ</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#GateMP"><span class="toc-number">4.</span> <span class="toc-text">GateMP</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2025/01/01/summary-2024/" title="2024年终总结"><img src="/2025/01/01/summary-2024/2025-01-01-21-54-27.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="2024年终总结"/></a><div class="content"><a class="title" href="/2025/01/01/summary-2024/" title="2024年终总结">2024年终总结</a><time datetime="2025-01-01T09:19:27.000Z" title="发表于 2025-01-01 17:19:27">2025-01-01</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2024/04/17/learn-cuda/" title="CUDA优化入门"><img src="/2024/04/17/learn-cuda/2024-04-16-15-52-38.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="CUDA优化入门"/></a><div class="content"><a class="title" href="/2024/04/17/learn-cuda/" title="CUDA优化入门">CUDA优化入门</a><time datetime="2024-04-17T12:00:00.000Z" title="发表于 2024-04-17 20:00:00">2024-04-17</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2024/04/04/bipartite-match/" title="二分图的判断与匹配"><img src="/2024/04/04/bipartite-match/2024-04-05-00-11-55.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="二分图的判断与匹配"/></a><div class="content"><a class="title" href="/2024/04/04/bipartite-match/" title="二分图的判断与匹配">二分图的判断与匹配</a><time datetime="2024-04-04T13:43:47.000Z" title="发表于 2024-04-04 21:43:47">2024-04-04</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2024/01/19/summary/" title="长风破浪会有时"><img src="/2024/01/19/summary/wrapped2023.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="长风破浪会有时"/></a><div class="content"><a class="title" href="/2024/01/19/summary/" title="长风破浪会有时">长风破浪会有时</a><time datetime="2024-01-19T13:15:25.000Z" title="发表于 2024-01-19 21:15:25">2024-01-19</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/06/05/remote-vivado/" title="Vivado远程开发探索"><img src="/2023/06/05/remote-vivado/2023-06-15-16-22-13.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Vivado远程开发探索"/></a><div class="content"><a class="title" href="/2023/06/05/remote-vivado/" title="Vivado远程开发探索">Vivado远程开发探索</a><time datetime="2023-06-05T09:52:47.000Z" title="发表于 2023-06-05 17:52:47">2023-06-05</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2025 By 裘剑东</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.js"></script><div class="js-pjax"><script>(() => {
+  const $mermaidWrap = document.querySelectorAll('#article-container .mermaid-wrap')
+  if ($mermaidWrap.length) {
+    window.runMermaid = () => {
+      window.loadMermaid = true
+      const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default'
+
+      Array.from($mermaidWrap).forEach((item, index) => {
+        const mermaidSrc = item.firstElementChild
+        const mermaidThemeConfig = '%%{init:{ \'theme\':\'' + theme + '\'}}%%\n'
+        const mermaidID = 'mermaid-' + index
+        const mermaidDefinition = mermaidThemeConfig + mermaidSrc.textContent
+        mermaid.mermaidAPI.render(mermaidID, mermaidDefinition, (svgCode) => {
+          mermaidSrc.insertAdjacentHTML('afterend', svgCode)
+        })
+      })
+    }
+
+    const loadMermaid = () => {
+      window.loadMermaid ? runMermaid() : getScript('https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js').then(runMermaid)
+    }
+
+    window.pjax ? loadMermaid() : document.addEventListener('DOMContentLoaded', loadMermaid)
+  }
+})()</script></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

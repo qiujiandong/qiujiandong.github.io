@@ -1,0 +1,186 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>FT-M6678开发（一） | 小裘控制系统</title><meta name="keywords" content="DSP,6678,M6678"><meta name="author" content="裘剑东"><meta name="copyright" content="裘剑东"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="时钟与PSC">
+<meta property="og:type" content="article">
+<meta property="og:title" content="FT-M6678开发（一）">
+<meta property="og:url" content="http://qjdxmy.com/2022/02/27/m6678-1/">
+<meta property="og:site_name" content="小裘控制系统">
+<meta property="og:description" content="时钟与PSC">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://qjdxmy.com/img/me.jpg">
+<meta property="article:published_time" content="2022-02-27T12:52:59.000Z">
+<meta property="article:modified_time" content="2024-04-17T12:40:48.549Z">
+<meta property="article:author" content="裘剑东">
+<meta property="article:tag" content="DSP">
+<meta property="article:tag" content="6678">
+<meta property="article:tag" content="M6678">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://qjdxmy.com/img/me.jpg"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="http://qjdxmy.com/2022/02/27/m6678-1/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '天',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery@2/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery@2/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'FT-M6678开发（一）',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2024-04-17 20:40:48'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 6.0.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/me.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data is-center"><div class="data-item"><a href="/archives/"><div class="headline">文章</div><div class="length-num">84</div></a></div><div class="data-item"><a href="/tags/"><div class="headline">标签</div><div class="length-num">101</div></a></div><div class="data-item"><a href="/categories/"><div class="headline">分类</div><div class="length-num">18</div></a></div></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/download/"><i class="fa-fw fas fa-download"></i><span> 下载</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 链接</span></a></div><div class="menus_item"><a class="site-page" href="/resume/"><i class="fa-fw fas fa-heart"></i><span> 个人简历</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="not-top-img" id="page-header"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">小裘控制系统</a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/download/"><i class="fa-fw fas fa-download"></i><span> 下载</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 链接</span></a></div><div class="menus_item"><a class="site-page" href="/resume/"><i class="fa-fw fas fa-heart"></i><span> 个人简历</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav></header><main class="layout" id="content-inner"><div id="post"><div id="post-info"><h1 class="post-title">FT-M6678开发（一）</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2022-02-27T12:52:59.000Z" title="发表于 2022-02-27 20:52:59">2022-02-27</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2024-04-17T12:40:48.549Z" title="更新于 2024-04-17 20:40:48">2024-04-17</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/DSP%E5%BC%80%E5%8F%91/">DSP开发</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/DSP%E5%BC%80%E5%8F%91/M6678/">M6678</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="FT-M6678开发（一）"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"></span></span></div></div></div><article class="post-content" id="article-container"><div class="hbe hbe-container" id="hexo-blog-encrypt" data-wpm="抱歉, 这个密码看着不太对, 请再试试." data-whm="抱歉, 这个文章不能被校验, 不过您还是能看看解密后的内容.">
+  <script id="hbeData" type="hbeData" data-hmacdigest="aa7d115ff33d0102235a2e68b65138decf0936f22f95aacebdc37e586f3f5742">82fdcffe56fbcc1dd2db551588416a33d54467b7340f2e7ac21428b5aac675e3386f8412c91cd2d22a980252157e819a12e15b6b7ae033dc8cce47b2e11a468b9f67087368679a8f4d3855f8ef233032b25af32848dfcf9d657e6241bedadc75f6bb57ca8d45f2c4a4a8edc5033a84bf93b5f5891844c24f5fc4a60e3fe049c4a296427c83a6d240670b9c44af8cc5f01cd9624417bd584731553a064ab801e09201e853504d62a4a7239aa72127d7058d5bdd16ccb7dc0169a1580a5ca8e620007cb2a53eb92b0cd57749baa33c462068969717bbcb9c07fb1ed08526a362e3d96ff750d55b494e2d67615a357f88c349589498fb327a2ad9ebddb1f0ed62d7af859895f380f9f836af4ae1104bd79818b244d11e6f3ac9b5bf7d1303af1e87e93a04e7b8d16c4704ca619d110a4479b01dee5070fda31162edd2d7f45c4f28854dc285e0fd059a4925cf82d19ffc73f853de25cc8cbaf184c9e891527190a5593ec0155486297de9e391ab63d725714151be26bf5981af8a8aaa29c5c4ef3f315c71cad5c6a4a83882636a25825a07a81f174e9665086431096ab0642b0454fb6006434909f402b0bcf7a3596373902ddaf57e8978726dfcec8be8865ac529de82b46a796bb0d69d7e5b9c530d2d7fbf1f01aa4128c9e3569b63e95bf5d7326afc9b4a8961d055b7861bc43ad735ca8f96a5d0c059e41d5374fdb9eaffa77614e0b9013ef80de40144867288d190ae7c68b50d722e17780903370b211ae24179824e458385ced48bd19899a6bb1b1c7d7e7b265ab1dc5e37c78cbbcf993ad1b9c08182499d9f362650a226e996cf198f4ce375ba01645b6ef6f3618544728a2462d144e7ea5e2a39dfbb6828c3525ef9f7d5061d54dc8c48d39d964112f53f94e16f1eb4be6c6b462f54da952ea0da86adc32ddc35a3c34c03a68aaf99cba8a13a1e4388e55438b64d97517ee8d409095eea73e736e017a43c43849fcf0e0fbe24db29900f5060ff0b91be424952d586a03fb5ed1a00f35084a5124a3ad9b0c98b6db42ed273891475f7fc5963a8f001216046151054f5d964aceab38f42c17b8fdec949f248e88695cea59312a2a4399d8196804f7f986dd9bb90d45712e2649531759b3c29c8c1b1dafe53b2896b769f06c4e890c97a4f0601d7a0a74daa185810427f0f2e0f58cc1e2cd2ab87fc2d97b4faf7638009ae0dbaa7ded2c081393b44c98a90e706241e02faf20bc35114407a0e11203ba2d83713201b9db2fe16fa5e643ef643ac2448c2505eb2aa0c26f69cb3396b9ca2c9c066a29b4037f89eae6a7fb72648ed87dd8688e9abad4906fbb7f8653834172437b06de2971aa3e680ab567de2a65a7fc0410562a510c2cb21ef2b63e5271246c38c332fb8c1a60111c622e3a206ca5b6e1a3c3b600eb2d3f7fca2588e1a2b0f57dea2c4f1909db1368b75192a331579b1813fdc04fc9d2e84cda465cba19b7b06d3c73650781a86e7f51f9e306a25df03c85e0a66bd62adfe8162f83df293d3148d5ad6425f71a349872c8990ac507672e91a3273366a9c87ac8b9332077e3d7a3af3537b1be9bb76c3c478be0190548c2ca871c564b6c9603b884725380c3570072f4caddc1d05ecbaeca5898c80e06b028370c61bef5d0a71d3a57a466f1405e8d5a20da422e4e16caf1a43eb0decb2ef35f1d85c87abdfc0ad526aad82765542134a4eaeb22a3ca846d85b30183e372d1443c8a1adcfe9ed772f850916425e1181f75a09165f055ca8721699daec65932726ed89260d126d9c70c33b1d82372c45bb717736393de344f099541296cda78bc6fe72e73e99ed9fb2fa1f2d7b4f25f4861a7a1ee2e9f1213dad1a2becccbf84bcf1b46e87cb79cd1f22d2d8dc76a762b4e2f408e826918dcbccbdca94a089aeee35d2ebd627ecdc04e88a4d89e1c5e39c32578ffba026ac6d2558bc0aabaaee4abe27546e4946a60798d1820f1ca391bd32f64c70ecddf1b0c7640262834b36856bd61116ba4e06e35a55fe32307e6718455da2c6b223d42e3acb263b90a00fbdfc3f77afe322d81a26acad867e07e37d641c9b6fc5e5e9c8ae0a4dadc91edd47eb75a2d490be3a6f68f65a1f1d5778e1ce8afeff846405273fe7f93e8df0c74a05cfb3ae05f63cdb31b37c6eb0b2fea69d56c7672795916f3f1354e8b989aae2b1b3765e45f8384496bb5b2c0cd30720dda6c364d9f9faf440d2cfe9c3a40cec09cfc59d428a6afcc330bd26a061c48ac4fc38622da69acf3749ff55a64d9dbf8dceafdd1d54eaadc47cb476350d762b9fa788e2a1bfedb3815692c94abc92fc3fe8f181f46c3b362a2146ad2a3871eca245ece272d0f6dda07971389dba6f826bb163c8ab821f5b6dd9fc7c0dad7ca8fc953dcadfbf7a510f9b8c04e3cf8e2b6b9b1e34d36969f181fc43abac12bf395a949b1c4028f8b6210cd83429756a364c87b3ce37d2dcbe1a5682f9798c3e2c0e5737c362cc14cd96be04d2f3b6046ea782ce467efa8a30d18ee52b822d3a3c8a0bbf65f31599568123c3620f6b660d9f7d41978ebd33f63d93461b2d41498a0bc6eeb647c70f89bae94c9dac302d71c36053cfa027f8252a245abc79fea872f267358061466baa041cbd30cd89832a6d8ecff91ec3b7fd372b99eba7f97adece69f969ed6378d9d398b6404f7894f4c2f85281cacf0f505b74b7c9859f55c2c849b6d66ae87ce14686fdd450b46d386f4975353c2e7181600cf012c8040ade1327eada65dd0d029b98f2e1aabe21c446882a7dc5cf82c83e4feb7ff09c655a8929d88c7674b161746e6b4d0a7236e5731918926a154a6f74e6a5525b5f544e3f73db14d1f6c921a256ee00d21ed4c79bfd59d3ddca1c643c58bac21e7558c0c8d67d230b4bd117bfdf5d49950d2912302a34239701513eeac269ad23c10c52a3f3e4cb554eeacd34fb4edf1870a64653cb99e5eb02c082762ffee4e9b2b81462ddd20308a975ab3e898a9ef8199f8afd7b42abd659cb4a844955dc7034a1079159fc3a0134557b90955ca3b5daf44d7e0b595513359d47a20ed77cab490702ea1756c19c8c607e92e899d8c10afb0d4afab505504d2f723726e331825488cdf08c9113b2013b4ccc96ae06b3ba19ec8186f50c699dd54a7e1c24237ea8a58ead24d16f94766ebf24799b1b3fdca8478effc74013b339409aaaaca44b2033111ba0e8eec0ef6cbbca80bfe295173b61dcaa25454d66a857cffd8a8fd09e1fd255c517b934871dd53eef36047d1674099fbaca6b5ec8ccc5c39450458fa0e09bb42eb608a0774e81bc322dda0514632065b0a09ec32eebc38d2dbff658e32507a7cbf5d497e8b7a9db2adf5e8b31a8bc4101aa432f8457f1473ec6855d929e62bb0f0d832b081a15f1459f019aa58050ac04f0c00ddc0afe1c3b3fc1b5f4a286add49b9f6cf1ccab3c9a1a280dc9d8b8df645b5b1dfb74cd0e4356d7e88688a8a20c4918d2ec13e3616665b19eac460570e5baaeb7a81a6f9a9e48e88e78e8dfb8dcd536b7aaa0eed37ada1abd8a6d686112ed0a3c5066d439d8e7e1ab711e46b9e183c7ad36a082aa682e2838255c5ebf2d6c5956c5a9a6b36bfdacd2da5a646e385cb8680e84b3844587d772fc7d5d8ed82dd87598b137c60694ae676915576ff66544e84904afd9947c6a9ace97c441ff8673eb6c7d429472a6b91cbea60b87749115f3d75e092fad9ad39c8f522e50809f9147df7e8a60457b696837db11f781d7ec8daa1d60ccbf75f24f4a7ef460951f81ffd5f314d2fffd5f734e102bda5a21decf2742c8adf7ce32ceed1f51ec8eb2261c1c06219d85727c2d99763d13767d116c60185b30b541d07de3c0dff28827748d8c5c1566370f7fd21f045de5b6553c5e9fa605791ae37af5710ff581b6dc16cd6c79830d8bfae177333af4d158fe207e3815b7dc19412affd9e1d6ca823b695ea9e617b8b89477fc7f7a747e8fae61b7e6295cc46c429136bf2b97f88d47307b96d5673e47924eab4bcd45156eece50109242108817adbe46bb8c9bbefa74e5c7f00547ed0f68f836a62df88742e6ef5bc10f7787b86f84bc03f5630d61d9578e0d33ad5042a0e134b55251a4e3cb1f5ffa11081390306dd61ec6ce859b3cb21a8a54a923991ea6e5a288d80ef66a5da11ad22a63e696c496be066a1f73e4d364853a0e45ae8772962a1406e312ce371586fcbca4fff58a4a6e2749623f9382a92e27b5cc67d78d70f82f0c3f2c12a737966d288d2567d3ff6e8fdd8245c0abbb7950577b9e3c55980beebfa403827cb67cd4e9edbb3accb0c298bb68fac650683fa65bf85c1ba508d1624fc5231b8b3d2293c8cff0639a3bd93fb1e04776cb72589664970cfc92f46b980aeaabe884ac77c76150b6b634322a4d8c717c4365a4f51b4f482d82c9b8e7152358ede811cc7b60ba67a1d2f771dcf00f3b2d91953bf158c01ecc4ec2ab37eb951abb375857e572ccc6ea0f37ff571c3009389a7560f6088e481715fff211b086d6a9b0d4db2b76654b1bc958b3c6cc9e7a5680b0938e0faa485963ce9bf469b3e8c560383dd9b7f3f4f711b1a1c83c7d82e714d88674e668a10f2812cc8697f197e82ab12cb85fe57463834bd5d009889e9165fa09c7d741bf431520ddbcaabbd1796a3fa40a882a75a3c6bf34d0af12356dc720dad8bc975ff24614d6449b7a5b067a00ec4206ab634e223929a322bb989bf768765996d9ca4bf04d23b5c851d5e63428fdcabba27dc928828b6e7562fdf38977afaaa56792596c131a977f0a3c169311773d37a89e6cda97fc83be52ffa24e0220ce509d1360f3f1b763aecc5f74f0b465f05790cedc088a23de7f8d7230914b60eaa40815f5d30a4e9d0bc9e084b0c82a2f8674303bad004b01f0a5350e077775aa297d1330971cad817047a79eb063c3f9712a1fe02cda19ae7513fc723616092d2000e6bad4ef96b1d4b4c695ef21ac228f239027806167acba693cbb16f5c428fadb9ae44d2993f2d557dc134e74671f9821699ab90da2f0e898a09b786645d2cb02d73ae363acceb4465ac906b5b25ae24ea2b9f1c6590785f4efb6921760714ab6aab52acde0e232bf620be92f605afd19e2c4d62a81d320bb049ac6d6958ed12efdffc615223ea2277b034af14981dd729d29dbfa2ea7d3cfa9a83c89f2585fb929b05347dff5f0a1fa6d7a751db7c4242e57bd62b2880622e72ba6b397158451c70557f8ce32b9d7b6b92582ea7897ea5b652e9ac18bd7b1f0a7e0ffe9b895ceb3adc72c16cfca947d136694ef39526ba5a41ad20aeddb4761d221b39fe186b6e3c516f33479fbbbb91adcdd35fc33ad86ebb3be92e75b399db5166293715883d39d970ef551757289c06e5ce58a5da6c056fb25e406c8bd86b3e4e82e3617f8fb366390d68e61f6277a0a90956ef2c168b2eeed20abe29f7b54b984ec1ccf5f36add4a9d4d066aff0a282a309e7e50a8ffc984807e1282d286ad86c15ac86b2af8a55129e1c950a6cce122717a245bbad1a17f5b339204fa79d4c2b08aa874ba2212f773d76173ee403e88183c8b2fe75a296475a9a5ef8a36a19a9bd84d311af1e56a21e107d63da1710f5018e9db12c21f7f3e05196f63c2392fdd35650f7c1978b78df15f4209a144c25b8ffee479dad820ce922ea5b69bb3f5fcc0febb8c6ef91c280efb34385e71b0d6baa660fbf754acee6c0631937118bcdff7485ec9d96555b3f19c04425a44581e82748d2b727644cfe1f86d85cef1d4cd33bc11f8dac2cc987339d88968d021766fa9578883c73ef3365a1de812e058a12f8301feaf8ce07c7c69d355f43a5705ecf9d05454a268513562bcec116cd208f26d53cf5d0147ade775f6e9c49cd65e193fdb914c650f7ce40db156d14003027736737e5a2333b2daf1ce150927d836f03e6f50b3d565357f9b05ec207ab13747bd58205f2ca0d7fc4e4ac7f3e65f4867a2286e3401e9227202fa79420777239cfc8de197227cd3c41b1838c97028068c18511532d0a1a99e52560f80b68c13d185aa3444e5b513e48c0f5765c3a80a800afab2f8b25e425bac6e8e72f51926d37e17eb497591fa0f6b3018b46bd021bf9992c17106bcb3cba6d0cf3767c844f3c23fc0d87497da097083c100cd9238feb8c1c2ead8b78f77363f8b0e1d6b097a1bba6df66594712fb3237b2a8a553f9848b6c8d8d95fcdc451a4c7ff953892f9fb16698a3a68532b8e533d2a7a819eaee2ad9f68a1f1d7248dec10ced3a11fce2901e4c6d14675987a88a673fe316199d295b406e126c38c196c130a0bbd0665792fb3656ae01106a306ae2d9089b87019eb52e217c3335789ce43061f9f3ff6f1c91de6efc433d5368bf0d16a46d3d6d8ec8b5ad96feb0559af16fcdf2dd765269276fe480f9a552ec30f75b0f1b4fc5b28bb4788c10f02449dc3b52b4ff19376aa4333ef67aad770afcb3372d171ee291fdaffc375991741e756cc1b14b0f595ed3cfbf77e11bafc54d434e1e3e16dd493160385fb52f16d4498b669b1870ad56d574da4d299091b8374bf4c4b44b720af7ec529c1e98aa9352147e3922d8460b2351d3fa25169a6ec3cb90b0c834e2d4283c6546a0c5eb8b379969675618a1cc62484aa281e27268104da31886081fa517da6cb1c9bdbaadad7bc65625445f6d1c6b60bc477622d9b4d634c9172f6e1cfa1fc6c957bbb09eeec89c9566cd8c5c7cb6c2b195a40b8a5bde907a967ab6e630692b3b663e84dd309a4f5a9676f349332d06855a46964c3c8018ef36451ac74985b096837a983e4500b4630a0acc44371b16c67aaeb34f520a0cad840883d2e5aae4c5c69f9d13f3ba5ca607472b4874baeb2509920d369c824c4f164c4470832854d9204a4b232894e5946551d9b88030270d28c6d2699fe80f9abf7bb926dabc878cfb8a2a6da1f0aa9fc9176adb083303ed225762263b2f8f6009e99ee7bcefac685d0ee41758954563496fb72909c227bbe6f2ea728b31cbb3e5749bbd146d40c96ec3c860456519b9a3fbb00f03fe3ddb61300725b1ec71887c89a33dd2f16a6bf2bf3d606ad09c55f37b87d1c622566bcfe990c9ded1da0f1c72978e2e036b0166fef6c8be48c08ae0bc684c03df36a0a205e0f9e44c0a045fed96665ab425f53244d2f1d27b71c3982be43a2eff7c6a44e74c89e36ca83df9d519f42f4131f93a3adb9b04f085ea44e13bf2a48e9faf8c3aa074b7969c7efc2fce2f39f19c75259ea3398d521110fe3f0753520ceb0359f7bed024d48ff7301658b126b07a753f1d5247605e9927c866ed92ed99a69db060f73cbab59295ee8b4e75e077c77fed0a195f113cfd4f57815945539a1ca2fbde74a41e3b1299eb886340dda1141fdf99c133ac5e9948b379ccaade11aeef818be6d5e26e4bfd597905fa33488cf6265021a3956ad4ce8cb7bde2d69f82b1315abb6da4112ddd1a13f34804f085b7e39d2d80dc71aaf9f06da988b646a077b1c289ea4fa51b04838eab439c0a77362a53ea445b23a89b615a594c199bfa2d9df3a9276746b30e720938014b076ed659df02b945a8750</script>
+  <div class="hbe hbe-content">
+    <div class="hbe hbe-input hbe-input-xray">
+      <input class="hbe hbe-input-field hbe-input-field-xray" type="password" id="hbePass">
+      <label class="hbe hbe-input-label hbe-input-label-xray" for="hbePass">
+        <span class="hbe hbe-input-label-content hbe-input-label-content-xray">您好, 这里需要密码.</span>
+      </label>
+      <svg class="hbe hbe-graphic hbe-graphic-xray" width="300%" height="100%" viewBox="0 0 1200 60" preserveAspectRatio="none">
+        <path d="M0,56.5c0,0,298.666,0,399.333,0C448.336,56.5,513.994,46,597,46c77.327,0,135,10.5,200.999,10.5c95.996,0,402.001,0,402.001,0"></path>
+        <path d="M0,2.5c0,0,298.666,0,399.333,0C448.336,2.5,513.994,13,597,13c77.327,0,135-10.5,200.999-10.5c95.996,0,402.001,0,402.001,0"></path>
+      </svg>
+    </div>
+  </div>
+</div>
+<script data-pjax src="/lib/hbe.js"></script><link href="/css/hbe.style.css" rel="stylesheet" type="text/css"></article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="mailto:undefined">裘剑东</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="http://qjdxmy.com/2022/02/27/m6678-1/">http://qjdxmy.com/2022/02/27/m6678-1/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="http://qjdxmy.com" target="_blank">小裘控制系统</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/DSP/">DSP</a><a class="post-meta__tags" href="/tags/6678/">6678</a><a class="post-meta__tags" href="/tags/M6678/">M6678</a></div><div class="post_share"><div class="social-share" data-image="/img/me.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/social-share.js/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2022/02/27/c6455-etc/"><img class="prev-cover" src="/2022/02/27/c6455-etc/2022-02-27-20-02-12.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">TMS320C6455调试记录</div></div></a></div><div class="next-post pull-right"><a href="/2022/02/27/m6678-2/"><img class="next-cover" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">FT-M6678开发（二）</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/2022/02/27/m6678-2/" title="FT-M6678开发（二）"><img class="cover" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-02-27</div><div class="title">FT-M6678开发（二）</div></div></a></div><div><a href="/2022/02/27/m6678-3/" title="FT-M6678开发（三）"><img class="cover" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-02-27</div><div class="title">FT-M6678开发（三）</div></div></a></div><div><a href="/2022/02/27/m6678-4/" title="FT-M6678开发（四）"><img class="cover" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-02-27</div><div class="title">FT-M6678开发（四）</div></div></a></div><div><a href="/2022/02/27/m6678-5/" title="FT-M6678开发（五）"><img class="cover" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-02-27</div><div class="title">FT-M6678开发（五）</div></div></a></div><div><a href="/2022/02/27/m6678-6/" title="FT-M6678开发（六）"><img class="cover" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-02-27</div><div class="title">FT-M6678开发（六）</div></div></a></div><div><a href="/2022/02/27/m6678-7/" title="FT-M6678开发（七）"><img class="cover" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-02-27</div><div class="title">FT-M6678开发（七）</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/me.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">裘剑东</div><div class="author-info__description">芯来科技基础软件开发工程师，嵌入式开发爱好者</div></div><div class="card-info-data is-center"><div class="card-info-data-item"><a href="/archives/"><div class="headline">文章</div><div class="length-num">84</div></a></div><div class="card-info-data-item"><a href="/tags/"><div class="headline">标签</div><div class="length-num">101</div></a></div><div class="card-info-data-item"><a href="/categories/"><div class="headline">分类</div><div class="length-num">18</div></a></div></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/qiujiandong"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/qiujiandong" target="_blank" title="Github"><i class="fab fa-github"></i></a><a class="social-icon" href="mailto:1335521934@qq.com" target="_blank" title="Email"><i class="fas fa-envelope"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">最好的程序员做自己的硬件！</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content toc-div-class is-expand" style="display:none"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#PLL"><span class="toc-number">1.</span> <span class="toc-text">PLL</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#PLL%E7%9B%B8%E5%85%B3%E5%AF%84%E5%AD%98%E5%99%A8"><span class="toc-number">2.</span> <span class="toc-text">PLL相关寄存器</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#PLL%E9%85%8D%E7%BD%AE%E6%B5%81%E7%A8%8B"><span class="toc-number">3.</span> <span class="toc-text">PLL配置流程</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#PSC"><span class="toc-number">4.</span> <span class="toc-text">PSC</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#PSC%E5%88%87%E6%8D%A2%E6%A8%A1%E5%9D%97%E6%97%B6%E9%92%9F%E7%8A%B6%E6%80%81"><span class="toc-number">5.</span> <span class="toc-text">PSC切换模块时钟状态</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2025/01/01/summary-2024/" title="2024年终总结"><img src="/2025/01/01/summary-2024/2025-01-01-21-54-27.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="2024年终总结"/></a><div class="content"><a class="title" href="/2025/01/01/summary-2024/" title="2024年终总结">2024年终总结</a><time datetime="2025-01-01T09:19:27.000Z" title="发表于 2025-01-01 17:19:27">2025-01-01</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2024/04/17/learn-cuda/" title="CUDA优化入门"><img src="/2024/04/17/learn-cuda/2024-04-16-15-52-38.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="CUDA优化入门"/></a><div class="content"><a class="title" href="/2024/04/17/learn-cuda/" title="CUDA优化入门">CUDA优化入门</a><time datetime="2024-04-17T12:00:00.000Z" title="发表于 2024-04-17 20:00:00">2024-04-17</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2024/04/04/bipartite-match/" title="二分图的判断与匹配"><img src="/2024/04/04/bipartite-match/2024-04-05-00-11-55.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="二分图的判断与匹配"/></a><div class="content"><a class="title" href="/2024/04/04/bipartite-match/" title="二分图的判断与匹配">二分图的判断与匹配</a><time datetime="2024-04-04T13:43:47.000Z" title="发表于 2024-04-04 21:43:47">2024-04-04</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2024/01/19/summary/" title="长风破浪会有时"><img src="/2024/01/19/summary/wrapped2023.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="长风破浪会有时"/></a><div class="content"><a class="title" href="/2024/01/19/summary/" title="长风破浪会有时">长风破浪会有时</a><time datetime="2024-01-19T13:15:25.000Z" title="发表于 2024-01-19 21:15:25">2024-01-19</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/06/05/remote-vivado/" title="Vivado远程开发探索"><img src="/2023/06/05/remote-vivado/2023-06-15-16-22-13.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Vivado远程开发探索"/></a><div class="content"><a class="title" href="/2023/06/05/remote-vivado/" title="Vivado远程开发探索">Vivado远程开发探索</a><time datetime="2023-06-05T09:52:47.000Z" title="发表于 2023-06-05 17:52:47">2023-06-05</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2025 By 裘剑东</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.js"></script><div class="js-pjax"><script>(() => {
+  const $mermaidWrap = document.querySelectorAll('#article-container .mermaid-wrap')
+  if ($mermaidWrap.length) {
+    window.runMermaid = () => {
+      window.loadMermaid = true
+      const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default'
+
+      Array.from($mermaidWrap).forEach((item, index) => {
+        const mermaidSrc = item.firstElementChild
+        const mermaidThemeConfig = '%%{init:{ \'theme\':\'' + theme + '\'}}%%\n'
+        const mermaidID = 'mermaid-' + index
+        const mermaidDefinition = mermaidThemeConfig + mermaidSrc.textContent
+        mermaid.mermaidAPI.render(mermaidID, mermaidDefinition, (svgCode) => {
+          mermaidSrc.insertAdjacentHTML('afterend', svgCode)
+        })
+      })
+    }
+
+    const loadMermaid = () => {
+      window.loadMermaid ? runMermaid() : getScript('https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js').then(runMermaid)
+    }
+
+    window.pjax ? loadMermaid() : document.addEventListener('DOMContentLoaded', loadMermaid)
+  }
+})()</script></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

@@ -1,0 +1,245 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Vivado远程开发探索 | 小裘控制系统</title><meta name="keywords" content="Vivado,远程"><meta name="author" content="裘剑东"><meta name="copyright" content="裘剑东"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="平时主要用轻薄本办公，但是有时候又需要用Vivado做一些开发的工作，就感觉生产力不够。如果能在远程的高性能服务器上跑Vivado综合实现就好了。前段时间用ubuntu下安装的Vivado发现有一个Remote Host的设置。所以就准备折腾一下这个。 WSL   WSL的安装看官网的文档就好了。最近摸索了一段时间后感觉，Linux系统的桌面并没有很大的作用。一般只需要应用程序有一个可视化的图">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Vivado远程开发探索">
+<meta property="og:url" content="http://qjdxmy.com/2023/06/05/remote-vivado/">
+<meta property="og:site_name" content="小裘控制系统">
+<meta property="og:description" content="平时主要用轻薄本办公，但是有时候又需要用Vivado做一些开发的工作，就感觉生产力不够。如果能在远程的高性能服务器上跑Vivado综合实现就好了。前段时间用ubuntu下安装的Vivado发现有一个Remote Host的设置。所以就准备折腾一下这个。 WSL   WSL的安装看官网的文档就好了。最近摸索了一段时间后感觉，Linux系统的桌面并没有很大的作用。一般只需要应用程序有一个可视化的图">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://qjdxmy.com/2023/06/05/remote-vivado/2023-06-15-16-22-13.png">
+<meta property="article:published_time" content="2023-06-05T09:52:47.000Z">
+<meta property="article:modified_time" content="2024-04-17T12:40:48.621Z">
+<meta property="article:author" content="裘剑东">
+<meta property="article:tag" content="Vivado">
+<meta property="article:tag" content="ssh">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://qjdxmy.com/2023/06/05/remote-vivado/2023-06-15-16-22-13.png"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="http://qjdxmy.com/2023/06/05/remote-vivado/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '天',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery@2/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery@2/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'Vivado远程开发探索',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2024-04-17 20:40:48'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 6.0.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/me.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data is-center"><div class="data-item"><a href="/archives/"><div class="headline">文章</div><div class="length-num">84</div></a></div><div class="data-item"><a href="/tags/"><div class="headline">标签</div><div class="length-num">101</div></a></div><div class="data-item"><a href="/categories/"><div class="headline">分类</div><div class="length-num">18</div></a></div></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/download/"><i class="fa-fw fas fa-download"></i><span> 下载</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 链接</span></a></div><div class="menus_item"><a class="site-page" href="/resume/"><i class="fa-fw fas fa-heart"></i><span> 个人简历</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="not-top-img" id="page-header"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">小裘控制系统</a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/download/"><i class="fa-fw fas fa-download"></i><span> 下载</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 链接</span></a></div><div class="menus_item"><a class="site-page" href="/resume/"><i class="fa-fw fas fa-heart"></i><span> 个人简历</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav></header><main class="layout" id="content-inner"><div id="post"><div id="post-info"><h1 class="post-title">Vivado远程开发探索</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2023-06-05T09:52:47.000Z" title="发表于 2023-06-05 17:52:47">2023-06-05</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2024-04-17T12:40:48.621Z" title="更新于 2024-04-17 20:40:48">2024-04-17</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/Vivado/">Vivado</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="Vivado远程开发探索"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"></span></span></div></div></div><article class="post-content" id="article-container"><p>  平时主要用轻薄本办公，但是有时候又需要用Vivado做一些开发的工作，就感觉生产力不够。如果能在远程的高性能服务器上跑Vivado综合实现就好了。前段时间用ubuntu下安装的Vivado发现有一个Remote Host的设置。所以就准备折腾一下这个。</p>
+<h2 id="WSL">WSL</h2>
+<p>  WSL的安装看官网的<a target="_blank" rel="noopener" href="https://learn.microsoft.com/zh-cn/windows/wsl/">文档</a>就好了。最近摸索了一段时间后感觉，Linux系统的桌面并没有很大的作用。一般只需要应用程序有一个可视化的图形窗口就行。切换目录浏览文件，启动应用程序都可以通过命令行快速实现。因此安装完WSL之后并不太需要安装一个“桌面”，而只要能够显示某些应用软件的图形界面即可。<br>
+  图形界面显示用Xserver实现，我在widows端采用<a target="_blank" rel="noopener" href="https://sourceforge.net/projects/vcxsrv/">xcvsrc</a>作为服务端。在WSL中运行的应用程序都可以转发到widnows主机上显示，这一转发的功能需要设置转发显示的地址，由变量DSIPLAY控制显示的地址和端口。某些远程SSH登录的软件可以指定这一地址，如果不指定的话也需要在.profile或.bashrc中确定DISPLAY变量。</p>
+<h2 id="Vivado安装">Vivado安装</h2>
+<p>  Vivado的安装过程可以看<a target="_blank" rel="noopener" href="https://docs.xilinx.com/r/2020.2-English/ug973-vivado-release-notes-install-license">ug973</a>，在没有图形界面的情况下可以用Batch mode来安装。WSL默认的根目录大小是256 GB，我没有额外扩容，安装了Vivado2019.2。</p>
+<img src="/2023/06/05/remote-vivado/2023-06-12-14-58-38.png" class="">
+<p>  ug973里同样说明了特定版本的Vivado能够和什么版本的操作系统一起工作，能够和什么版本的仿真软件一起工作。比如在2019.2版本的ug973里，它并没有说支持20.04版本的ubuntu，可能那时候ubuntu还没有更新到20.04，但实际使用过程中是没问题的。</p>
+<img src="/2023/06/05/remote-vivado/2023-06-12-15-22-29.png" class="">
+<p>  在真正开始安装之前需要先安装ncurses5库，然后再按部就班安装即可。安装完成后用了70+ GB。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt install libncurses5</span><br></pre></td></tr></table></figure>
+<img src="/2023/06/05/remote-vivado/2023-06-12-15-09-24.png" class="">
+<p>  安装完成之后只需要把Vivado的路径添加到PATH环境变量中就可以通过命令行启动Vivado了。可以把下面这行命令放在~/.bashrc的末尾。然后就可以在任意目录下启动vivado了，vivado启动的路径下会生成.log和.jou日志文件，因此一般推荐在工程目录下启动vivado，这样方便管理那些自动生成的日志文件。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">source</span> /tools/Xilinx/Vivado/2019.2/settings64.sh</span><br></pre></td></tr></table></figure>
+<p>  用户目录下有两个文件.bashrc和.profile。.bashrc中的命令在每次打开一个终端的时候都会执行；.profile中的命令只有在用户刚登录的时候才会执行一次。Linux系统相比于windows系统能很快就让环境变量生效。因为只要在修改.bashrc之后，再打开一个新的终端，新的环境变量设置就能生效。更快的方式就是：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">source</span> ~/.bashrc</span><br></pre></td></tr></table></figure>
+<p>  总之，在确保Xserver运行的情况下，WSL设置正确的DISPLAY变量。然后启动Vivado，就可以在windows系统下运行Linux环境中的Vivado。</p>
+<img src="/2023/06/05/remote-vivado/2023-06-12-15-37-42.png" class="">
+<h2 id="Modelsim安装">Modelsim安装</h2>
+<p>  Vivado安装成功后基本就能用了，Vivado也可以用来仿真，但是modelsim优化得更好，仿真更快，所以我一般都用modelsim仿真。但是在WSL里安装modelsim有些问题，如果是直接在Ubuntu系统下安装是没有问题的，可以参考这篇<a target="_blank" rel="noopener" href="https://blog.csdn.net/baishikele006/article/details/128763006">文章</a>。<br>
+  我同样照着这篇文章安装modelsim，modelsim能够正常启动，但是有一个致命的问题是，WSL在每次启动时物理地址会变，导致license失效。网上好像有一些奇技淫巧可以做到固定MAC地址，但官方还没有给出解决方案，所以我还是想再等一等官方的更新。这时候我想大不了每次启动wsl都生成一遍license，因为生成license也挺快的。但实际上后面还有一个坑。<br>
+  加载正确的license之后能够打开modelsim了，但是不能开始仿真。一旦开始仿真它就报错，就像下面这样：</p>
+<img src="/2023/06/05/remote-vivado/2023-06-12-15-52-30.png" class="">
+<p>  这我就没办法了。WSL下的Modelsim仿真主要就是有这样两个问题：</p>
+<ul>
+<li>MAC地址在每次启动WSL时都会发送变化；</li>
+<li>启动仿真时发生socket被占用的问题。</li>
+</ul>
+<h2 id="Vivado调试">Vivado调试</h2>
+<p>  WSL中的Vivado连接板卡会相对比较繁琐，但是确实是可行的。</p>
+<h3 id="驱动安装">驱动安装</h3>
+<p>  参考ug973，Vivado的安装目录下有驱动的安装文件。执行以下命令来安装驱动：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo <span class="variable">$&#123;vivado_install_dir&#125;</span>/data/xicom/cable_drivers/lin64/install_script/install_drivers/install_drivers</span><br></pre></td></tr></table></figure>
+<p>需要把其中的${vivado_install_dir}替换为Vivado的安装路径。比如我的是：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo /tools/Xilinx/Vivado/2019.2/data/xicom/cable_drivers/lin64/install_script/install_drivers/install_drivers</span><br></pre></td></tr></table></figure>
+<h3 id="WSL连接USB设备">WSL连接USB设备</h3>
+<p>  微软官方有介绍一种<a target="_blank" rel="noopener" href="https://learn.microsoft.com/en-us/windows/wsl/connect-usb">方法</a>，可以由WSL直接连接USB外设。完成一系列安装后，需要在PowerShell中为WSL attach USB设备。<br>
+添加设备的命令：</p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">usbipd wsl attach <span class="literal">--busid</span> &lt;busid&gt;</span><br></pre></td></tr></table></figure>
+<p>删除设备的命令：</p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">usbipd wsl detach <span class="literal">--busid</span> &lt;busid&gt;</span><br></pre></td></tr></table></figure>
+<p>其中的busid是通过&quot;usbipd wsl list&quot;获得的。</p>
+<img src="/2023/06/05/remote-vivado/2023-06-12-17-19-21.png" class="">
+<p>  只要安装完驱动和attach USB设备，Vivado就可以识别并连接硬件板卡。</p>
+<h2 id="远程综合实现">远程综合实现</h2>
+<p>  虽然Xilinx的<a target="_blank" rel="noopener" href="https://docs.xilinx.com/v/u/2019.2-English/ug904-vivado-implementation">ug904</a>上有说可以利用远程的Linux主机来跑job。但它的要求就很迷，大概的意思就是需要工程所在的目录需要挂载到远程的服务器上才行。</p>
+<img src="/2023/06/05/remote-vivado/2023-06-12-17-39-39.png" class="">
+<p>  我遇到的情况大概和这个<a target="_blank" rel="noopener" href="https://support.xilinx.com/s/question/0D52E00006iHlI5SAK/lauching-runs-on-a-remote-host-on-ubuntu?language=en_US">帖子</a>差不多，单独使用ssh远程访问Linux主机没有问题，但是Test就是通不过。现在也没有找到解决方法。</p>
+<h2 id="远程服务器端工作">远程服务器端工作</h2>
+<p>  借助Remote Host综合实现的想法没能实现，那干脆直接就在Remote Host上工作吧。这样都不需要WSL了，直接ssh远程连接Linux主机，在远程主机上完成所有开发。如果是在实验室的话，在实验室的局域网内通过ssh连接服务器做开发是完全可行的。<br>
+  比如我用MobaXterm通过ssh连接我们实验室的服务器。</p>
+<ul>
+<li>服务器IP：192.168.3.192</li>
+<li>本地IP：192.168.3.49</li>
+</ul>
+<p>  因为要调试的设备也是在本地的，所以本地需要启动vivado的hw_server。并且hw_server的版本需要和服务器的vivado版本对应。2019版本及以前的Vivado支持单独下载<a target="_blank" rel="noopener" href="https://www.xilinx.com/support/download/index.html/content/xilinx/en/downloadNav/vivado-design-tools/archive.html">hardware server</a>。大概就200M的样子，很方便。<br>
+  还有一种方法很方便，就是直接去已经安装了Vivado的主机上拷贝hw_server.exe和驱动安装文件。这两个文件加起来都不超过100M，非常方便。可以让轻薄本不安装Vivado，然后借助远程服务器来调试本地的设备。本地的主机一般要写文档啥的还是windows比较方便，所以我这里用的是windows版本的软件。如果你的本地主机用的是Linux版本的，那应该也有对应的驱动和hw_server。</p>
+<ul>
+<li>hw_server.exe路径: ${vivado_install_dir}/bin/unwrapped/win64.o/hw_server.exe</li>
+<li>驱动安装包install_digilent.exe路径: ${vivado_install_dir}/data/xicom/cable_drivers/nt64/digilent/install_digilent.exe</li>
+</ul>
+<p>  安装完驱动，然后启动hw_server.exe就可以等待远程的服务器来连接了。</p>
+<img src="/2023/06/05/remote-vivado/2023-06-15-16-17-58.png" class="">
+<p>  结果就像这样，本地主机通过ssh连接远程服务器的22端口，远程服务器通过本地主机的3121端口连接待调试设备。</p>
+<img src="/2023/06/05/remote-vivado/2023-06-15-16-22-13.png" class="">
+<p>  而且这一做法不存在WSL中物理地址一直变的问题，可以正常在远程使用modelsim，modelsim的license里，需要为每一条加上&quot;TS_OK&quot;然后才能远程使用。可以看这个<a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_47139649/article/details/115005251">文章</a>。正常做设计和仿真都是没问题的。<br>
+  如果本地主机没法服务器在一个网段内，可以考虑结合ZeroTier使用。ZeroTier实现内网穿透非常方便，可以建立一个虚拟的局域网，但就是网速可能比较慢。<a target="_blank" rel="noopener" href="https://www.zerotier.com/download/">ZeroTier下载安装</a>，<a target="_blank" rel="noopener" href="https://docs.zerotier.com/getting-started/getting-started">使用方法</a>。</p>
+<h2 id="结论">结论</h2>
+<p>  本来想在我的笔记本上通过WSL安装Vivado，然后连接远程主机，用Remote Host来跑一些job。但是因为种种原因失败了。但在在轻薄本上做Xilinx的FPGA开发并不是不行，这里有两个选择：</p>
+<blockquote>
+<ol>
+<li>买高性能的轻薄本，既轻薄又有生产力，缺点就是比较贵。</li>
+<li>利用ssh连接服务器，结合X11Forwarding进行开发。本地资源占用小，缺点就是比较依赖网速。</li>
+</ol>
+</blockquote>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="mailto:undefined">裘剑东</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="http://qjdxmy.com/2023/06/05/remote-vivado/">http://qjdxmy.com/2023/06/05/remote-vivado/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="http://qjdxmy.com" target="_blank">小裘控制系统</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/Vivado/">Vivado</a><a class="post-meta__tags" href="/tags/ssh/">ssh</a></div><div class="post_share"><div class="social-share" data-image="/2023/06/05/remote-vivado/2023-06-15-16-22-13.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/social-share.js/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2023/05/29/kcf-impl-verify/"><img class="prev-cover" src="/2023/05/29/kcf-impl-verify/2023-06-04-20-52-57.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">基于国产器件的KCF跟踪算法实现与验证</div></div></a></div><div class="next-post pull-right"><a href="/2024/01/19/summary/"><img class="next-cover" src="/2024/01/19/summary/wrapped2023.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">长风破浪会有时</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/2022/02/26/logic-axi/" title="AXI协议与自定义AXI4-Lite外设"><img class="cover" src="/2022/02/26/logic-axi/2022-02-26-18-05-43.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-02-26</div><div class="title">AXI协议与自定义AXI4-Lite外设</div></div></a></div><div><a href="/2022/02/27/logic-inout-delay/" title="输入输出延时的时序约束"><img class="cover" src="/2022/02/27/logic-inout-delay/2022-02-27-14-36-39.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-02-27</div><div class="title">输入输出延时的时序约束</div></div></a></div><div><a href="/2022/02/27/vivado-git/" title="基于Git和Tcl脚本的Vivado工程管理"><img class="cover" src="/2022/02/27/vivado-git/2022-02-27-14-46-05.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-02-27</div><div class="title">基于Git和Tcl脚本的Vivado工程管理</div></div></a></div><div><a href="/2022/02/27/vivado-modelsim/" title="Vivado与Modelsim联合仿真"><img class="cover" src="/2022/02/27/vivado-modelsim/2022-02-27-14-59-20.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-02-27</div><div class="title">Vivado与Modelsim联合仿真</div></div></a></div><div><a href="/2022/02/27/vivado-tcl/" title="用于Vivado工程管理的Tcl语法学习"><img class="cover" src="/2022/02/27/vivado-tcl/2022-02-27-14-50-59.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-02-27</div><div class="title">用于Vivado工程管理的Tcl语法学习</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/me.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">裘剑东</div><div class="author-info__description">芯来科技基础软件开发工程师，嵌入式开发爱好者</div></div><div class="card-info-data is-center"><div class="card-info-data-item"><a href="/archives/"><div class="headline">文章</div><div class="length-num">84</div></a></div><div class="card-info-data-item"><a href="/tags/"><div class="headline">标签</div><div class="length-num">101</div></a></div><div class="card-info-data-item"><a href="/categories/"><div class="headline">分类</div><div class="length-num">18</div></a></div></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/qiujiandong"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/qiujiandong" target="_blank" title="Github"><i class="fab fa-github"></i></a><a class="social-icon" href="mailto:1335521934@qq.com" target="_blank" title="Email"><i class="fas fa-envelope"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">最好的程序员做自己的硬件！</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content is-expand"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#WSL"><span class="toc-number">1.</span> <span class="toc-text">WSL</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Vivado%E5%AE%89%E8%A3%85"><span class="toc-number">2.</span> <span class="toc-text">Vivado安装</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Modelsim%E5%AE%89%E8%A3%85"><span class="toc-number">3.</span> <span class="toc-text">Modelsim安装</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Vivado%E8%B0%83%E8%AF%95"><span class="toc-number">4.</span> <span class="toc-text">Vivado调试</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%A9%B1%E5%8A%A8%E5%AE%89%E8%A3%85"><span class="toc-number">4.1.</span> <span class="toc-text">驱动安装</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#WSL%E8%BF%9E%E6%8E%A5USB%E8%AE%BE%E5%A4%87"><span class="toc-number">4.2.</span> <span class="toc-text">WSL连接USB设备</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%BF%9C%E7%A8%8B%E7%BB%BC%E5%90%88%E5%AE%9E%E7%8E%B0"><span class="toc-number">5.</span> <span class="toc-text">远程综合实现</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%BF%9C%E7%A8%8B%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%AB%AF%E5%B7%A5%E4%BD%9C"><span class="toc-number">6.</span> <span class="toc-text">远程服务器端工作</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%BB%93%E8%AE%BA"><span class="toc-number">7.</span> <span class="toc-text">结论</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2025/01/01/summary-2024/" title="2024年终总结"><img src="/2025/01/01/summary-2024/2025-01-01-21-54-27.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="2024年终总结"/></a><div class="content"><a class="title" href="/2025/01/01/summary-2024/" title="2024年终总结">2024年终总结</a><time datetime="2025-01-01T09:19:27.000Z" title="发表于 2025-01-01 17:19:27">2025-01-01</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2024/04/17/learn-cuda/" title="CUDA优化入门"><img src="/2024/04/17/learn-cuda/2024-04-16-15-52-38.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="CUDA优化入门"/></a><div class="content"><a class="title" href="/2024/04/17/learn-cuda/" title="CUDA优化入门">CUDA优化入门</a><time datetime="2024-04-17T12:00:00.000Z" title="发表于 2024-04-17 20:00:00">2024-04-17</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2024/04/04/bipartite-match/" title="二分图的判断与匹配"><img src="/2024/04/04/bipartite-match/2024-04-05-00-11-55.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="二分图的判断与匹配"/></a><div class="content"><a class="title" href="/2024/04/04/bipartite-match/" title="二分图的判断与匹配">二分图的判断与匹配</a><time datetime="2024-04-04T13:43:47.000Z" title="发表于 2024-04-04 21:43:47">2024-04-04</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2024/01/19/summary/" title="长风破浪会有时"><img src="/2024/01/19/summary/wrapped2023.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="长风破浪会有时"/></a><div class="content"><a class="title" href="/2024/01/19/summary/" title="长风破浪会有时">长风破浪会有时</a><time datetime="2024-01-19T13:15:25.000Z" title="发表于 2024-01-19 21:15:25">2024-01-19</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/06/05/remote-vivado/" title="Vivado远程开发探索"><img src="/2023/06/05/remote-vivado/2023-06-15-16-22-13.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Vivado远程开发探索"/></a><div class="content"><a class="title" href="/2023/06/05/remote-vivado/" title="Vivado远程开发探索">Vivado远程开发探索</a><time datetime="2023-06-05T09:52:47.000Z" title="发表于 2023-06-05 17:52:47">2023-06-05</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2025 By 裘剑东</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.js"></script><div class="js-pjax"><script>(() => {
+  const $mermaidWrap = document.querySelectorAll('#article-container .mermaid-wrap')
+  if ($mermaidWrap.length) {
+    window.runMermaid = () => {
+      window.loadMermaid = true
+      const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default'
+
+      Array.from($mermaidWrap).forEach((item, index) => {
+        const mermaidSrc = item.firstElementChild
+        const mermaidThemeConfig = '%%{init:{ \'theme\':\'' + theme + '\'}}%%\n'
+        const mermaidID = 'mermaid-' + index
+        const mermaidDefinition = mermaidThemeConfig + mermaidSrc.textContent
+        mermaid.mermaidAPI.render(mermaidID, mermaidDefinition, (svgCode) => {
+          mermaidSrc.insertAdjacentHTML('afterend', svgCode)
+        })
+      })
+    }
+
+    const loadMermaid = () => {
+      window.loadMermaid ? runMermaid() : getScript('https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js').then(runMermaid)
+    }
+
+    window.pjax ? loadMermaid() : document.addEventListener('DOMContentLoaded', loadMermaid)
+  }
+})()</script></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

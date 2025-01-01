@@ -1,0 +1,299 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>基于多核DSP的双目标KCF跟踪实现 | 小裘控制系统</title><meta name="keywords" content="DSP,多核"><meta name="author" content="裘剑东"><meta name="copyright" content="裘剑东"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="KCF目标跟踪算法在DSP上实现的具体细节我已写了一篇文章，已被《红外技术》期刊录用，应该不久之后会见刊。文中主要介绍如何用单核DSP和硬件FFT加速器实现KCF算法，并满足实时性需求。   后来为了用KCF跟踪算法同时跟踪两个不同的目标，就有了这篇文章所介绍的工作，本文主要就是分享一下我的设计过程，同时也作为一个多核DSP工程的示例（Gitee链接）。多核工程在实现的过程中主要要解决的就是不">
+<meta property="og:type" content="article">
+<meta property="og:title" content="基于多核DSP的双目标KCF跟踪实现">
+<meta property="og:url" content="http://qjdxmy.com/2023/02/05/kcf-double/">
+<meta property="og:site_name" content="小裘控制系统">
+<meta property="og:description" content="KCF目标跟踪算法在DSP上实现的具体细节我已写了一篇文章，已被《红外技术》期刊录用，应该不久之后会见刊。文中主要介绍如何用单核DSP和硬件FFT加速器实现KCF算法，并满足实时性需求。   后来为了用KCF跟踪算法同时跟踪两个不同的目标，就有了这篇文章所介绍的工作，本文主要就是分享一下我的设计过程，同时也作为一个多核DSP工程的示例（Gitee链接）。多核工程在实现的过程中主要要解决的就是不">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://qjdxmy.com/2023/02/05/kcf-double/2023-02-05-20-11-38.png">
+<meta property="article:published_time" content="2023-02-04T20:31:07.000Z">
+<meta property="article:modified_time" content="2024-04-17T12:40:48.613Z">
+<meta property="article:author" content="裘剑东">
+<meta property="article:tag" content="DSP">
+<meta property="article:tag" content="多核">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://qjdxmy.com/2023/02/05/kcf-double/2023-02-05-20-11-38.png"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="http://qjdxmy.com/2023/02/05/kcf-double/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '天',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery@2/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery@2/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '基于多核DSP的双目标KCF跟踪实现',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2024-04-17 20:40:48'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 6.0.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/me.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data is-center"><div class="data-item"><a href="/archives/"><div class="headline">文章</div><div class="length-num">84</div></a></div><div class="data-item"><a href="/tags/"><div class="headline">标签</div><div class="length-num">101</div></a></div><div class="data-item"><a href="/categories/"><div class="headline">分类</div><div class="length-num">18</div></a></div></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/download/"><i class="fa-fw fas fa-download"></i><span> 下载</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 链接</span></a></div><div class="menus_item"><a class="site-page" href="/resume/"><i class="fa-fw fas fa-heart"></i><span> 个人简历</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="not-top-img" id="page-header"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">小裘控制系统</a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/download/"><i class="fa-fw fas fa-download"></i><span> 下载</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 链接</span></a></div><div class="menus_item"><a class="site-page" href="/resume/"><i class="fa-fw fas fa-heart"></i><span> 个人简历</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav></header><main class="layout" id="content-inner"><div id="post"><div id="post-info"><h1 class="post-title">基于多核DSP的双目标KCF跟踪实现</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2023-02-04T20:31:07.000Z" title="发表于 2023-02-05 04:31:07">2023-02-05</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2024-04-17T12:40:48.613Z" title="更新于 2024-04-17 20:40:48">2024-04-17</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/DSP%E5%BC%80%E5%8F%91/">DSP开发</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="基于多核DSP的双目标KCF跟踪实现"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"></span></span></div></div></div><article class="post-content" id="article-container"><p>  KCF目标跟踪算法在DSP上实现的具体细节我已写了一篇文章，已被《红外技术》期刊录用，应该不久之后会见刊。文中主要介绍如何用单核DSP和硬件FFT加速器实现KCF算法，并满足实时性需求。<br>
+  后来为了用KCF跟踪算法同时跟踪两个不同的目标，就有了这篇文章所介绍的工作，本文主要就是分享一下我的设计过程，同时也作为一个多核DSP工程的示例（<a target="_blank" rel="noopener" href="https://gitee.com/jayden1998/m6678">Gitee链接</a>）。多核工程在实现的过程中主要要解决的就是不同核之间的同步的问题和共享资源的互斥访问的问题。</p>
+<h2 id="软件整体结构">软件整体结构</h2>
+<img src="/2023/02/05/kcf-double/2023-02-05-20-11-38.png" class="">
+<p>  多核程序的设计首先可以确定软件的整体结构，可以是主从式，也可以是流水线的形式。最好能平衡每个核的工作量，合理地安排每个核的任务。我这次采用的是类似主从式的结构，软件整体框图如上图所示。主要实现以下功能：</p>
+<ul>
+<li>Core0负责接收图像数据，采用乒乓缓存的方式接收，在处理当前帧的同时可以同时接收新的数据。Core0可以按照一定的帧频接收图像，也可以主动向PC发出接收图像的请求。</li>
+<li>Core0通过消息队列（MsgQ）向Core1和Core2发送命令，执行KCF跟踪算法，Core1和Core2分别将两个目标框的左上角坐标和长宽(x,y,w,h)通过MsgQ返回Core0，由Core0汇总结果;</li>
+<li>Core1和Core2在计算过程中需要调用硬件FFT加速器，Core3作为中介，Core1和Core2只需要将FFT计算的需求通过MsgQ发送给Core3即可;</li>
+<li>Core3按照收到的计算需求配置硬件FFT加速器和EDMA来完成二维FFT计算。并在完成计算后利用Notify告知相应的核。Core1和Core2可以在指定的地址直接获得计算结果。</li>
+</ul>
+<h2 id="存储空间分配">存储空间分配</h2>
+<p>  嵌入式系统往往都存在资源有限的问题，在确定每个核大致的任务之后，就应该根据每个核的需求来划分一些共享的存储空间。</p>
+<h3 id="存储空间">存储空间</h3>
+<p>  TMS320C6678或者是银河飞腾FT-M6678的存储空间分配情况如下表所示。我们主要关注的是L2的配置以及MSMC SRAM和DDR3的空间划分。</p>
+<table>
+<thead>
+<tr>
+<th>类别</th>
+<th>大小</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>L1D</td>
+<td>32kB (per core)</td>
+<td>一般都作为Cache使用</td>
+</tr>
+<tr>
+<td>L1P</td>
+<td>32kB (per core)</td>
+<td>一般都作为Cache使用</td>
+</tr>
+<tr>
+<td>L2</td>
+<td>512kB (per core)</td>
+<td>可以部分作为Cache，用于缓存DDR3中的数据或指令；或者作为SRAM</td>
+</tr>
+<tr>
+<td>MSMC SRAM</td>
+<td>4MB (shared)</td>
+<td>由多核共享存储器控制器（Multicore Shared Memory Controller）管理的SRAM，由8个核共享，访问速度类似于L2</td>
+</tr>
+<tr>
+<td>DDR3</td>
+<td>2GB (shared)</td>
+<td>DDR3的访问速度相比于L2或者MSMC SRAM的访问速度要慢得多，为了保证计算的实时性，如果用DDR3存放数据，一定要将部分L2作为Cache使用</td>
+</tr>
+</tbody>
+</table>
+<h3 id="存储配置">存储配置</h3>
+<p>  存储器的使用情况如下表所示。数据区能放在MSMC SRAM就放，迫不得已才放到DDR上去，因为如果把数据放在DDR上，计算起来真的非常慢，即使是用了L2 Cache，也不如直接把数据放在MSMC SRAM上快。代码的量一般比较少，每个核的L2基本够用。</p>
+<table>
+<thead>
+<tr>
+<th>Core</th>
+<th>L2 Cache</th>
+<th>L2 SRAM</th>
+<th>MSMC SRAM</th>
+<th>DDR3</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Core0</td>
+<td>256kB</td>
+<td>256kB Code Memory</td>
+<td>256kB Data Memory</td>
+<td>128MB (images for simulation)</td>
+</tr>
+<tr>
+<td>Core1</td>
+<td>128kB</td>
+<td><strong>384kB</strong> Code Memory</td>
+<td><strong>1.5MB</strong> Data Memory</td>
+<td>128MB</td>
+</tr>
+<tr>
+<td>Core2</td>
+<td>128kB</td>
+<td><strong>384kB</strong> Code Memory</td>
+<td><strong>1.5MB</strong> Data Memory</td>
+<td>128MB</td>
+</tr>
+<tr>
+<td>Core3</td>
+<td>256kB</td>
+<td>256kB Code Memory</td>
+<td>256kB Data Memory</td>
+<td>128MB</td>
+</tr>
+<tr>
+<td>Shared</td>
+<td>/</td>
+<td>/</td>
+<td>512kB SharedRegion0</td>
+<td>1GB SharedRegion1</td>
+</tr>
+<tr>
+<td>Total/Rate</td>
+<td>/</td>
+<td>/</td>
+<td>4MB/100%</td>
+<td>1.5GB/75%</td>
+</tr>
+</tbody>
+</table>
+<p>  在此之前我已经完成了单核实现KCF算法的功能，当时的计算在堆区开辟了1MB以上的空间，因此我为Core1和Core2各分配了1.5MB的MSMC SRAM来满足KCF计算的需求。之前也试过直接放在DDR上，但是计算速度不理想。<br>
+  我为每个核分配的128MB的DDR上的空间基本都是没用的，除了Core0用来存放仿真用的图像数据。因此他们的L2 Cache的大小其实无所谓，MSMC SRAM上的数据是直接缓存到L1上去的，不会用到L2 Cache。而KCF计算的代码量也超过了256kB，因此我为Core1和Core2各分配了384kB用作代码区。<br>
+  从MSMC SRAM中取512kB作为共享数据区，配置为SharedRegion0，用于IPC模块的核间通信。在DDR中划出1GB的共享存储空间，配置为SharedRegion1，用于在核间传输大批量的数据。比如Core0的红外图像乒乓接收，一张图是320kB，因此接收缓冲区需要640kB。SharedRegion0的访问速度快，但是大小不够，因此这一接收缓冲区需要设置在SharedRegion1里，Core1和Core2都通过这一共享数据区来获取待处理的红外图像。</p>
+<h2 id="测试流程">测试流程</h2>
+<img src="/2023/02/05/kcf-double/2023-02-06-16-19-15.png" class="">
+<p>  目前只进行了仿真测试，用于测试的图像数据事先加载到DDR中，由Core0配置EDMA，将图像搬运到同样位于DDR的乒乓接收缓冲区，而后由Core1和Core2完成两个目标的KCF跟踪运算，并将结每一帧的结果通过消息队列返回Core0。<br>
+  利用调试器向DDR加载图像数据非常慢，因此我们只采用了10张图片进行测试，在此之前已在单核上运行，结果如下图：</p>
+<img src="/2023/02/05/kcf-double/single-core.png" class="">
+<p>  将单核运行结果作为参考标准，对于双目标跟踪的测试采用同样的目标，运行结果与单核一致则跟踪正确。也可以看到，除了第一帧图像外，单核处理每帧图像所需的时间为12.6ms左右。</p>
+<h2 id="任务调度">任务调度</h2>
+<p>  根据我们的设想，我们在Core0上设置了三个任务，优先级从高到低依次是MainTask，C1KcfTask和C2KcfTask。MainTask负责启动EDMA来模拟仿真图像数据的接收。虽然我们实际用了10张图像序列进行测试，但太多了画不下，所以<strong>这里只画了处理两张图的示意图</strong>。<br>
+  程序启动后，由MainTask首先启动接收一张图像，图像接收完成时，C1KcfTask和C2KcfTask都会收到信号，并依次启动Core1和Core2开始执行KCF算法。当两个核都开始处理图像时，MainTask再次启动接收下一帧图像。</p>
+<img src="/2023/02/05/kcf-double/2023-02-06-16-33-50.png" class="">
+<p>  当Core1和Core2完成计算时，C1KcfTask和C2KcfTask知道下一帧图像已经接收完成，因此它们紧接着又让Core1和Core2开始下一帧的计算。当两帧图像均处理完后，C1KcfTask和C2KcfTask向MainTask报告测试实验结束，结束整个测试过程。</p>
+<img src="/2023/02/05/kcf-double/multi-core-without-PriQ.png" class="">
+<p>  上图的实验结果中，两个核跟踪的目标框位置与单核运行结果一致。我们记录了每次MainTask启动接收图像的时刻，除去第一帧图像处理所用的时间，其余时间间隔的平均值为16.2ms。两个核在运算的过程中都要用到硬件FFT加速器和EDMA，虽然已经用Core3单独管理这部分共享的硬件外设，保证了计算的正确性，但这种集中的调用还可能会造成数据传输上的瓶颈导致运算效率下降。</p>
+<h2 id="优先队列">优先队列</h2>
+<img src="/2023/02/05/kcf-double/2023-02-06-16-58-45.png" class="">
+<p>  为了解决前面的问题，我们将Core3的FFT命令队列引入优先级的机制，Core1调用FFT的优先级更高，Core2的优先级次之，这样我们能保证尽快完成Core1的计算。启动Core1和Core2的时刻也会自然地错开，这也是我们为什么在Core0里单独设计了两个任务C1KcfTask和C2KcfTask的原因，因为这样就能够更容易地分别控制Core1和Core2的启动时刻。</p>
+<img src="/2023/02/05/kcf-double/multi-core-with-PriQ.png" class="">
+<p>  在FFT命令队列中引入优先级机制后，对比前后两次测试的结果，可以看到处理第一帧图像的时间略微增加了，猜测可能是根据优先级排队产生的额外开销，但后续的几帧图像的处理时间明显缩短，最终单帧图像的处理时间仅需13.4ms左右。</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="mailto:undefined">裘剑东</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="http://qjdxmy.com/2023/02/05/kcf-double/">http://qjdxmy.com/2023/02/05/kcf-double/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="http://qjdxmy.com" target="_blank">小裘控制系统</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/DSP/">DSP</a><a class="post-meta__tags" href="/tags/%E5%A4%9A%E6%A0%B8/">多核</a></div><div class="post_share"><div class="social-share" data-image="/2023/02/05/kcf-double/2023-02-05-20-11-38.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/social-share.js/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2023/01/17/multi-core/"><img class="prev-cover" src="/2023/01/17/multi-core/2023-01-19-22-01-50.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">用于多核DSP开发的核间通信</div></div></a></div><div class="next-post pull-right"><a href="/2023/02/18/emif2axil/"><img class="next-cover" src="/2023/02/18/emif2axil/2023-02-18-22-09-53.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">EMIF转AXI4-Lite接口</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/2023/01/17/multi-core/" title="用于多核DSP开发的核间通信"><img class="cover" src="/2023/01/17/multi-core/2023-01-19-22-01-50.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-01-17</div><div class="title">用于多核DSP开发的核间通信</div></div></a></div><div><a href="/2022/03/09/phase-review-1/" title="近期C6000 DSP开发小结"><img class="cover" src="/2022/03/09/phase-review-1/2022-03-09-22-40-16.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-03-09</div><div class="title">近期C6000 DSP开发小结</div></div></a></div><div><a href="/2022/04/30/cpp-stm32/" title="C++开发STM32 FreeRTOS工程与添加DSP库"><img class="cover" src="/2022/04/30/cpp-stm32/2022-04-30-09-44-59.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-04-30</div><div class="title">C++开发STM32 FreeRTOS工程与添加DSP库</div></div></a></div><div><a href="/2022/05/26/c6678-openmp/" title="OpenMP在多核DSP上的应用"><img class="cover" src="/2022/05/26/c6678-openmp/2022-05-26-10-31-10.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-05-26</div><div class="title">OpenMP在多核DSP上的应用</div></div></a></div><div><a href="/2022/02/27/c6455-1/" title="TMS320C6455入门实践（一）"><img class="cover" src="/2022/02/27/c6455-1/2022-02-27-16-54-12.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-02-27</div><div class="title">TMS320C6455入门实践（一）</div></div></a></div><div><a href="/2022/02/27/c6455-10/" title="TMS320C6455入门实践（十）"><img class="cover" src="/2022/02/27/c6455-10/2022-02-27-19-49-41.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-02-27</div><div class="title">TMS320C6455入门实践（十）</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/me.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">裘剑东</div><div class="author-info__description">芯来科技基础软件开发工程师，嵌入式开发爱好者</div></div><div class="card-info-data is-center"><div class="card-info-data-item"><a href="/archives/"><div class="headline">文章</div><div class="length-num">84</div></a></div><div class="card-info-data-item"><a href="/tags/"><div class="headline">标签</div><div class="length-num">101</div></a></div><div class="card-info-data-item"><a href="/categories/"><div class="headline">分类</div><div class="length-num">18</div></a></div></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/qiujiandong"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/qiujiandong" target="_blank" title="Github"><i class="fab fa-github"></i></a><a class="social-icon" href="mailto:1335521934@qq.com" target="_blank" title="Email"><i class="fas fa-envelope"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">最好的程序员做自己的硬件！</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content is-expand"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%BD%AF%E4%BB%B6%E6%95%B4%E4%BD%93%E7%BB%93%E6%9E%84"><span class="toc-number">1.</span> <span class="toc-text">软件整体结构</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AD%98%E5%82%A8%E7%A9%BA%E9%97%B4%E5%88%86%E9%85%8D"><span class="toc-number">2.</span> <span class="toc-text">存储空间分配</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AD%98%E5%82%A8%E7%A9%BA%E9%97%B4"><span class="toc-number">2.1.</span> <span class="toc-text">存储空间</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AD%98%E5%82%A8%E9%85%8D%E7%BD%AE"><span class="toc-number">2.2.</span> <span class="toc-text">存储配置</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%B5%8B%E8%AF%95%E6%B5%81%E7%A8%8B"><span class="toc-number">3.</span> <span class="toc-text">测试流程</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BB%BB%E5%8A%A1%E8%B0%83%E5%BA%A6"><span class="toc-number">4.</span> <span class="toc-text">任务调度</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BC%98%E5%85%88%E9%98%9F%E5%88%97"><span class="toc-number">5.</span> <span class="toc-text">优先队列</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2025/01/01/summary-2024/" title="2024年终总结"><img src="/2025/01/01/summary-2024/2025-01-01-21-54-27.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="2024年终总结"/></a><div class="content"><a class="title" href="/2025/01/01/summary-2024/" title="2024年终总结">2024年终总结</a><time datetime="2025-01-01T09:19:27.000Z" title="发表于 2025-01-01 17:19:27">2025-01-01</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2024/04/17/learn-cuda/" title="CUDA优化入门"><img src="/2024/04/17/learn-cuda/2024-04-16-15-52-38.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="CUDA优化入门"/></a><div class="content"><a class="title" href="/2024/04/17/learn-cuda/" title="CUDA优化入门">CUDA优化入门</a><time datetime="2024-04-17T12:00:00.000Z" title="发表于 2024-04-17 20:00:00">2024-04-17</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2024/04/04/bipartite-match/" title="二分图的判断与匹配"><img src="/2024/04/04/bipartite-match/2024-04-05-00-11-55.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="二分图的判断与匹配"/></a><div class="content"><a class="title" href="/2024/04/04/bipartite-match/" title="二分图的判断与匹配">二分图的判断与匹配</a><time datetime="2024-04-04T13:43:47.000Z" title="发表于 2024-04-04 21:43:47">2024-04-04</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2024/01/19/summary/" title="长风破浪会有时"><img src="/2024/01/19/summary/wrapped2023.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="长风破浪会有时"/></a><div class="content"><a class="title" href="/2024/01/19/summary/" title="长风破浪会有时">长风破浪会有时</a><time datetime="2024-01-19T13:15:25.000Z" title="发表于 2024-01-19 21:15:25">2024-01-19</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/06/05/remote-vivado/" title="Vivado远程开发探索"><img src="/2023/06/05/remote-vivado/2023-06-15-16-22-13.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Vivado远程开发探索"/></a><div class="content"><a class="title" href="/2023/06/05/remote-vivado/" title="Vivado远程开发探索">Vivado远程开发探索</a><time datetime="2023-06-05T09:52:47.000Z" title="发表于 2023-06-05 17:52:47">2023-06-05</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2025 By 裘剑东</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.js"></script><div class="js-pjax"><script>(() => {
+  const $mermaidWrap = document.querySelectorAll('#article-container .mermaid-wrap')
+  if ($mermaidWrap.length) {
+    window.runMermaid = () => {
+      window.loadMermaid = true
+      const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default'
+
+      Array.from($mermaidWrap).forEach((item, index) => {
+        const mermaidSrc = item.firstElementChild
+        const mermaidThemeConfig = '%%{init:{ \'theme\':\'' + theme + '\'}}%%\n'
+        const mermaidID = 'mermaid-' + index
+        const mermaidDefinition = mermaidThemeConfig + mermaidSrc.textContent
+        mermaid.mermaidAPI.render(mermaidID, mermaidDefinition, (svgCode) => {
+          mermaidSrc.insertAdjacentHTML('afterend', svgCode)
+        })
+      })
+    }
+
+    const loadMermaid = () => {
+      window.loadMermaid ? runMermaid() : getScript('https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js').then(runMermaid)
+    }
+
+    window.pjax ? loadMermaid() : document.addEventListener('DOMContentLoaded', loadMermaid)
+  }
+})()</script></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

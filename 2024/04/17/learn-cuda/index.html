@@ -1,0 +1,289 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>CUDA优化入门 | 小裘控制系统</title><meta name="keywords" content="CUDA,优化"><meta name="author" content="裘剑东"><meta name="copyright" content="裘剑东"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="Refences System Requirment How To Build  Check Compute Capability Build All   Content  baseline shared memory coalesce other practice  graph memory mapped       本文记录了我的cuda学习经历，和大多数人一样，通过优化矩阵乘法的过程来">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CUDA优化入门">
+<meta property="og:url" content="http://qjdxmy.com/2024/04/17/learn-cuda/">
+<meta property="og:site_name" content="小裘控制系统">
+<meta property="og:description" content="Refences System Requirment How To Build  Check Compute Capability Build All   Content  baseline shared memory coalesce other practice  graph memory mapped       本文记录了我的cuda学习经历，和大多数人一样，通过优化矩阵乘法的过程来">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://qjdxmy.com/2024/04/17/learn-cuda/2024-04-16-15-52-38.png">
+<meta property="article:published_time" content="2024-04-17T12:00:00.000Z">
+<meta property="article:modified_time" content="2024-04-17T12:40:48.633Z">
+<meta property="article:author" content="裘剑东">
+<meta property="article:tag" content="优化">
+<meta property="article:tag" content="CUDA">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://qjdxmy.com/2024/04/17/learn-cuda/2024-04-16-15-52-38.png"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="http://qjdxmy.com/2024/04/17/learn-cuda/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '天',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery@2/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery@2/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'CUDA优化入门',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2024-04-17 20:40:48'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 6.0.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/me.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data is-center"><div class="data-item"><a href="/archives/"><div class="headline">文章</div><div class="length-num">84</div></a></div><div class="data-item"><a href="/tags/"><div class="headline">标签</div><div class="length-num">101</div></a></div><div class="data-item"><a href="/categories/"><div class="headline">分类</div><div class="length-num">18</div></a></div></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/download/"><i class="fa-fw fas fa-download"></i><span> 下载</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 链接</span></a></div><div class="menus_item"><a class="site-page" href="/resume/"><i class="fa-fw fas fa-heart"></i><span> 个人简历</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="not-top-img" id="page-header"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">小裘控制系统</a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/download/"><i class="fa-fw fas fa-download"></i><span> 下载</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 链接</span></a></div><div class="menus_item"><a class="site-page" href="/resume/"><i class="fa-fw fas fa-heart"></i><span> 个人简历</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav></header><main class="layout" id="content-inner"><div id="post"><div id="post-info"><h1 class="post-title">CUDA优化入门</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2024-04-17T12:00:00.000Z" title="发表于 2024-04-17 20:00:00">2024-04-17</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2024-04-17T12:40:48.633Z" title="更新于 2024-04-17 20:40:48">2024-04-17</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CUDA/">CUDA</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="CUDA优化入门"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"></span></span></div></div></div><article class="post-content" id="article-container"><!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+<ul>
+<li><a href="#refences">Refences</a></li>
+<li><a href="#system-requirment">System Requirment</a></li>
+<li><a href="#how-to-build">How To Build</a>
+<ul>
+<li><a href="#check-compute-capability">Check Compute Capability</a></li>
+<li><a href="#build-all">Build All</a></li>
+</ul>
+</li>
+<li><a href="#content">Content</a>
+<ul>
+<li><a href="#baseline">baseline</a></li>
+<li><a href="#shared-memory">shared memory</a></li>
+<li><a href="#coalesce">coalesce</a></li>
+<li><a href="#other-practice">other practice</a>
+<ul>
+<li><a href="#graph">graph</a></li>
+<li><a href="#memory-mapped">memory mapped</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<!-- /code_chunk_output -->
+<p>本文记录了我的cuda学习经历，和大多数人一样，通过优化矩阵乘法的过程来了解一些基本的概念。仓库链接：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://gitee.com/jayden1998/learn-cuda.git">Gitee</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/qiujiandong/learn-cuda">Github</a></li>
+</ul>
+<h2 id="Refences">Refences</h2>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://www.nvidia.com/content/PDF/fermi_white_papers/NVIDIA_Fermi_Compute_Architecture_Whitepaper.pdf">NVIIDA Fermi Architecture Whitepaper</a></li>
+<li><a target="_blank" rel="noopener" href="https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html">CUDA C++ Programming Guide</a></li>
+<li><a target="_blank" rel="noopener" href="https://docs.nvidia.com/cuda/cuda-c-best-practices-guide/index.html">CUDA C++ Best Practices Guide</a></li>
+</ul>
+<p>其中Fermi架构是Compute Capability 2.0的架构。从白皮书里能了解到硬件相关的一些基本概念。比如streaming multiprocessor，有时候也简称multiprocessor或者SM。一个SM里有32个cuda core，有两个warp调度器。一个warp是由32个thread组成。和硬件结合后就比较容易理解，为什么一个block里最好至少放64个thread，因为有两个warp scheduler存在，至少可以放两个warp的thread进行工作。</p>
+<p>Programming Guide里比较详细地介绍了编程模型（Programming Model），也比较详细地介绍了一些Runtime API。CUDA也提供了更底层的Driver API，但一般Runtime API已经够用了，而且使用起来更容易。除此之外，我看的比较多的还有<a target="_blank" rel="noopener" href="https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#compute-capabilities">不同版本的Compute Capability</a>的介绍，其中包括每个SM最多能同时处理的block数量，每个block最大的线程数……这些在实际调用kernel的时候都需要考虑。</p>
+<p>Best Practices Guide介绍的优化技巧和硬件就比较相关了。特别是需要了解设备中的存储结构，因为很大部分情况下是在想办法降低访存的延时。比如<a target="_blank" rel="noopener" href="https://docs.nvidia.com/cuda/cuda-c-best-practices-guide/index.html#memory-optimizations">Memory Optimizations</a>这一章介绍的内容就非常值得细看。</p>
+<h2 id="System-Requirment">System Requirment</h2>
+<ul>
+<li>Ubuntu 20.04</li>
+<li>NVIDIA Driver Version 550.67</li>
+<li>CUDA Version 12.4</li>
+<li>Eigen <a target="_blank" rel="noopener" href="https://gitlab.com/libeigen/eigen/">repository-url</a></li>
+<li>cmake version 3.25.1</li>
+<li>gcc (Ubuntu 9.4.0-1ubuntu1~20.04.2) 9.4.0</li>
+</ul>
+<h2 id="How-To-Build">How To Build</h2>
+<p>在开始之前需要有一台带有Nvidia显卡的主机，然后安装上驱动，最新的驱动可以从<a target="_blank" rel="noopener" href="https://www.nvidia.cn/geforce/drivers/">官网</a>下载得到。直接运行然后按照指示进行安装即可，网上的教程需要用户手动去禁用nouveau，但现在这些操作驱动安装程序都可以完成，所以不需要额外的准备工作了（至少我安装的时候是这样的）。</p>
+<p>驱动安装完成后再同样按照官网的指导步骤安装<a target="_blank" rel="noopener" href="https://developer.nvidia.com/cuda-downloads">CUDA Toolkit</a>。安装完成后再修改.zshrc或.bashrc将bin路径和lib路径添加到分别添加到PATH和LD_LIBRARY_PATH中。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">export PATH=/usr/local/cuda/bin$&#123;PATH:+:$&#123;PATH&#125;&#125;</span><br><span class="line">export LD_LIBRARY_PATH=/usr/local/cuda/lib64$&#123;LD_LIBRARY_PATH:+:$&#123;LD_LIBRARY_PATH&#125;&#125;</span><br></pre></td></tr></table></figure>
+<p>另外本项目依赖Eigen，因此还需要另外安装Eigen库。拉取<a target="_blank" rel="noopener" href="https://gitlab.com/libeigen/eigen/">源码</a>后直接install即可。</p>
+<h3 id="Check-Compute-Capability">Check Compute Capability</h3>
+<p>在开始前需要确定显卡的Compute Capability，可通过<a target="_blank" rel="noopener" href="https://developer.nvidia.com/cuda-gpus">官网</a>查询。也可以先编译check_cc来获取当前设备的Compute Capability。（默认查询的是device 0 的设备信息）</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">mkdir build</span><br><span class="line">cd build</span><br><span class="line">cmake ..</span><br><span class="line">make check_cc</span><br></pre></td></tr></table></figure>
+<img src="/2024/04/17/learn-cuda/2024-04-16-15-52-38.png" class="">
+<p>我的设备用到了两种显卡，因此设置的CMAKE_CUDA_ARCHITECTURES是75和86，如果你的设备用的是其他的显卡，可以修改<a href="./CMakeLists.txt">CMakeLists.txt</a>，将CMAKE_CUDA_ARCHITECTURES修改成你需要的值。</p>
+<h3 id="Build-All">Build All</h3>
+<p>切换到build目录下，make all即可。</p>
+<h2 id="Content">Content</h2>
+<p>本项目做的主要就是用Nvidia GPU实现两个NxN的双精度矩阵乘法，在<a href="./common.h">common.h</a>中，设置了N的大小以及thread block的大小。</p>
+<p>主要内容：</p>
+<ol>
+<li><a href="./0-baseline/README.md">baseline</a> - 最基础的矩阵乘法实现方式与eigen，cublas的实现进行对比；</li>
+<li><a href="./1-shared_memory/README.md">shared_memory</a> - 用共享内存实现，减少访问global memory的次数；</li>
+<li><a href="./2-coalesce/README.md">coalesce</a> - 尽可能用coalesce的形式访存；减少访问shared memory的bank冲突；</li>
+<li><a href="./3-other_practice/README.md">other_practice</a> - 用capture graph执行矩阵乘法；用memory mapped方式执行矩阵乘法。</li>
+</ol>
+<h3 id="baseline">baseline</h3>
+<p>按照矩阵乘法的规则，两个NxN的矩阵相乘，得到的也是一个NxN的矩阵。结果矩阵中的每个元素都是由一个行向量和一个列向量求内积得到的。最直接的想法就是用NxN个线程来完成计算，每个线程负责计算一组内积。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">__global__ <span class="type">void</span> <span class="title">basic</span><span class="params">(<span class="type">int</span> N, <span class="type">double</span> *a, <span class="type">double</span> *b, <span class="type">double</span> *c)</span> </span>&#123;</span><br><span class="line">  <span class="type">int</span> row = blockIdx.y * blockDim.y + threadIdx.y;</span><br><span class="line">  <span class="type">int</span> col = blockIdx.x * blockDim.x + threadIdx.x;</span><br><span class="line">  <span class="type">double</span> sum = <span class="number">0.0</span>;</span><br><span class="line">  <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; N; i++) &#123;</span><br><span class="line">    <span class="comment">// 注意数据是按照列优先存储的</span></span><br><span class="line">    sum += a[row + i * N] * b[col * N + i];</span><br><span class="line">  &#125;</span><br><span class="line">  c[col * N + row] = sum;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>值得注意的是，如果使用Eigen库，那么矩阵的数据是优先按照列存放的，即矩阵中同一列的数据是连续地址存放的。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 进行矩阵乘法。将数据拷贝到设备，再将结果拷贝回来</span></span><br><span class="line">Eigen::MatrixXd result_cuda = Eigen::MatrixXd::<span class="built_in">Zero</span>(N, N);</span><br><span class="line">start = std::chrono::high_resolution_clock::<span class="built_in">now</span>();</span><br><span class="line"><span class="built_in">cudaMemcpy</span>(d_mat1, mat1.<span class="built_in">data</span>(), N * N * <span class="built_in">sizeof</span>(<span class="type">double</span>), cudaMemcpyHostToDevice);</span><br><span class="line"><span class="built_in">cudaMemcpy</span>(d_mat2, mat2.<span class="built_in">data</span>(), N * N * <span class="built_in">sizeof</span>(<span class="type">double</span>), cudaMemcpyHostToDevice);</span><br><span class="line">basic&lt;&lt;&lt;gridSize, blockSize&gt;&gt;&gt;(N, d_mat1, d_mat2, d_result);</span><br><span class="line"><span class="built_in">cudaMemcpy</span>(result_cuda.<span class="built_in">data</span>(), d_result, N * N * <span class="built_in">sizeof</span>(<span class="type">double</span>), cudaMemcpyDeviceToHost);</span><br><span class="line"><span class="built_in">cudaDeviceSynchronize</span>();</span><br><span class="line">end = std::chrono::high_resolution_clock::<span class="built_in">now</span>();</span><br></pre></td></tr></table></figure>
+<p>调用自己写的kernel实现矩阵乘法也不需要多考虑什么，直接在一条stream上，先把数据拷贝到device，再进行运算，算完之后再把结果拷贝到host。统计这整个过程的时间。</p>
+<p>分别将Eigen库中的矩阵乘法，我们自己写的基础的矩阵乘法和cublas库实现的矩阵乘法进行对比。因为用到里Eigen库，所以编译的时候一定要编译Release的版本，不然用Eigen库实现的矩阵乘法需要很久。不光是比较时间，而且也需要确认计算结果的正确性。以Eiegn库的计算结果作为参照，要求GPU的计算结果与Eigen库的计算结果相同。最终得到如下结果：</p>
+<img src="/2024/04/17/learn-cuda/2024-04-16-22-13-47.png" class="">
+<p>再用Nsight Systems分析一下，可以看到这个自己写的kernel相比于cublas实现的kernel真的慢很多。</p>
+<img src="/2024/04/17/learn-cuda/2024-04-16-22-58-07.png" class="">
+<h3 id="shared-memory">shared memory</h3>
+<p>在device上malloc的数据分配在global memory中，访问global memory相对来说是比较慢的，而访问shared memory会很快，shared memory类似于scratchpad memory，是一块可以由程序员自己管理的cache。</p>
+<img src="/2024/04/17/learn-cuda/2024-04-17-09-45-12.png" class="">
+<p>shared memory是在片内的，而且不会经过cache，因为它很小而且访问速度够快；global memory是在片外的，而且会经过L1，L2cache。</p>
+<p>所以如果频繁地从global memory读数据是很费时间的。考虑矩阵乘法的过程，两个相乘的矩阵需要分别被读取N次才能计算得到最终结果。</p>
+<p>shared memory是一个thread block中的线程共享的，那么就可以考虑让一个thread block中的线程“互帮互助”。一个block中共有BLOCK_SIZExBLOCK_SIZE个线程，每个线程从global memory拷贝一个数据到到shared memory，这些数据就可以由这个block中的线程共享。在一个block中，原本一个线程需要从global memory读BLOCK_SIZE个数据，而采用共享的方式之后，就可以每个block里每个线程只读1个数据。完整的计算下来，就只需要从global memory读N/BLOCK_SIZE次数据。</p>
+<p>这样看似乎BLOCK_SIZE越大，加速效果会越明显。但实际上block越大，block中的线程同步也会更久。而且一个block中的shared memeory是有限的，register也是有限的。一般来说总的线程数一定的话，block分的小一点，多一点，更容易把每个block分到multiprocessor上去运行，提高并行度。所以BLOCK_SIZE的选取我没有去详细比较分析了，为了简便起见，我在这里固定用的是16x16的大小。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">__global__ <span class="type">void</span> <span class="title">shared_memory</span><span class="params">(<span class="type">double</span> *a, <span class="type">double</span> *b, <span class="type">double</span> *c)</span> </span>&#123;</span><br><span class="line">  <span class="type">int</span> result_row = blockIdx.y * BLOCK_SIZE + threadIdx.y;</span><br><span class="line">  <span class="type">int</span> result_col = blockIdx.x * BLOCK_SIZE + threadIdx.x;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 将结果清空</span></span><br><span class="line">  c[result_row + result_col * N] = <span class="number">0.0</span>;</span><br><span class="line"></span><br><span class="line">  <span class="type">int</span> a_col_global, b_row_global;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 每个block一起load数据，放入s_a s_b中</span></span><br><span class="line">  __shared__ <span class="type">double</span> s_a[BLOCK_SIZE][BLOCK_SIZE];</span><br><span class="line">  __shared__ <span class="type">double</span> s_b[BLOCK_SIZE][BLOCK_SIZE];</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 每个thread需要load N/BLOCK_SIZE次数据</span></span><br><span class="line">  <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; N / BLOCK_SIZE; ++i) &#123;</span><br><span class="line">    <span class="comment">// 计算要搬运的数据在global下的索引</span></span><br><span class="line">    a_col_global = i * BLOCK_SIZE + threadIdx.x;</span><br><span class="line">    b_row_global = i * BLOCK_SIZE + threadIdx.y;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 搬运数据</span></span><br><span class="line">    s_a[threadIdx.y][threadIdx.x] = a[result_row + a_col_global * N];</span><br><span class="line">    s_b[threadIdx.y][threadIdx.x] = b[b_row_global + result_col * N];</span><br><span class="line">    __syncthreads();</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 计算部分和</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> j = <span class="number">0</span>; j &lt; BLOCK_SIZE; ++j) &#123;</span><br><span class="line">      c[result_row + result_col * N] += s_a[threadIdx.y][j] * s_b[j][threadIdx.x];</span><br><span class="line">    &#125;</span><br><span class="line">    __syncthreads();</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>从运行结果看，用shared memory之后，乘法计算所需的时间明显降低。</p>
+<img src="/2024/04/17/learn-cuda/2024-04-16-23-02-02.png" class="">
+<p>查看nsight systems的分析结果：</p>
+<img src="/2024/04/17/learn-cuda/2024-04-16-23-08-45.png" class="">
+<h3 id="coalesce">coalesce</h3>
+<p>对比采用shared memory加速的结果和cublas实现的结果，实际上还是有很多优化空间。</p>
+<p>有个新的概念是coalesced memory access，是为了最大化数据传输的带宽，尽可能使数据“联合”访问。</p>
+<p>一个warp中的线程如果是访问global memory中的一块连续地址，那就是可以联合访问的。block的维度有一维，二维，三维，这是为了更好地与具体应用进行映射，而block的性能，只和block的size有关。也就是说8x2的block和4x4的block本质上是一样的，都是16个线程。每个线程有自己的ID，类似于二维数组，二维block中的线程ID计算：<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>i</mi><mi>d</mi><mo>=</mo><mi>x</mi><mo>+</mo><mi>y</mi><msub><mi>D</mi><mi>x</mi></msub></mrow><annotation encoding="application/x-tex">id=x+yD_x</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal">i</span><span class="mord mathnormal">d</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6667em;vertical-align:-0.0833em;"></span><span class="mord mathnormal">x</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8778em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.03588em;">y</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.02778em;">D</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0278em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">x</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>，其中<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>x</mi></mrow><annotation encoding="application/x-tex">x</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">x</span></span></span></span>, <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>y</mi></mrow><annotation encoding="application/x-tex">y</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.03588em;">y</span></span></span></span>分别是两个维度的索引值，<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>D</mi><mi>x</mi></msub></mrow><annotation encoding="application/x-tex">D_x</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.02778em;">D</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0278em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">x</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>表示x方向的维度。然后以连续的32个ID的thread作为一个warp。在设计kernel的时候需要考虑让一个warp中的thread访问连续的一片global memory。</p>
+<p>shared memory分32个bank，每个bank是4字节，比如字节地址0~3属于bank0，4~7属于bank1，8~11属于bank2……不同bank的数据可以同时被访问，同一bank的数据就不能一起访问。比如字节地址0和字节地址128的数据都属于bank0，就不能一起访问。</p>
+<p>在矩阵乘法过程中，从global memory读数据，然后写入shared memory。不仅需要考虑从global memory的连续地址读取数据，而且在写入shared memory的时候也需要考虑减少bank冲突。</p>
+<p>考虑到矩阵乘法axb的时候，a中取一行数据，和b中的一列数据计算内积。b本身就是按列存放数据的，warp中的线程也按照列来组织，这样能够保证warp中的线程访问的是shared memory中的连续的一片数据。但是要取a中的一行数据，就要跨行取数了，或者是当我从global memory读数据后，就将矩阵转置，再存到shared memory里。这里不管怎样都会涉及跨行的问题，而且如果block size是128字节的整数倍，那就肯定会有bank访问冲突。这里有个技巧就是在shared memory中额外多分配一点空间，从而让跨行的数据不再是128字节的整数倍，人为地让地址错开。我最后采用的做法就是将数据转置后存入shared memory，而在计算部分和的时候每个warp就可以从连续的地址加载数据了。在矩阵的维度足够大的时候，bank冲突是无法避免的，只不过通过这种方式能够充分利用访问shared memory的带宽，减少无效的数据访问。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">__global__ <span class="type">void</span> <span class="title">coalesce</span><span class="params">(<span class="type">double</span> *a, <span class="type">double</span> *b, <span class="type">double</span> *c)</span> </span>&#123;</span><br><span class="line">  <span class="comment">// 数据按列存放，所以x按列方向增长，y按行方向增长</span></span><br><span class="line">  <span class="type">int</span> result_row = blockIdx.x * BLOCK_SIZE + threadIdx.x;</span><br><span class="line">  <span class="type">int</span> result_col = blockIdx.y * BLOCK_SIZE + threadIdx.y;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 将结果清空</span></span><br><span class="line">  c[result_col * N + result_row] = <span class="number">0.0</span>;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 每个block一起load数据，放入s_a s_b中，同一列的数据在地址上不能对齐，对齐的话会bank访问冲突</span></span><br><span class="line">  __shared__ <span class="type">double</span> s_a[BLOCK_SIZE][BLOCK_SIZE + <span class="number">1</span>];</span><br><span class="line">  __shared__ <span class="type">double</span> s_b[BLOCK_SIZE][BLOCK_SIZE + <span class="number">1</span>];</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 每个thread需要load N/BLOCK_SIZE次数据</span></span><br><span class="line">  <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; N / BLOCK_SIZE; ++i) &#123;</span><br><span class="line">    <span class="comment">// (y, x) thread 负责拷贝global中的 (y, x)的数据</span></span><br><span class="line">    <span class="type">int</span> s_a_row_in_global = result_row;</span><br><span class="line">    <span class="type">int</span> s_a_col_in_global = i * BLOCK_SIZE + threadIdx.y;</span><br><span class="line">    <span class="type">int</span> s_b_col_in_global = result_col;</span><br><span class="line">    <span class="type">int</span> s_b_row_in_global = i * BLOCK_SIZE + threadIdx.x;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// s_a中的数据需要跨行存放，因为一个warp读的是列数据</span></span><br><span class="line">    s_a[threadIdx.x][threadIdx.y] = a[s_a_row_in_global + s_a_col_in_global * N];</span><br><span class="line">    s_b[threadIdx.y][threadIdx.x] = b[s_b_row_in_global + s_b_col_in_global * N];</span><br><span class="line">    __syncthreads();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> j = <span class="number">0</span>; j &lt; BLOCK_SIZE; ++j) &#123;</span><br><span class="line">      c[result_col * N + result_row] += s_a[threadIdx.x][j] * s_b[threadIdx.y][j];</span><br><span class="line">    &#125;</span><br><span class="line">    __syncthreads();</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>从运行结果可以看出，在考虑上访存的过程后，同样维度的矩阵乘法进一步得到加速，而且与cublas实现的性能比较接近了。</p>
+<img src="/2024/04/17/learn-cuda/2024-04-16-23-02-47.png" class="">
+<p>查看nsight systems的分析结果：</p>
+<img src="/2024/04/17/learn-cuda/2024-04-16-23-09-34.png" class="">
+<h3 id="other-practice">other practice</h3>
+<p>除了一些优化的措施外我也做了一些其它的尝试。</p>
+<h4 id="graph">graph</h4>
+<p>根据官方文档里介绍的，可以将一些要在某条stream上执行的任务capture，来组成一个capture graph。再结合event，graph不再是单条stream的顺序结构，而是可以结合多个stream，形成一个有向图。在graph的节点中还可以添加条件判断，做一些简单的控制逻辑。graph在执行的过程中虽然也是stream，但它在实例化的过程中可以提前完成一些工作，而且经过实例化后可以多次执行，相比于单纯的stream应该会更快。</p>
+<p>所以我也实际用graph试了一下，实际效果并不会有明显的提速，但我觉得这个在其他地方应该会有应用。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 创建capture graph</span></span><br><span class="line"><span class="built_in">cudaStreamBeginCapture</span>(s, cudaStreamCaptureModeRelaxed);</span><br><span class="line"><span class="built_in">cudaMemcpyAsync</span>(d_mat1, mat1.<span class="built_in">data</span>(), N * N * <span class="built_in">sizeof</span>(<span class="type">double</span>), cudaMemcpyHostToDevice, s);</span><br><span class="line"><span class="built_in">cudaMemcpyAsync</span>(d_mat2, mat2.<span class="built_in">data</span>(), N * N * <span class="built_in">sizeof</span>(<span class="type">double</span>), cudaMemcpyHostToDevice, s);</span><br><span class="line">coalesce&lt;&lt;&lt;gridSize, blockSize, <span class="number">0</span>, s&gt;&gt;&gt;(d_mat1, d_mat2, d_result);</span><br><span class="line"><span class="built_in">cudaMemcpyAsync</span>(result_graph.<span class="built_in">data</span>(), d_result, N * N * <span class="built_in">sizeof</span>(<span class="type">double</span>), cudaMemcpyDeviceToHost, s);</span><br><span class="line"><span class="built_in">cudaStreamEndCapture</span>(s, &amp;graph);</span><br><span class="line"></span><br><span class="line"><span class="comment">// graph实例化</span></span><br><span class="line"><span class="built_in">cudaGraphInstantiate</span>(&amp;exec, graph, <span class="literal">NULL</span>, <span class="literal">NULL</span>, <span class="number">0</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 运行graph</span></span><br><span class="line">start = std::chrono::high_resolution_clock::<span class="built_in">now</span>();</span><br><span class="line"><span class="built_in">cudaGraphLaunch</span>(exec, s);</span><br><span class="line"><span class="built_in">cudaDeviceSynchronize</span>();</span><br><span class="line">end = std::chrono::high_resolution_clock::<span class="built_in">now</span>();</span><br></pre></td></tr></table></figure>
+<h4 id="memory-mapped">memory mapped</h4>
+<p>在矩阵乘法的例子里，数据在device和host之间传输的时间开销并不明显。但我也在想能不能省去这部分拷贝数据过程，然后看到了有一个地址映射的操作。可以将host的一块数据映射到device端，相当于让kernel直接处理host的memory数据。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 分配结果存放的空间，获取map后的device端地址</span></span><br><span class="line">Eigen::MatrixXd reuslt_mapped = Eigen::MatrixXd::<span class="built_in">Zero</span>(N, N);</span><br><span class="line"><span class="type">double</span> *d_mat1_mapped, *d_mat2_mapped, *d_result_mapped;</span><br><span class="line"><span class="built_in">cudaHostRegister</span>(reuslt_mapped.<span class="built_in">data</span>(), N * N * <span class="built_in">sizeof</span>(<span class="type">double</span>), cudaHostRegisterDefault);</span><br><span class="line"><span class="built_in">cudaHostGetDevicePointer</span>(&amp;d_mat1_mapped, mat1.<span class="built_in">data</span>(), <span class="number">0</span>);</span><br><span class="line"><span class="built_in">cudaHostGetDevicePointer</span>(&amp;d_mat2_mapped, mat2.<span class="built_in">data</span>(), <span class="number">0</span>);</span><br><span class="line"><span class="built_in">cudaHostGetDevicePointer</span>(&amp;d_result_mapped, reuslt_mapped.<span class="built_in">data</span>(), <span class="number">0</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 进行矩阵乘法</span></span><br><span class="line">start = std::chrono::high_resolution_clock::<span class="built_in">now</span>();</span><br><span class="line">coalesce&lt;&lt;&lt;gridSize, blockSize&gt;&gt;&gt;(d_mat1_mapped, d_mat2_mapped, d_result_mapped);</span><br><span class="line"><span class="built_in">cudaDeviceSynchronize</span>();</span><br><span class="line">end = std::chrono::high_resolution_clock::<span class="built_in">now</span>();</span><br></pre></td></tr></table></figure>
+<p>实际运行后发现这么做会更慢，需要尽量减少host和device之间的数据拷贝！</p>
+<img src="/2024/04/17/learn-cuda/2024-04-16-23-03-22.png" class="">
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="mailto:undefined">裘剑东</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="http://qjdxmy.com/2024/04/17/learn-cuda/">http://qjdxmy.com/2024/04/17/learn-cuda/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="http://qjdxmy.com" target="_blank">小裘控制系统</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E4%BC%98%E5%8C%96/">优化</a><a class="post-meta__tags" href="/tags/CUDA/">CUDA</a></div><div class="post_share"><div class="social-share" data-image="/2024/04/17/learn-cuda/2024-04-16-15-52-38.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/social-share.js/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2024/04/04/bipartite-match/"><img class="prev-cover" src="/2024/04/04/bipartite-match/2024-04-05-00-11-55.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">二分图的判断与匹配</div></div></a></div><div class="next-post pull-right"><a href="/2025/01/01/summary-2024/"><img class="next-cover" src="/2025/01/01/summary-2024/2025-01-01-21-54-27.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">2024年终总结</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/2022/10/02/dsp-opt/" title="C6000 DSP优化技术入门"><img class="cover" src="/2022/10/02/dsp-opt/2022-10-02-22-20-37.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-10-02</div><div class="title">C6000 DSP优化技术入门</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/me.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">裘剑东</div><div class="author-info__description">芯来科技基础软件开发工程师，嵌入式开发爱好者</div></div><div class="card-info-data is-center"><div class="card-info-data-item"><a href="/archives/"><div class="headline">文章</div><div class="length-num">84</div></a></div><div class="card-info-data-item"><a href="/tags/"><div class="headline">标签</div><div class="length-num">101</div></a></div><div class="card-info-data-item"><a href="/categories/"><div class="headline">分类</div><div class="length-num">18</div></a></div></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/qiujiandong"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/qiujiandong" target="_blank" title="Github"><i class="fab fa-github"></i></a><a class="social-icon" href="mailto:1335521934@qq.com" target="_blank" title="Email"><i class="fas fa-envelope"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">最好的程序员做自己的硬件！</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content is-expand"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Refences"><span class="toc-number">1.</span> <span class="toc-text">Refences</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#System-Requirment"><span class="toc-number">2.</span> <span class="toc-text">System Requirment</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#How-To-Build"><span class="toc-number">3.</span> <span class="toc-text">How To Build</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Check-Compute-Capability"><span class="toc-number">3.1.</span> <span class="toc-text">Check Compute Capability</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Build-All"><span class="toc-number">3.2.</span> <span class="toc-text">Build All</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Content"><span class="toc-number">4.</span> <span class="toc-text">Content</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#baseline"><span class="toc-number">4.1.</span> <span class="toc-text">baseline</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#shared-memory"><span class="toc-number">4.2.</span> <span class="toc-text">shared memory</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#coalesce"><span class="toc-number">4.3.</span> <span class="toc-text">coalesce</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#other-practice"><span class="toc-number">4.4.</span> <span class="toc-text">other practice</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#graph"><span class="toc-number">4.4.1.</span> <span class="toc-text">graph</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#memory-mapped"><span class="toc-number">4.4.2.</span> <span class="toc-text">memory mapped</span></a></li></ol></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2025/01/01/summary-2024/" title="2024年终总结"><img src="/2025/01/01/summary-2024/2025-01-01-21-54-27.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="2024年终总结"/></a><div class="content"><a class="title" href="/2025/01/01/summary-2024/" title="2024年终总结">2024年终总结</a><time datetime="2025-01-01T09:19:27.000Z" title="发表于 2025-01-01 17:19:27">2025-01-01</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2024/04/17/learn-cuda/" title="CUDA优化入门"><img src="/2024/04/17/learn-cuda/2024-04-16-15-52-38.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="CUDA优化入门"/></a><div class="content"><a class="title" href="/2024/04/17/learn-cuda/" title="CUDA优化入门">CUDA优化入门</a><time datetime="2024-04-17T12:00:00.000Z" title="发表于 2024-04-17 20:00:00">2024-04-17</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2024/04/04/bipartite-match/" title="二分图的判断与匹配"><img src="/2024/04/04/bipartite-match/2024-04-05-00-11-55.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="二分图的判断与匹配"/></a><div class="content"><a class="title" href="/2024/04/04/bipartite-match/" title="二分图的判断与匹配">二分图的判断与匹配</a><time datetime="2024-04-04T13:43:47.000Z" title="发表于 2024-04-04 21:43:47">2024-04-04</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2024/01/19/summary/" title="长风破浪会有时"><img src="/2024/01/19/summary/wrapped2023.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="长风破浪会有时"/></a><div class="content"><a class="title" href="/2024/01/19/summary/" title="长风破浪会有时">长风破浪会有时</a><time datetime="2024-01-19T13:15:25.000Z" title="发表于 2024-01-19 21:15:25">2024-01-19</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/06/05/remote-vivado/" title="Vivado远程开发探索"><img src="/2023/06/05/remote-vivado/2023-06-15-16-22-13.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Vivado远程开发探索"/></a><div class="content"><a class="title" href="/2023/06/05/remote-vivado/" title="Vivado远程开发探索">Vivado远程开发探索</a><time datetime="2023-06-05T09:52:47.000Z" title="发表于 2023-06-05 17:52:47">2023-06-05</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2025 By 裘剑东</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.js"></script><div class="js-pjax"><link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.css"><script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/contrib/copy-tex.min.js"></script><link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/katex@latest/dist/contrib/copy-tex.css"><script>(() => {
+  document.querySelectorAll('#article-container span.katex-display').forEach(item => {
+    btf.wrap(item, 'div', { class: 'katex-wrap'})
+  })
+})()</script><script>(() => {
+  const $mermaidWrap = document.querySelectorAll('#article-container .mermaid-wrap')
+  if ($mermaidWrap.length) {
+    window.runMermaid = () => {
+      window.loadMermaid = true
+      const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default'
+
+      Array.from($mermaidWrap).forEach((item, index) => {
+        const mermaidSrc = item.firstElementChild
+        const mermaidThemeConfig = '%%{init:{ \'theme\':\'' + theme + '\'}}%%\n'
+        const mermaidID = 'mermaid-' + index
+        const mermaidDefinition = mermaidThemeConfig + mermaidSrc.textContent
+        mermaid.mermaidAPI.render(mermaidID, mermaidDefinition, (svgCode) => {
+          mermaidSrc.insertAdjacentHTML('afterend', svgCode)
+        })
+      })
+    }
+
+    const loadMermaid = () => {
+      window.loadMermaid ? runMermaid() : getScript('https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js').then(runMermaid)
+    }
+
+    window.pjax ? loadMermaid() : document.addEventListener('DOMContentLoaded', loadMermaid)
+  }
+})()</script></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

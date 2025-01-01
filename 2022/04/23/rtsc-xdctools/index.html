@@ -1,0 +1,221 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>RTSC与XDCTools | 小裘控制系统</title><meta name="keywords" content="RTSC,XDCTools"><meta name="author" content="裘剑东"><meta name="copyright" content="裘剑东"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="网上能找到的最新的关于XDCTools的文档好像是3.20.4.68版本，据说最新的文档可以在rtsc.eclipse.org找到，但是这个网页怎么也打不开了，估计已经没有人维护了。   网上仅存的文档是可以在TI官网下载到的，就是3.20.4.68版本的xdctools-doc。    但是下载的文档里的内容也是不全面的，比如这里的一些条目都是“under construction”，所以如">
+<meta property="og:type" content="article">
+<meta property="og:title" content="RTSC与XDCTools">
+<meta property="og:url" content="http://qjdxmy.com/2022/04/23/rtsc-xdctools/">
+<meta property="og:site_name" content="小裘控制系统">
+<meta property="og:description" content="网上能找到的最新的关于XDCTools的文档好像是3.20.4.68版本，据说最新的文档可以在rtsc.eclipse.org找到，但是这个网页怎么也打不开了，估计已经没有人维护了。   网上仅存的文档是可以在TI官网下载到的，就是3.20.4.68版本的xdctools-doc。    但是下载的文档里的内容也是不全面的，比如这里的一些条目都是“under construction”，所以如">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://qjdxmy.com/2022/04/23/rtsc-xdctools/2022-04-23-17-53-34.png">
+<meta property="article:published_time" content="2022-04-23T09:22:29.000Z">
+<meta property="article:modified_time" content="2024-04-17T12:40:48.601Z">
+<meta property="article:author" content="裘剑东">
+<meta property="article:tag" content="RTSC">
+<meta property="article:tag" content="XDCTools">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://qjdxmy.com/2022/04/23/rtsc-xdctools/2022-04-23-17-53-34.png"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="http://qjdxmy.com/2022/04/23/rtsc-xdctools/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '天',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery@2/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery@2/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'RTSC与XDCTools',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2024-04-17 20:40:48'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 6.0.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/me.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data is-center"><div class="data-item"><a href="/archives/"><div class="headline">文章</div><div class="length-num">84</div></a></div><div class="data-item"><a href="/tags/"><div class="headline">标签</div><div class="length-num">101</div></a></div><div class="data-item"><a href="/categories/"><div class="headline">分类</div><div class="length-num">18</div></a></div></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/download/"><i class="fa-fw fas fa-download"></i><span> 下载</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 链接</span></a></div><div class="menus_item"><a class="site-page" href="/resume/"><i class="fa-fw fas fa-heart"></i><span> 个人简历</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="not-top-img" id="page-header"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">小裘控制系统</a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/download/"><i class="fa-fw fas fa-download"></i><span> 下载</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 链接</span></a></div><div class="menus_item"><a class="site-page" href="/resume/"><i class="fa-fw fas fa-heart"></i><span> 个人简历</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav></header><main class="layout" id="content-inner"><div id="post"><div id="post-info"><h1 class="post-title">RTSC与XDCTools</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2022-04-23T09:22:29.000Z" title="发表于 2022-04-23 17:22:29">2022-04-23</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2024-04-17T12:40:48.601Z" title="更新于 2024-04-17 20:40:48">2024-04-17</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E5%B5%8C%E5%85%A5%E5%BC%8F%E8%BD%AF%E4%BB%B6/">嵌入式软件</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="RTSC与XDCTools"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"></span></span></div></div></div><article class="post-content" id="article-container"><p>  网上能找到的最新的关于XDCTools的文档好像是3.20.4.68版本，据说最新的文档可以在rtsc.eclipse.org找到，但是这个网页怎么也打不开了，估计已经没有人维护了。<br>
+  网上仅存的文档是可以在TI官网下载到的，就是3.20.4.68版本的<a target="_blank" rel="noopener" href="https://software-dl.ti.com/dsps/dsps_public_sw/sdo_sb/targetcontent/rtsc/3_20_04_68/exports/docs/docs.zip">xdctools-doc</a>。</p>
+<img src="/2022/04/23/rtsc-xdctools/2022-04-23-17-23-59.png" class="">
+<p>  但是下载的文档里的内容也是不全面的，比如这里的一些条目都是“under construction”，所以如果你是刚准备入坑的话要做好心理准备这是一个大坑，一些问题可能找不到相关的资料。</p>
+<h2 id="RTSC简介">RTSC简介</h2>
+<p>  RTSC，全称是Real-Time Software Components，是在2008年发起的一个开源项目，然而大概在2010年就终止了。RTSC 的发音是<em>rit-see</em>。它是一个基于C语言的项目，为的是能够用Package的方式管理C源代码，方便用C语言的开发者从外部导入一些需要的组件（Component）。</p>
+<img src="/2022/04/23/rtsc-xdctools/2022-04-23-17-53-34.png" class="">
+<p>  RTSC的引入是对C语言的一种增强。在传统的compile和link的基础上，RTSC提供了一种可以通过脚本配置，生成部分所需的目标文件的机制，最终生成的目标文件还能进行分析（这个好像不是很有用）。我觉得这么做最大的优势就是能够实现一种<strong>统一而且灵活的</strong>库的管理。</p>
+<h2 id="直观认识">直观认识</h2>
+<p>  对RTSC的直观认识可以从CCS的开发环境中看到。</p>
+<img src="/2022/04/23/rtsc-xdctools/2022-04-23-18-15-43.png" class="">
+<p>  在CCS的工程的浏览目录下，可以看到一般的C/C++工程图标上写的是CCS，而带有RTSC配置的工程则是标有“RTSC”。</p>
+<img src="/2022/04/23/rtsc-xdctools/2022-04-23-18-07-15.png" class="">
+<p>  在一般的C/C++工程中可以添加RTSC的配置文件，添加之后会有提示，询问是否要使能RTSC支持？</p>
+<img src="/2022/04/23/rtsc-xdctools/2022-04-23-18-18-25.png" class="">
+<p>  可以通过这样的方式将一般的C/C++工程转成RTSC工程，但是如果想要转回来就没那么简单了。</p>
+<img src="/2022/04/23/rtsc-xdctools/2022-04-23-18-23-58.png" class="">
+<p>  右键一个RTSC工程可以查看它的属性，在CCS General中的RTSC标签栏，显示了当前工程中包含的Package。这里勾选之后实际上是把对应Package的路径添加到了XDCPATH这个变量中，XDCPATH是在用XDCTools的时候用来搜索Package的路径。<br>
+  开头的XDCTools的版本号也很重要，因为有些Package是需要特定版本以上的XDCTools的。<br>
+  最下面的Target和Platform用于设置编译的目标。<br>
+  Target没有下拉栏可选，但实际上是有迹可循的。“ti.targets.elf.C64P”实际上对应的是“&lt;xdc-root&gt;/ti/targets/elf/C64P.xdc”这个文件，这个文件里设置了调用编译器时的，针对特定器件的编译选项。</p>
+<img src="/2022/04/23/rtsc-xdctools/2022-04-23-18-26-22.png" class="">
+<p>  Platform是我自己创建的，用于规定当前编译的代码会运行在什么样的平台上，这里给出了特定平台的内外存储空间分布，Cache的设置，代码区，数据区和栈区的默认存放位置。可以通过以下两种方式创建Platform。<br>
+  一种是File-&gt;New-&gt;Others，然后选择编辑或者查看Platform。</p>
+<img src="/2022/04/23/rtsc-xdctools/2022-04-23-19-11-44.png" class="">
+<p>  另一种是通过Project-&gt;RTSC Tools-&gt;Platform来编辑或者查看Platform。</p>
+<img src="/2022/04/23/rtsc-xdctools/2022-04-23-19-12-23.png" class="">
+<p>  自己创建的Platform需要在工程属性的RTSC标签页中“Add”Platform所在的路径，这样才能在下面的下拉框中找到自己创建的Platform。就像上面我把“D:\PrjCCS\platform”这个路径添加进去了一样。</p>
+<img src="/2022/04/23/rtsc-xdctools/2022-04-23-19-18-29.png" class="">
+<p>  Package的安装是在Windows-&gt;Preferences这个页面中设置的。Code Composer Studio-&gt;Products页面中可以安装和卸载Package。一般可以把Package安装在同一个路径，然后勾选下面的，每次启动CCS的时候自动在这个特定的路径下搜索发现新下载的Package。</p>
+<h2 id="XDCTools">XDCTools</h2>
+<p>  为了管理这些Package，自然需要相应的工具。XDCTools我觉得一般指的就是xdc.exe这个工具。在xdc的安装目录下，主要有xdc.exe和xs.exe两个可执行文件。xdc负责软件包构建，xs负责执行一些脚本。<br>
+  XDC的全称是eXpanDed C，定义它的初衷可能是作为C语言的一种扩展。XDC的语言由两部分组成，分别是<strong>XDCspec</strong>和<strong>XDCscript</strong>。</p>
+<h3 id="XDC-specification">XDC specification</h3>
+<p>  XDCspec，顾名思义是一种规范，最常见的就是在每个Package的目录下都有一个“package.xdc”的文件，其中定义了这个package由哪些module组成。而module也有一个对应的“xxx.xdc”文件，它定义了这个module有哪些参数，有哪些函数可以调用，就像C++的类一样。基本上“.xdc”后缀的文件就是遵循XDCspec的语法规则。其中典型的关键词有：package、module、interface、metaonly、inherits等等。<br>
+  特殊的“.xdc”文件，比如“package.xdc”用于定义一个Package中的包含的模块。那些大写字母“I”开头的“.xdc”文件都是interface，它们就像是C++中的基类一样，可以被其它module继承，继承后的module需要对interface中定义的方法做实现。这种接口的定义使得部分模块之间的调用有了一个公认的标准。</p>
+<h3 id="XDC-script">XDC script</h3>
+<p>  XDCscript是一种脚本语言，从官方的定义上来说它是JavaScript的一个超集。这个相关的文件就比较多了，RTSC工程目录下的“.cfg”文件，模块相关的“.bld”文件和“.xs”文件都是用XDCscript写的。<br>
+  XDCscript也被成为meta-language，这个meta-language我不知道怎么翻译，wiki上的解释是这是一种描述另一种语言的语言。这个不必深究，只要知道是用它来使用每个模块就行。<br>
+  举个RTSC工程中的“.cfg”配置文件的例子。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> <span class="title class_">System</span> = xdc.<span class="title function_">useModule</span>(<span class="string">&#x27;xdc.runtime.System&#x27;</span>);</span><br></pre></td></tr></table></figure>
+<p>  每个模块的使用都需要用xdc.useModule的方式得到一个模块的对象。然后就可以设置对象的属性和调用对象的方法。这个模块的方法是在对应模块的“.xs”文件中定义的。模块名称中的“.”也如前面介绍Platform是一样，实际上对应的是路径。把“.”换成路径的分隔符“\”（linux系统下是“/”），就可以找到相应的模块的“.xdc”文件和“.xs文件”。</p>
+<h2 id="系统学习">系统学习</h2>
+<p>  如果想要完全掌握RTSC相关的内容，肯定是要熟悉Package的构建与使用。RTSC的文档中给出了相关的教程，从module，到interface再到package，可以说是非常详细。每个教程都有配套的例子，可以边做边学。</p>
+<img src="/2022/04/23/rtsc-xdctools/2022-04-23-20-10-52.png" class="">
+<h2 id="模块的使用">模块的使用</h2>
+<p>  我简单地把上面的教程都过了一遍，感觉我们一般情况下只需要能够懂得如何使用模块就行。上面的教程只是让我对整体的module和package的构成有了一个大概的印象，而且我也大概率不会自己去写package。而且花时间去详细地学习这些以后实际用的情况并不多，这么做划不来。能够实现类似功能的还有CMake，CMake也有一个package的机制，比如OpenCV就支持CMake通过package的方式来调用。<br>
+  模块的使用除了查阅某个package中的文档，最常用的工具就是Help-&gt;Help Contents。在打开的帮助目录里有详细的API的介绍。</p>
+<img src="/2022/04/23/rtsc-xdctools/2022-04-23-21-06-19.png" class="">
+<p>  以SYS/BIOS中的Clock模块为例，这里既介绍了C语言的API，也对配置文件中的设置做了介绍。如果遇到什么和module相关的问题，往往都是在这里找到答案。</p>
+<img src="/2022/04/23/rtsc-xdctools/2022-04-23-21-10-44.png" class="">
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="mailto:undefined">裘剑东</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="http://qjdxmy.com/2022/04/23/rtsc-xdctools/">http://qjdxmy.com/2022/04/23/rtsc-xdctools/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="http://qjdxmy.com" target="_blank">小裘控制系统</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/RTSC/">RTSC</a><a class="post-meta__tags" href="/tags/XDCTools/">XDCTools</a></div><div class="post_share"><div class="social-share" data-image="/2022/04/23/rtsc-xdctools/2022-04-23-17-53-34.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/social-share.js/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2022/04/22/cpp-rvo/"><img class="prev-cover" src="/2022/04/22/cpp-rvo/2022-04-22-20-56-51.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">C++运算符重载与返回值优化</div></div></a></div><div class="next-post pull-right"><a href="/2022/04/24/eclipse-base/"><img class="next-cover" src="/2022/04/24/eclipse-base/2022-04-24-18-11-15.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">CubeMX+Eclipse+Jlink STM32开发环境搭建</div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/me.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">裘剑东</div><div class="author-info__description">芯来科技基础软件开发工程师，嵌入式开发爱好者</div></div><div class="card-info-data is-center"><div class="card-info-data-item"><a href="/archives/"><div class="headline">文章</div><div class="length-num">84</div></a></div><div class="card-info-data-item"><a href="/tags/"><div class="headline">标签</div><div class="length-num">101</div></a></div><div class="card-info-data-item"><a href="/categories/"><div class="headline">分类</div><div class="length-num">18</div></a></div></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/qiujiandong"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/qiujiandong" target="_blank" title="Github"><i class="fab fa-github"></i></a><a class="social-icon" href="mailto:1335521934@qq.com" target="_blank" title="Email"><i class="fas fa-envelope"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">最好的程序员做自己的硬件！</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content is-expand"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#RTSC%E7%AE%80%E4%BB%8B"><span class="toc-number">1.</span> <span class="toc-text">RTSC简介</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%9B%B4%E8%A7%82%E8%AE%A4%E8%AF%86"><span class="toc-number">2.</span> <span class="toc-text">直观认识</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#XDCTools"><span class="toc-number">3.</span> <span class="toc-text">XDCTools</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#XDC-specification"><span class="toc-number">3.1.</span> <span class="toc-text">XDC specification</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#XDC-script"><span class="toc-number">3.2.</span> <span class="toc-text">XDC script</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%B3%BB%E7%BB%9F%E5%AD%A6%E4%B9%A0"><span class="toc-number">4.</span> <span class="toc-text">系统学习</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A8%A1%E5%9D%97%E7%9A%84%E4%BD%BF%E7%94%A8"><span class="toc-number">5.</span> <span class="toc-text">模块的使用</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2025/01/01/summary-2024/" title="2024年终总结"><img src="/2025/01/01/summary-2024/2025-01-01-21-54-27.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="2024年终总结"/></a><div class="content"><a class="title" href="/2025/01/01/summary-2024/" title="2024年终总结">2024年终总结</a><time datetime="2025-01-01T09:19:27.000Z" title="发表于 2025-01-01 17:19:27">2025-01-01</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2024/04/17/learn-cuda/" title="CUDA优化入门"><img src="/2024/04/17/learn-cuda/2024-04-16-15-52-38.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="CUDA优化入门"/></a><div class="content"><a class="title" href="/2024/04/17/learn-cuda/" title="CUDA优化入门">CUDA优化入门</a><time datetime="2024-04-17T12:00:00.000Z" title="发表于 2024-04-17 20:00:00">2024-04-17</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2024/04/04/bipartite-match/" title="二分图的判断与匹配"><img src="/2024/04/04/bipartite-match/2024-04-05-00-11-55.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="二分图的判断与匹配"/></a><div class="content"><a class="title" href="/2024/04/04/bipartite-match/" title="二分图的判断与匹配">二分图的判断与匹配</a><time datetime="2024-04-04T13:43:47.000Z" title="发表于 2024-04-04 21:43:47">2024-04-04</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2024/01/19/summary/" title="长风破浪会有时"><img src="/2024/01/19/summary/wrapped2023.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="长风破浪会有时"/></a><div class="content"><a class="title" href="/2024/01/19/summary/" title="长风破浪会有时">长风破浪会有时</a><time datetime="2024-01-19T13:15:25.000Z" title="发表于 2024-01-19 21:15:25">2024-01-19</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/06/05/remote-vivado/" title="Vivado远程开发探索"><img src="/2023/06/05/remote-vivado/2023-06-15-16-22-13.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Vivado远程开发探索"/></a><div class="content"><a class="title" href="/2023/06/05/remote-vivado/" title="Vivado远程开发探索">Vivado远程开发探索</a><time datetime="2023-06-05T09:52:47.000Z" title="发表于 2023-06-05 17:52:47">2023-06-05</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2025 By 裘剑东</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.js"></script><div class="js-pjax"><script>(() => {
+  const $mermaidWrap = document.querySelectorAll('#article-container .mermaid-wrap')
+  if ($mermaidWrap.length) {
+    window.runMermaid = () => {
+      window.loadMermaid = true
+      const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default'
+
+      Array.from($mermaidWrap).forEach((item, index) => {
+        const mermaidSrc = item.firstElementChild
+        const mermaidThemeConfig = '%%{init:{ \'theme\':\'' + theme + '\'}}%%\n'
+        const mermaidID = 'mermaid-' + index
+        const mermaidDefinition = mermaidThemeConfig + mermaidSrc.textContent
+        mermaid.mermaidAPI.render(mermaidID, mermaidDefinition, (svgCode) => {
+          mermaidSrc.insertAdjacentHTML('afterend', svgCode)
+        })
+      })
+    }
+
+    const loadMermaid = () => {
+      window.loadMermaid ? runMermaid() : getScript('https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js').then(runMermaid)
+    }
+
+    window.pjax ? loadMermaid() : document.addEventListener('DOMContentLoaded', loadMermaid)
+  }
+})()</script></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

@@ -1,0 +1,243 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>PCIe接口在FPGA上的实现 | 小裘控制系统</title><meta name="keywords" content="FPGA,PCIe"><meta name="author" content="裘剑东"><meta name="copyright" content="裘剑东"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="PCIe接口在FPGA上的实现">
+<meta property="og:type" content="article">
+<meta property="og:title" content="PCIe接口在FPGA上的实现">
+<meta property="og:url" content="http://qjdxmy.com/2022/02/27/pcie-fpga/">
+<meta property="og:site_name" content="小裘控制系统">
+<meta property="og:description" content="PCIe接口在FPGA上的实现">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://qjdxmy.com/2022/02/27/pcie-fpga/2022-02-27-13-58-06.png">
+<meta property="article:published_time" content="2022-02-27T04:40:53.000Z">
+<meta property="article:modified_time" content="2024-04-17T12:40:48.561Z">
+<meta property="article:author" content="裘剑东">
+<meta property="article:tag" content="PCIe">
+<meta property="article:tag" content="FPGA">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://qjdxmy.com/2022/02/27/pcie-fpga/2022-02-27-13-58-06.png"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="http://qjdxmy.com/2022/02/27/pcie-fpga/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '天',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery@2/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery@2/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'PCIe接口在FPGA上的实现',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2024-04-17 20:40:48'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 6.0.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/me.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data is-center"><div class="data-item"><a href="/archives/"><div class="headline">文章</div><div class="length-num">84</div></a></div><div class="data-item"><a href="/tags/"><div class="headline">标签</div><div class="length-num">101</div></a></div><div class="data-item"><a href="/categories/"><div class="headline">分类</div><div class="length-num">18</div></a></div></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/download/"><i class="fa-fw fas fa-download"></i><span> 下载</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 链接</span></a></div><div class="menus_item"><a class="site-page" href="/resume/"><i class="fa-fw fas fa-heart"></i><span> 个人简历</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="not-top-img" id="page-header"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">小裘控制系统</a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/download/"><i class="fa-fw fas fa-download"></i><span> 下载</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 链接</span></a></div><div class="menus_item"><a class="site-page" href="/resume/"><i class="fa-fw fas fa-heart"></i><span> 个人简历</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav></header><main class="layout" id="content-inner"><div id="post"><div id="post-info"><h1 class="post-title">PCIe接口在FPGA上的实现</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2022-02-27T04:40:53.000Z" title="发表于 2022-02-27 12:40:53">2022-02-27</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2024-04-17T12:40:48.561Z" title="更新于 2024-04-17 20:40:48">2024-04-17</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E9%AB%98%E9%80%9F%E9%93%BE%E8%B7%AF/">高速链路</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E9%AB%98%E9%80%9F%E9%93%BE%E8%B7%AF/PCIe/">PCIe</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="PCIe接口在FPGA上的实现"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"></span></span></div></div></div><article class="post-content" id="article-container"><ol>
+<li><a target="_blank" rel="noopener" href="http://akkit.org/info/PCI_Express_Base_r3.0_10Nov10.pdf">PCI Express Base Specification Revision 3.0</a></li>
+<li><a target="_blank" rel="noopener" href="https://lekensteyn.nl/files/docs/PCI_SPEV_V3_0.pdf">PCI Local Bus Specification Revision 3.0</a></li>
+<li>书籍：<a target="_blank" rel="noopener" href="https://www.grc.com/dev/SpinRite/docs/PCI%20Express%20System%20Architecture.pdf">PCI Express System Architecture</a>，对应那本紫色的《PCI Express 体系结构标准教材》</li>
+</ol>
+<p>  上面的两个Specification的文档虽然不是从官网找的，但是可信度还是有保证的。我们学校图书馆有那本中文的书，基本上跟规范里的内容是一致的，而且应该更好理解一点。第一个规范里主要看第七章“Software Initialization and Configuration”，里面介绍了PCIe配置空间的大部分寄存器；第二个规范介绍的是PCI协议，PCIe很多都跟PCI兼容，所以这个文档也很重要，这里主要看第六章“Configuration Space”，MSI相关的寄存器只有在这个文档里才有。在开发过程中，Xilinx的IP文档里没有对这些配置寄存器做具体的说明，所以需要查看这两个规范文档。<br>
+  目前我的需求是实现FPGA和DSP之间利用PCIe链路进行通信，所以准备先从FPGA这边的实现开始介绍，然后再写DSP相关的配置。我采用的方式是DSP作为RC（Root Complex）端，FPGA作为EP（End Point）端。我觉得作为嵌入式开发者，对于PCIe的协议其实不用理解特别深入，能够实现初始化配置、数据传输和中断就可以了。</p>
+<h2 id="PCIe协议简介">PCIe协议简介</h2>
+<h3 id="PCIe的配置空间">PCIe的配置空间</h3>
+<p>  首先最重要的就是PCIe的配置空间，当PCIe板卡插到主机上时，host可以通过这一块配置空间获取PCIe设备的信息，同时可以对其进行配置。</p>
+<img src="/2022/02/27/pcie-fpga/2022-02-27-13-56-21.png" class="">
+<p>  这块空间的前64个字节（0x00~0x3F）作为这块空间的头部，有两种类型，Type 0 和Type 1 。Type 0 是作为端点设备（EP）的设置，Type 1 是作为跟复合体（RC）或者交换结构（Switch）的设置。也就是说，主机和从机，这块配置空间头部是不同的。</p>
+<h3 id="BAR空间">BAR空间</h3>
+<p>  BAR，Base Address Register，就是基址寄存器。什么的基址呢？PCIe的数据空间的基址。PCIe的EP有一块自己的数据空间，上游设备可以通过发包的形式直接对指定的数据空间进行读写。<br>
+  一般只在EP上实现BAR，很少有在RC上实现BAR。因为一般都是主机来方位PCIe设备的数据空间。<br>
+  如果EP上是32位的BAR，它会先用BAR中低位0的个数来表明BAR对应的数据空间的大小。比如BAR的初始值是“0xFFFF0000”，它的低位有16个0，这几个bit都是硬件上固定的，RC无法改写。这个BAR就表明了它的大小是64kB。RC先读这个BAR，根据低位0 的数量确定了BAR对应的数据空间大小之后，再对高位的“F”进行改写，改成需要的PCIe地址空间的地址。比如改写成“0x68000000”，那么从0x68000000开始的64kB的数据就是这个BAR对应的数据空间。<br>
+  如果EP是64位的BAR，情况会有点不一样，但是大同小异。</p>
+<h3 id="MSI中断">MSI中断</h3>
+<p>  MSI，Message Signaled Interrupts，EP可以用这个给RC发中断。MSI中断实际上是EP向RC发送双字数据包，这个双字的地址和内容由RC给定。就是在系统初始化的时候，需要由RC的系统软件往EP的MSI Capability Structure里面进行配置。不难理解，这里的一组寄存器只有RC能够对它改写，因为这是RC告诉EP可以往哪里写数据就表示发中断；如果EP随便往一个地址写数据，搞不好会出大问题。MSI Capability Structure有下面这几种结构：</p>
+<img src="/2022/02/27/pcie-fpga/2022-02-27-13-56-48.png" class="">
+<p>  这几种结构的区别在于是32位地址还是64位地址，是否支持Per-vector Masking。<br>
+  地址的区别很好理解，如果是64位地址，就会多一个Message Upper Address的寄存器。<br>
+  Per-vector Masking是一个可选的功能。支持这一功能的话就会多一个Mask Bits的寄存和一个Pending Bits的寄存器。Mask Bits中每一个bit对应一个MSI vector，MSI总共支持32个中断向量。如果把相应的bit置一，EP想要发送这个中断向量的中断的话，就发不出去，而对应的Pending Bits中的bit会置一。如果把mask撤销，这个被挂起的中断就会被发送。<br>
+  Message Control寄存器中的有相应的只读的bit来表明目前这个设备是哪种结构的MSI Capability Structure。Xilinx的PCIe的IP好像是支持64bit地址，但是不支持Masking。</p>
+<h2 id="Xilinx提供的IP">Xilinx提供的IP</h2>
+<p>  Xilinx 提供了三个和PCIe相关的IP，就是下面这三个。文档都可以在DocNav里很容易找到。</p>
+<ol>
+<li>Integrated Block for PCI Express</li>
+<li>AXI Memory Mapped to PCI Express</li>
+<li>DMA/Bridge Subsystem for PCI Express</li>
+</ol>
+<p>  我感觉第一个IP的接口是最复杂的，有四个Stream通道，然后又有很多物理层的配置接口。这个应该是PCIe最底层的IP，Virtex 7系列的FPGA的IP文档还是独立的，但都是“Integrated Block for PCI Express”。这个文档里有一部分内容很重要，就是第二章的PCI Configuration Space，这里介绍了PCIe配置空间的寄存器分布。即使我们实际用的是另外两个IP，也需要通过这个文档查寄存器的位置。而这每个寄存器的功能就要查之前说的PCIe的协议规范了。<br>
+  第二个IP应该是用AXI接口封了一层，这个AXI接口直接访问PCIe的BAR寄存器对应的数据空间。这个就很方便了，相当于我可以直接从PCIe的数据空间读写数据。这个数据空间既可以是存储器，也可以是外设，总之非常方便灵活。然后这个IP还支持传统的PCI中断，也支持MSI中断。当我们拿它作EP时，可以给RC发中断，这个在之后的具体设计中应该也会经常用到。<br>
+  第三个IP的功能最强大，它不仅实现了第二个IP的功能，而且实现了数据上下行的DMA通道，这个IP也被称为XDMA。RC可以给它发送DMA传输的描述符，然后它自己就能搬数据。它也有DMA Bypass 的通道，就是RC也可以不用XDMA，而是像第二个IP一样直接对一块数据空间进行读写。<br>
+  第二个IP和第三个IP我觉得各有侧重点。第三个IP虽然既能DMA传输，又能DMA Bypass地直接访问，但是它的Bypass空间只能有一个BAR寄存器对应，而第二个IP可以灵活地设置多个BAR。而且因为第三个IP实现了XDMA，它把原有的最多32个MSI中断中的16个固定作为了DMA传输中断，剩余16个留给用户；而第二个IP则是32个MSI中断都可以由用户自己使用。<br>
+  不管是用哪个IP都可以根据实际需求来选择，在每个IP的文档中的Product Specification里面介绍了相关的寄存器。然后要看清楚有些寄存器写着“Only applicable to Root Port cores”，那就是它只能在用作RC的时候使用，要分清楚哪些寄存器是作为RC用的，哪些是作为EP用的。</p>
+<h2 id="电路设计">电路设计</h2>
+<ul>
+<li>UG476 - 7 Series FPGAs GTX/GTH Transceivers</li>
+<li>对应器件的 Integrated Block for PCI Express（PG023、PG054、PG156、PG213）</li>
+</ul>
+<p>  我用的FPGA是国产的的Virtex 7 系列的XC7VX690T，其实跟Xilinx的是一样的用法。FPGA的PCIe接口是在BANK115上做的，在设计电路的时候要查看上面两篇文档来选择BANK。</p>
+<img src="/2022/02/27/pcie-fpga/2022-02-27-13-57-06.png" class="">
+<p>  先看Integrated Block for PCI Express，第四章Design Flow Steps里的Constraining the Core里的Transceiver Placemenet里面介绍了每条链路应该放在哪个Block里。要找准型号和封装，就比如我用的是XC7VX690T，就找到下面这张表，然后找到FFG1927的封装，准备用下面红框中的这几个Block来做一个x4的链路。</p>
+<img src="/2022/02/27/pcie-fpga/2022-02-27-13-57-22.png" class="">
+<p>  找到Block之后就需要去另一个文档——UG476里面找对应的引脚位置。在附录A里面根据Tranceiver的类型和封装可以找到下面这张图。我们在上面已经知道了LANE0是在X1Y23的Block，就像下面红框中标注的一样，我们用红框内的引脚作为LANE0的引脚。所以我们就依次可以确定LANE0~LANE4的发送和接收的差分对应该接哪几个引脚。</p>
+<img src="/2022/02/27/pcie-fpga/2022-02-27-13-57-37.png" class="">
+<p>  DSP的电路没有什么好说的，PCIe的模块引脚都是固定的。值得一提的是时钟的问题，PCIe通信的双方时钟可以是同步时钟，也可以使异步时钟。如果用异步时钟的话需要注意下面的问题。我用的是异步时钟，但是一般来说同步时钟用得比较多。</p>
+<img src="/2022/02/27/pcie-fpga/2022-02-27-13-57-53.png" class="">
+<h2 id="Block-Design">Block Design</h2>
+<p>  下面是我的整体的设计，主要是实现了让DSP通过PCIe接口访问FPGA上外接的DDR的功能。</p>
+<img src="/2022/02/27/pcie-fpga/2022-02-27-13-58-06.png" class="">
+<p>  新建一个Block Design之后，加入“AXI Bridge for PCI Express”的IP，点击页面上方的“Run Block Automation”之后，可以做一下简单的配置（之后还要改），它就能够生成一个时钟输入的Buffer</p>
+<img src="/2022/02/27/pcie-fpga/2022-02-27-13-58-24.png" class="">
+<p>  双击对其配置，这里的PCIe Block Location是和具体的引脚引脚分配有关的，已经在前面介绍了。如果这里的Block选得不对，后面的Implement就会报时序的问题。</p>
+<img src="/2022/02/27/pcie-fpga/2022-02-27-13-58-38.png" class="">
+<p>  IP配置中的PCIe ID那一栏可以默认不管；MISC那一栏是中断相关的，根据需求配置即可；AXI：BARs是AXI地址到PCIe地址的转换，这个应该是用了AXI Slave接口之后才会用到，我这次的设计里没有用Slave接口所以这个也没配置；Debug Options也没啥东西。所以只剩下这个PCIe的BARs了，我分配了三个BAR空间，如下面的图所示。</p>
+<img src="/2022/02/27/pcie-fpga/2022-02-27-13-58-53.png" class="">
+<p>  BAR0指向的是AXI PCIe的配置空间，它其实非常小，64kB已经完全能够访问到所有寄存器了；BAR1是指向的是我自己做的IP，用来从向RC发MSI中断；BAR2指向的是DDR内的128MB的数据空间。这里的PCIe to AXI Translation只要把AXI的基址填上去就行，要跟Address Editor里面的相对应。Address Editor里的地址我是自动分配的（很多可能BAR访问不到，但这不要紧）。用了XADC是因为DDR的MIG需要一个温度输入，如果MIG里面能直接Enable XADC那就很省事了，但我这不行所以在外面加了XADC。</p>
+<img src="/2022/02/27/pcie-fpga/2022-02-27-14-00-04.png" class="">
+<h2 id="一些经验">一些经验</h2>
+<p>  Windows下的Vivado默认线程（thread）数是2个，Linux系统下的默认线程数是8个。可以用下面的tcl命令获取当前的最大线程数：</p>
+<figure class="highlight tcl"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">get_param general.maxthreads</span><br></pre></td></tr></table></figure>
+<p>  Windows下的支持的最大线程数是8个，可以用下面的tcl命令更改</p>
+<figure class="highlight tcl"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">set_param general.maxthreads <span class="number">8</span></span><br></pre></td></tr></table></figure>
+<p>  每次启动Vivado，这个最大线程数都会回到默认的2个，可以用这个博主的方法来一劳永逸地更改Vivado的默认线程数：<a target="_blank" rel="noopener" href="https://blog.csdn.net/yundanfengqing_nuc/article/details/107866015">链接</a></p>
+<img src="/2022/02/27/pcie-fpga/2022-02-27-14-00-29.png" class="">
+<p>  线程数量越多，实现每个job的速度越快。在Run Setting里面的Number of jobs是指可以同时运行的job个数，我们一般只有一个实现，所以即使把这个设置得很大，也不会有加速的效果。Number of jobs的设置在预先独立综合每个IP的时候很有用，每个IP可以各自综合，不同IP综合之间的并行会受到这个数量限制。</p>
+<img src="/2022/02/27/pcie-fpga/2022-02-27-14-00-48.png" class="">
+<p>  我之前为了在一个工程里实现两个方案，所以新建了一个Run，同时把不用的源文件disable掉。但我看别人好像是用不同的约束文件来限制不同的Run，但是源文件是不用改的。我这么做的时候要改源文件，有时候会报一些奇怪的报错，但确实能在一个工程里做两个实现。</p>
+<img src="/2022/02/27/pcie-fpga/2022-02-27-14-01-03.png" class="">
+<p>  最后是在读写DDR的时候，出现了这个Transaction Overflow的问题，但是数据都是没错的。DDR在读写的时候会有好几个Outstanding的Transaction，就是那种在读写，但是还没有响应完成的事务。我用的是加在Block Design里面的System ILA，只要在这个IP里面把Enable Transaction Tracing Counter的勾去掉或者把计数值加大就好了。</p>
+<img src="/2022/02/27/pcie-fpga/2022-02-27-14-01-21.png" class="">
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="mailto:undefined">裘剑东</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="http://qjdxmy.com/2022/02/27/pcie-fpga/">http://qjdxmy.com/2022/02/27/pcie-fpga/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="http://qjdxmy.com" target="_blank">小裘控制系统</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/PCIe/">PCIe</a><a class="post-meta__tags" href="/tags/FPGA/">FPGA</a></div><div class="post_share"><div class="social-share" data-image="/2022/02/27/pcie-fpga/2022-02-27-13-58-06.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/social-share.js/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2022/02/27/pcie-dsp/"><img class="prev-cover" src="/2022/02/27/pcie-dsp/2022-02-27-13-46-03.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">DSP端的PCIe外设使用</div></div></a></div><div class="next-post pull-right"><a href="/2022/02/27/pcie-test/"><img class="next-cover" src="/2022/02/27/pcie-test/2022-02-27-14-04-46.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">基于PCIe的FPGA与DSP间高速数据传输测试</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/2022/02/27/pcie-test/" title="基于PCIe的FPGA与DSP间高速数据传输测试"><img class="cover" src="/2022/02/27/pcie-test/2022-02-27-14-04-46.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-02-27</div><div class="title">基于PCIe的FPGA与DSP间高速数据传输测试</div></div></a></div><div><a href="/2022/02/27/pcie-dsp/" title="DSP端的PCIe外设使用"><img class="cover" src="/2022/02/27/pcie-dsp/2022-02-27-13-46-03.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-02-27</div><div class="title">DSP端的PCIe外设使用</div></div></a></div><div><a href="/2022/02/27/srio-ctrl/" title="AXI Memory-Mapped SRIO收发控制器"><img class="cover" src="/2022/02/27/srio-ctrl/2022-02-27-12-23-13.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-02-27</div><div class="title">AXI Memory-Mapped SRIO收发控制器</div></div></a></div><div><a href="/2022/02/27/srio-dsp-fpga-test/" title="基于SRIO的FPGA与DSP间高速数据传输"><img class="cover" src="/2022/02/27/srio-dsp-fpga-test/2022-02-27-12-29-59.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-02-27</div><div class="title">基于SRIO的FPGA与DSP间高速数据传输</div></div></a></div><div><a href="/2022/02/27/srio-dsp-fpga/" title="DSP与FPGA的SRIO通信实现"><img class="cover" src="/2022/02/27/srio-dsp-fpga/2022-02-27-12-14-52.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-02-27</div><div class="title">DSP与FPGA的SRIO通信实现</div></div></a></div><div><a href="/2022/06/14/bios-srio/" title="SYS/BIOS与SRIO应用实例"><img class="cover" src="/2022/06/14/bios-srio/2022-06-14-11-16-30.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-06-14</div><div class="title">SYS/BIOS与SRIO应用实例</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/me.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">裘剑东</div><div class="author-info__description">芯来科技基础软件开发工程师，嵌入式开发爱好者</div></div><div class="card-info-data is-center"><div class="card-info-data-item"><a href="/archives/"><div class="headline">文章</div><div class="length-num">84</div></a></div><div class="card-info-data-item"><a href="/tags/"><div class="headline">标签</div><div class="length-num">101</div></a></div><div class="card-info-data-item"><a href="/categories/"><div class="headline">分类</div><div class="length-num">18</div></a></div></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/qiujiandong"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/qiujiandong" target="_blank" title="Github"><i class="fab fa-github"></i></a><a class="social-icon" href="mailto:1335521934@qq.com" target="_blank" title="Email"><i class="fas fa-envelope"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">最好的程序员做自己的硬件！</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content is-expand"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#PCIe%E5%8D%8F%E8%AE%AE%E7%AE%80%E4%BB%8B"><span class="toc-number">1.</span> <span class="toc-text">PCIe协议简介</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#PCIe%E7%9A%84%E9%85%8D%E7%BD%AE%E7%A9%BA%E9%97%B4"><span class="toc-number">1.1.</span> <span class="toc-text">PCIe的配置空间</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#BAR%E7%A9%BA%E9%97%B4"><span class="toc-number">1.2.</span> <span class="toc-text">BAR空间</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#MSI%E4%B8%AD%E6%96%AD"><span class="toc-number">1.3.</span> <span class="toc-text">MSI中断</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Xilinx%E6%8F%90%E4%BE%9B%E7%9A%84IP"><span class="toc-number">2.</span> <span class="toc-text">Xilinx提供的IP</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%94%B5%E8%B7%AF%E8%AE%BE%E8%AE%A1"><span class="toc-number">3.</span> <span class="toc-text">电路设计</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Block-Design"><span class="toc-number">4.</span> <span class="toc-text">Block Design</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80%E4%BA%9B%E7%BB%8F%E9%AA%8C"><span class="toc-number">5.</span> <span class="toc-text">一些经验</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2025/01/01/summary-2024/" title="2024年终总结"><img src="/2025/01/01/summary-2024/2025-01-01-21-54-27.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="2024年终总结"/></a><div class="content"><a class="title" href="/2025/01/01/summary-2024/" title="2024年终总结">2024年终总结</a><time datetime="2025-01-01T09:19:27.000Z" title="发表于 2025-01-01 17:19:27">2025-01-01</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2024/04/17/learn-cuda/" title="CUDA优化入门"><img src="/2024/04/17/learn-cuda/2024-04-16-15-52-38.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="CUDA优化入门"/></a><div class="content"><a class="title" href="/2024/04/17/learn-cuda/" title="CUDA优化入门">CUDA优化入门</a><time datetime="2024-04-17T12:00:00.000Z" title="发表于 2024-04-17 20:00:00">2024-04-17</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2024/04/04/bipartite-match/" title="二分图的判断与匹配"><img src="/2024/04/04/bipartite-match/2024-04-05-00-11-55.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="二分图的判断与匹配"/></a><div class="content"><a class="title" href="/2024/04/04/bipartite-match/" title="二分图的判断与匹配">二分图的判断与匹配</a><time datetime="2024-04-04T13:43:47.000Z" title="发表于 2024-04-04 21:43:47">2024-04-04</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2024/01/19/summary/" title="长风破浪会有时"><img src="/2024/01/19/summary/wrapped2023.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="长风破浪会有时"/></a><div class="content"><a class="title" href="/2024/01/19/summary/" title="长风破浪会有时">长风破浪会有时</a><time datetime="2024-01-19T13:15:25.000Z" title="发表于 2024-01-19 21:15:25">2024-01-19</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/06/05/remote-vivado/" title="Vivado远程开发探索"><img src="/2023/06/05/remote-vivado/2023-06-15-16-22-13.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Vivado远程开发探索"/></a><div class="content"><a class="title" href="/2023/06/05/remote-vivado/" title="Vivado远程开发探索">Vivado远程开发探索</a><time datetime="2023-06-05T09:52:47.000Z" title="发表于 2023-06-05 17:52:47">2023-06-05</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2025 By 裘剑东</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.js"></script><div class="js-pjax"><script>(() => {
+  const $mermaidWrap = document.querySelectorAll('#article-container .mermaid-wrap')
+  if ($mermaidWrap.length) {
+    window.runMermaid = () => {
+      window.loadMermaid = true
+      const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default'
+
+      Array.from($mermaidWrap).forEach((item, index) => {
+        const mermaidSrc = item.firstElementChild
+        const mermaidThemeConfig = '%%{init:{ \'theme\':\'' + theme + '\'}}%%\n'
+        const mermaidID = 'mermaid-' + index
+        const mermaidDefinition = mermaidThemeConfig + mermaidSrc.textContent
+        mermaid.mermaidAPI.render(mermaidID, mermaidDefinition, (svgCode) => {
+          mermaidSrc.insertAdjacentHTML('afterend', svgCode)
+        })
+      })
+    }
+
+    const loadMermaid = () => {
+      window.loadMermaid ? runMermaid() : getScript('https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js').then(runMermaid)
+    }
+
+    window.pjax ? loadMermaid() : document.addEventListener('DOMContentLoaded', loadMermaid)
+  }
+})()</script></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

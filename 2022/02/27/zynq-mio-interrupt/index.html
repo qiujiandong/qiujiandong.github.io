@@ -1,0 +1,228 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Zynq MIO中断配置实现与中断响应过程 | 小裘控制系统</title><meta name="keywords" content="中断,Zynq,MIO"><meta name="author" content="裘剑东"><meta name="copyright" content="裘剑东"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="Zynq MIO中断配置实现与中断响应过程">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Zynq MIO中断配置实现与中断响应过程">
+<meta property="og:url" content="http://qjdxmy.com/2022/02/27/zynq-mio-interrupt/">
+<meta property="og:site_name" content="小裘控制系统">
+<meta property="og:description" content="Zynq MIO中断配置实现与中断响应过程">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://qjdxmy.com/2022/02/27/zynq-mio-interrupt/2022-02-27-11-04-44.png">
+<meta property="article:published_time" content="2022-02-27T02:05:32.000Z">
+<meta property="article:modified_time" content="2024-04-17T12:40:48.585Z">
+<meta property="article:author" content="裘剑东">
+<meta property="article:tag" content="中断">
+<meta property="article:tag" content="Zynq">
+<meta property="article:tag" content="MIO">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://qjdxmy.com/2022/02/27/zynq-mio-interrupt/2022-02-27-11-04-44.png"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="http://qjdxmy.com/2022/02/27/zynq-mio-interrupt/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '天',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery@2/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery@2/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'Zynq MIO中断配置实现与中断响应过程',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2024-04-17 20:40:48'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 6.0.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/me.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data is-center"><div class="data-item"><a href="/archives/"><div class="headline">文章</div><div class="length-num">84</div></a></div><div class="data-item"><a href="/tags/"><div class="headline">标签</div><div class="length-num">101</div></a></div><div class="data-item"><a href="/categories/"><div class="headline">分类</div><div class="length-num">18</div></a></div></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/download/"><i class="fa-fw fas fa-download"></i><span> 下载</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 链接</span></a></div><div class="menus_item"><a class="site-page" href="/resume/"><i class="fa-fw fas fa-heart"></i><span> 个人简历</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="not-top-img" id="page-header"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">小裘控制系统</a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/download/"><i class="fa-fw fas fa-download"></i><span> 下载</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 链接</span></a></div><div class="menus_item"><a class="site-page" href="/resume/"><i class="fa-fw fas fa-heart"></i><span> 个人简历</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav></header><main class="layout" id="content-inner"><div id="post"><div id="post-info"><h1 class="post-title">Zynq MIO中断配置实现与中断响应过程</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2022-02-27T02:05:32.000Z" title="发表于 2022-02-27 10:05:32">2022-02-27</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2024-04-17T12:40:48.585Z" title="更新于 2024-04-17 20:40:48">2024-04-17</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E5%B5%8C%E5%85%A5%E5%BC%8F%E8%BD%AF%E4%BB%B6/">嵌入式软件</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="Zynq MIO中断配置实现与中断响应过程"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"></span></span></div></div></div><article class="post-content" id="article-container"><h2 id="中断结构">中断结构</h2>
+<p>  在进行中断相关的程序编写之前，首先需要了解zynq的中断框图。<br>
+  这部分内容建议直接看xilinx官方手册ug585的第7章，里面有非常详细的介绍。xilinx文档可以直接用DocNav查看，会很方便。</p>
+<img src="/2022/02/27/zynq-mio-interrupt/2022-02-27-10-56-12.png" class="">
+<p>  从整体框图中可以看到，中断的来源主要分为三个部分，分别是<strong>软件中断</strong>、<strong>私有外设中断</strong>和<strong>共享外设中断</strong>。这里的顺序也是它中断ID编号的顺序，从前往后依次增大，总共有81个中断ID。</p>
+<ul>
+<li>软件中断ID 0~15</li>
+<li>私有外设中断ID 27 ~ 31，编号 16 ~ 26的ID是保留的</li>
+<li>共享外设中断ID 32 ~ 91</li>
+</ul>
+<p>  这些中断源送进通用中断控制器（GIC）后再由GIC分配给两个CPU。手册中还有很多关于这三类中断的详细介绍。<br>
+  有一个很好的地方是，共享外设中断虽然说是两个CPU共享的，但是只有其中一个CPU会进行处理，而不需要额外的加互斥锁之类的操作。<br>
+  比较让我在意的是这里的共享外设中断除了那几个来自PL的中断可以自定义中断的触发类型，而其他的中断都是固定的触发类型。然而我们要用的GPIO中断可能会有不同的应用场景，这要是不能配置触发类型就很奇怪。后来发现这部分是在GPIO相关的寄存器中进行配置的。<br>
+  6个ICD ICFR寄存器用来配置不同中断的触发类型，其中SGI和PPI中断的触发类型是固定的，所以是不能改的，寄存器只读。SPI的中断有两种配置选项，高电平触发或者是上升沿触发。<br>
+  几个ICD IPTR寄存器用来设置中断目标，除了PPI的中断目标是固定的，SGI和SPI的中断目标都是可以配置的。</p>
+<h2 id="MIO中断实现">MIO中断实现</h2>
+<h3 id="基本配置">基本配置</h3>
+<p>  Vivado的Block Design部分基本不需要什么配置，只要有GPIO就行。硬件上按键引脚上拉，按键按下后变成低电平，设计上采用下降沿触发。实验后发现应该是硬件上自带有消抖的功能，在软件中没有另外进行按键消抖处理也能正常使用。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> GPIO_DEVICE_ID  XPAR_XGPIOPS_0_DEVICE_ID</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> INTC_DEVICE_ID  XPAR_SCUGIC_SINGLE_DEVICE_ID</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> GPIO_INTERRUPT_ID XPAR_XGPIOPS_0_INTR</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> KEY_NUMBER 50</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> LED_NUMBER 0</span></span><br></pre></td></tr></table></figure>
+<p>  这个案例中，中断相关的头文件要包含&quot;xgpiops.h&quot;和&quot;xscugic.h&quot;，主要对GPIO和GIC进行配置。宏定义的设备ID用来后面查找设备，这里用到的GPIO的引脚比较少，可以直接对单个引脚进行配置，而不需要对整个GPIO Bank进行配置。</p>
+<img src="/2022/02/27/zynq-mio-interrupt/2022-02-27-11-01-11.png" class="">
+<p>  有些GPIO的函数需要用到Bank号，但只用引脚编号（0-117），就可以不需要用到Bank号，直接对单个IO进行配置。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> XGpioPs Gpio; <span class="comment">/* The Instance of the GPIO Driver */</span></span><br><span class="line"><span class="type">static</span> XScuGic Intc; <span class="comment">/* The Instance of the Interrupt Controller Driver */</span></span><br></pre></td></tr></table></figure>
+<p>  GPIO和GIC的实例是全局唯一的，所以声明为全局变量。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">XGpioPs_Config *ConfigPtr;</span><br><span class="line"><span class="type">int</span> Status;</span><br><span class="line">ConfigPtr = XGpioPs_LookupConfig(DeviceId);</span><br><span class="line"><span class="keyword">if</span> (ConfigPtr == <span class="literal">NULL</span>) &#123;</span><br><span class="line">    <span class="keyword">return</span> XST_FAILURE;</span><br><span class="line">&#125;</span><br><span class="line">    XGpioPs_CfgInitialize(Gpio, ConfigPtr, ConfigPtr-&gt;BaseAddr);</span><br><span class="line">    Status = XGpioPs_SelfTest(Gpio);</span><br><span class="line">    <span class="keyword">if</span>( Status != XST_SUCCESS )&#123;</span><br><span class="line">        <span class="keyword">return</span> XST_FAILURE;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">XScuGic_Config *IntcConfig;</span><br><span class="line"><span class="type">int</span> Status;</span><br><span class="line">IntcConfig = XScuGic_LookupConfig(INTC_DEVICE_ID);</span><br><span class="line"><span class="keyword">if</span> (<span class="literal">NULL</span> == IntcConfig) &#123;</span><br><span class="line">    <span class="keyword">return</span> XST_FAILURE;</span><br><span class="line">&#125;</span><br><span class="line">Status = XScuGic_CfgInitialize(GicInstancePtr, IntcConfig,IntcConfig-&gt;CpuBaseAddress);</span><br><span class="line"><span class="keyword">if</span> (Status != XST_SUCCESS) &#123;</span><br><span class="line">    <span class="keyword">return</span> XST_FAILURE;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>  GPIO和GIC的初始化是类似的，都是先根据设备ID查找设备，再调用初始化函数。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">XGpioPs_SetDirectionPin(Gpio, KEY_NUMBER, <span class="number">0</span>);<span class="comment">// input</span></span><br><span class="line">XGpioPs_SetDirectionPin(Gpio, LED_NUMBER, <span class="number">1</span>);<span class="comment">// output</span></span><br><span class="line">XGpioPs_SetOutputEnablePin(Gpio, LED_NUMBER, <span class="number">1</span>);</span><br><span class="line">XGpioPs_WritePin(Gpio, LED_NUMBER, <span class="number">1</span>);<span class="comment">// led off</span></span><br></pre></td></tr></table></figure>
+<p>  GPIO口的基本配置，输入输出方向，输出使能，设置输出引脚的初始状态。关于GPIO中断的配置在SetupInterruptSystem函数中实现，在GPIO初始化函数中调用该函数。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Status = SetupInterruptSystem(Intc, Gpio, GPIO_INTERRUPT_ID);</span><br><span class="line"><span class="keyword">if</span> (Status != XST_SUCCESS) &#123;</span><br><span class="line">    <span class="keyword">return</span> XST_FAILURE;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="中断相关配置">中断相关配置</h3>
+<p>  除了对GIC进行初始化，接着主要就是回调函数的绑定。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Xil_ExceptionInit();</span><br></pre></td></tr></table></figure>
+<p>  中断处理函数都是由这个“异常”来统一管理的，异常不仅限于IRQ中断，还有系统复位、未定义的中断、FIQ等等。这里的Xil_ExceptionInit函数在函数定义的注释里解释了这个没有任何作用，只是为了兼容。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Xil_ExceptionRegisterHandler(XIL_EXCEPTION_ID_INT, (Xil_ExceptionHandler)XScuGic_InterruptHandler, GicInstancePtr);</span><br></pre></td></tr></table></figure>
+<p>  这个函数用来在异常处理向量表汇总注册GIC的中断处理函数。异常总共只有七中，这个异常处理向量表实际上是一个结构体数组，数组中的每个元素是一个结构体，包含异常处理函数的函数指针和这个函数的自变量。</p>
+<img src="/2022/02/27/zynq-mio-interrupt/2022-02-27-11-03-08.png" class="">
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="title function_">void</span> <span class="params">(*Xil_ExceptionHandler)</span><span class="params">(<span class="type">void</span> *data)</span>;</span><br></pre></td></tr></table></figure>
+<p>  这个函数指针的类型已经有定义，和我以前所遇到的中断服务函数不同，这里的中断服务函数可以由自变量。这个自变量一般就是这个GIC的实例的指针。<br>
+  XScuGic_InterruptHandler这个函数也不是我们自己定义的，而是GIC的驱动自带的，那么它完成了什么工作呢？<br>
+  它实际上一个管理所有中断处理函数的一个函数，它会根据中断编号，比如GPIO的中断编号是52，根据52它会在HandlerTable中找到相应的中断处理函数进行执行。这里的这个HandlerTable和上面的异常处理向量表类似，也是一个结构体数组，将中断处理函数和自变量一同存储，而这个自变量命名为CallBackRef，一般也就是某个实例的指针。<br>
+  为什么经常会看到函数把实例的指针作为参数进行传递？这类似面向对象的思想，实例本身是一个结构体，其中有关于这个实例的所有相关的内容。上面的HandlerTable也可以在GIC的实例中找到，而把实例作为一个参数传给中断处理函数，也使得中断处理函数能更加灵活地对外设进行修改。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Status = XScuGic_Connect(GicInstancePtr, GpioIntrId, (Xil_ExceptionHandler)XGpioPs_IntrHandler, (<span class="type">void</span> *)Gpio);</span><br><span class="line"><span class="keyword">if</span> (Status != XST_SUCCESS) &#123;</span><br><span class="line">    <span class="keyword">return</span> Status;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>  在HandlerTable中并没有明确相应的中断处理函数，所以我们还要用这个XScuGic_Connect把GPIO的中断处理函数放到HandlerTable中。XGpioPs_IntrHandler是一个GPIO的通用的中断处理函数，它有一个自变量是GPIO的实例，XScuGic_Connect把它和GIC的实例中的HandlerTable进行绑定。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">XGpioPs_SetCallbackHandler(Gpio, (<span class="type">void</span> *)Gpio, IntrHandler);</span><br></pre></td></tr></table></figure>
+<p>  然而XGpioPs_IntrHandler也还是GPIO驱动自带的中断服务函数，我们还需要定义一个实际的中断处理函数，用XGpioPs_SetCallbackHandler把XGpioPs_IntrHandler和实际的中断处理函数进行绑定。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="title function_">void</span> <span class="params">(*XGpioPs_Handler)</span> <span class="params">(<span class="type">void</span> *CallBackRef, u32 Bank, u32 Status)</span>;</span><br></pre></td></tr></table></figure>
+<p>  为了实现更加灵活的功能，GPIO对实际的中断服务函数的定义需要按照XGpioPs_Handler这个函数指针的形式来，其中除了CallBackRef，另外对Bank进行了区分，是的GPIO中断在产生时，可以根据不同的bank定义不同的功能。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">void</span> <span class="title function_">IntrHandler</span><span class="params">(<span class="type">void</span> *CallBackRef, u32 Bank, u32 Status)</span></span><br><span class="line">&#123;</span><br><span class="line">    XGpioPs *Gpio = (XGpioPs *)CallBackRef;</span><br><span class="line">    u32 DataRead;</span><br><span class="line">    DataRead = XGpioPs_ReadPin(Gpio, LED_NUMBER);</span><br><span class="line">    <span class="keyword">if</span> (DataRead != <span class="number">0</span>) &#123;</span><br><span class="line">        XGpioPs_WritePin(Gpio, LED_NUMBER, <span class="number">0</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> &#123;</span><br><span class="line">        XGpioPs_WritePin(Gpio, LED_NUMBER, <span class="number">1</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>  以上是我定义的实际的中断服务函数，实现的是LED在按键后切换状态的功能。因为只有一处GPIO中断，所以没用到这里形参中的Status，如果有多个MIO中断来源，就需要根据Status和Bank进行判断具体是哪个IO口发生了中断。</p>
+<img src="/2022/02/27/zynq-mio-interrupt/2022-02-27-11-04-44.png" class="">
+<p>  实际的配置过程没有顺序要求，但一定要有这三个步骤；GPIO的中断响应过程基本上就是上面右图所示。<br>
+最后还有一些中断类型和使能的配置，这些都比较简单就不细说了。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* Enable falling edge interrupts for the key pin. */</span></span><br><span class="line">XGpioPs_SetIntrTypePin(Gpio, KEY_NUMBER, XGPIOPS_IRQ_TYPE_EDGE_FALLING);</span><br><span class="line"><span class="comment">/* Enable the GPIO interrupts of key pin. */</span></span><br><span class="line">XGpioPs_IntrEnablePin(Gpio, KEY_NUMBER);</span><br><span class="line"><span class="comment">/* Enable the interrupt for the GPIO device. */</span></span><br><span class="line">XScuGic_Enable(GicInstancePtr, GpioIntrId);</span><br><span class="line"><span class="comment">/* Enable interrupts in the Processor. */</span></span><br><span class="line">Xil_ExceptionEnableMask(XIL_EXCEPTION_IRQ);</span><br></pre></td></tr></table></figure>
+<p>  在设计过程中有时候文件很大找不到函数，可以打开Windows菜单下的Open perspective… 选第一个C/C++，就会有一个Outline的窗口，可以很方便地查看有哪些函数。</p>
+<img src="/2022/02/27/zynq-mio-interrupt/2022-02-27-11-05-14.png" class="">
+<img src="/2022/02/27/zynq-mio-interrupt/2022-02-27-11-05-26.png" class="">
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="mailto:undefined">裘剑东</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="http://qjdxmy.com/2022/02/27/zynq-mio-interrupt/">http://qjdxmy.com/2022/02/27/zynq-mio-interrupt/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="http://qjdxmy.com" target="_blank">小裘控制系统</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E4%B8%AD%E6%96%AD/">中断</a><a class="post-meta__tags" href="/tags/Zynq/">Zynq</a><a class="post-meta__tags" href="/tags/MIO/">MIO</a></div><div class="post_share"><div class="social-share" data-image="/2022/02/27/zynq-mio-interrupt/2022-02-27-11-04-44.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/social-share.js/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2022/02/27/nand-flash/"><img class="prev-cover" src="/2022/02/27/nand-flash/2022-02-27-10-35-07.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">S34MS01G2 NAND Flash读写</div></div></a></div><div class="next-post pull-right"><a href="/2022/02/27/aligned-malloc/"><img class="next-cover" src="/2022/02/27/aligned-malloc/extra_space.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">分配对齐的内存空间</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/2022/02/27/c6455-2/" title="TMS320C6455入门实践（二）"><img class="cover" src="/2022/02/27/c6455-2/2022-02-27-17-27-11.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-02-27</div><div class="title">TMS320C6455入门实践（二）</div></div></a></div><div><a href="/2022/02/26/logic-zynq-vga/" title="基于Zynq的VGA驱动"><img class="cover" src="/2022/02/26/logic-zynq-vga/circuit.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-02-26</div><div class="title">基于Zynq的VGA驱动</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/me.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">裘剑东</div><div class="author-info__description">芯来科技基础软件开发工程师，嵌入式开发爱好者</div></div><div class="card-info-data is-center"><div class="card-info-data-item"><a href="/archives/"><div class="headline">文章</div><div class="length-num">84</div></a></div><div class="card-info-data-item"><a href="/tags/"><div class="headline">标签</div><div class="length-num">101</div></a></div><div class="card-info-data-item"><a href="/categories/"><div class="headline">分类</div><div class="length-num">18</div></a></div></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/qiujiandong"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/qiujiandong" target="_blank" title="Github"><i class="fab fa-github"></i></a><a class="social-icon" href="mailto:1335521934@qq.com" target="_blank" title="Email"><i class="fas fa-envelope"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">最好的程序员做自己的硬件！</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content is-expand"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%AD%E6%96%AD%E7%BB%93%E6%9E%84"><span class="toc-number">1.</span> <span class="toc-text">中断结构</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#MIO%E4%B8%AD%E6%96%AD%E5%AE%9E%E7%8E%B0"><span class="toc-number">2.</span> <span class="toc-text">MIO中断实现</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9F%BA%E6%9C%AC%E9%85%8D%E7%BD%AE"><span class="toc-number">2.1.</span> <span class="toc-text">基本配置</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%AD%E6%96%AD%E7%9B%B8%E5%85%B3%E9%85%8D%E7%BD%AE"><span class="toc-number">2.2.</span> <span class="toc-text">中断相关配置</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2025/01/01/summary-2024/" title="2024年终总结"><img src="/2025/01/01/summary-2024/2025-01-01-21-54-27.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="2024年终总结"/></a><div class="content"><a class="title" href="/2025/01/01/summary-2024/" title="2024年终总结">2024年终总结</a><time datetime="2025-01-01T09:19:27.000Z" title="发表于 2025-01-01 17:19:27">2025-01-01</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2024/04/17/learn-cuda/" title="CUDA优化入门"><img src="/2024/04/17/learn-cuda/2024-04-16-15-52-38.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="CUDA优化入门"/></a><div class="content"><a class="title" href="/2024/04/17/learn-cuda/" title="CUDA优化入门">CUDA优化入门</a><time datetime="2024-04-17T12:00:00.000Z" title="发表于 2024-04-17 20:00:00">2024-04-17</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2024/04/04/bipartite-match/" title="二分图的判断与匹配"><img src="/2024/04/04/bipartite-match/2024-04-05-00-11-55.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="二分图的判断与匹配"/></a><div class="content"><a class="title" href="/2024/04/04/bipartite-match/" title="二分图的判断与匹配">二分图的判断与匹配</a><time datetime="2024-04-04T13:43:47.000Z" title="发表于 2024-04-04 21:43:47">2024-04-04</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2024/01/19/summary/" title="长风破浪会有时"><img src="/2024/01/19/summary/wrapped2023.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="长风破浪会有时"/></a><div class="content"><a class="title" href="/2024/01/19/summary/" title="长风破浪会有时">长风破浪会有时</a><time datetime="2024-01-19T13:15:25.000Z" title="发表于 2024-01-19 21:15:25">2024-01-19</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/06/05/remote-vivado/" title="Vivado远程开发探索"><img src="/2023/06/05/remote-vivado/2023-06-15-16-22-13.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Vivado远程开发探索"/></a><div class="content"><a class="title" href="/2023/06/05/remote-vivado/" title="Vivado远程开发探索">Vivado远程开发探索</a><time datetime="2023-06-05T09:52:47.000Z" title="发表于 2023-06-05 17:52:47">2023-06-05</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2025 By 裘剑东</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.js"></script><div class="js-pjax"><script>(() => {
+  const $mermaidWrap = document.querySelectorAll('#article-container .mermaid-wrap')
+  if ($mermaidWrap.length) {
+    window.runMermaid = () => {
+      window.loadMermaid = true
+      const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default'
+
+      Array.from($mermaidWrap).forEach((item, index) => {
+        const mermaidSrc = item.firstElementChild
+        const mermaidThemeConfig = '%%{init:{ \'theme\':\'' + theme + '\'}}%%\n'
+        const mermaidID = 'mermaid-' + index
+        const mermaidDefinition = mermaidThemeConfig + mermaidSrc.textContent
+        mermaid.mermaidAPI.render(mermaidID, mermaidDefinition, (svgCode) => {
+          mermaidSrc.insertAdjacentHTML('afterend', svgCode)
+        })
+      })
+    }
+
+    const loadMermaid = () => {
+      window.loadMermaid ? runMermaid() : getScript('https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js').then(runMermaid)
+    }
+
+    window.pjax ? loadMermaid() : document.addEventListener('DOMContentLoaded', loadMermaid)
+  }
+})()</script></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
