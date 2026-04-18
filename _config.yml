@@ -172,6 +172,7 @@ exclude:
   - .bundle
   - .github
   - .jekyll-assets-cache
+  - .omx
   - .sass-cache
   - assets/js/_main.js
   - assets/js/plugins
