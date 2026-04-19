@@ -196,44 +196,6 @@ body {
     transform: translateY(-2px);
 }
 
-.save-menu-options {
-    display: none;
-    margin-top: 6px;
-    border-radius: 10px;
-    overflow: hidden;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.12);
-    background: var(--cv-surface);
-}
-
-.save-menu.open .save-menu-options {
-    display: flex;
-    flex-direction: column;
-    animation: fadeInUp 0.2s ease-out;
-}
-
-.save-menu-options button {
-    display: block;
-    width: 100%;
-    padding: 8px 16px;
-    border: none;
-    background: var(--cv-surface);
-    color: var(--cv-accent-strong);
-    font-size: 0.85em;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    text-align: left;
-}
-
-.save-menu-options button:hover {
-    background: var(--cv-accent-strong);
-    color: white;
-}
-
-.save-menu-options button:not(:last-child) {
-    border-bottom: 1px solid var(--cv-border);
-}
-
 .info-section {
     text-align: center;
     color: var(--cv-accent-strong);
@@ -593,24 +555,6 @@ body {
 
     .cv-details-content {
         display: none !important;
-    }
-
-    .print-with-details .cv-details-content {
-        display: block !important;
-        border-left: 2px solid var(--cv-accent);
-        padding: 6px 10px;
-        margin-top: 4px;
-        font-size: 10px;
-        color: #555;
-        line-height: 1.5;
-    }
-
-    .print-with-details .cv-details-print-link {
-        display: none !important;
-    }
-
-    .print-with-details .cv-section-item {
-        page-break-inside: auto !important;
     }
 
     .social-icons {
