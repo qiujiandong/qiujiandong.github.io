@@ -1,0 +1,222 @@
+---
+layout: null
+permalink: /cv
+---
+<!DOCTYPE html>
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#2f7f93">
+    <link rel="shortcut icon" href="/images/favicon.ico" type="image/vnd.microsoft.icon">
+    <link rel="stylesheet" type="text/css" href="/assets/css/cv.css">
+    <title>Jiandong Qiu - CV</title>
+</head>
+<body>
+<a href="/about">
+    <span class="go-back web-only cv-link">←</span>
+</a>
+<div class="save-menu web-only">
+    <button class="save-menu-toggle" onclick="this.parentElement.classList.toggle('open')" title="Save CV">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Save PDF
+    </button>
+    <div class="save-menu-options">
+        <button onclick="window.print(); this.closest('.save-menu').classList.remove('open');">Simplified</button>
+        <button onclick="printWithDetails(); this.closest('.save-menu').classList.remove('open');">Detailed</button>
+    </div>
+</div>
+<div class="cv-container">
+    <div class="info-section">
+        <div class="info-section-name">裘剑东</div>
+        <div class="web-only">
+            <div>
+                <a class="cv-link" href="mailto:qiujiandong1998@gmail.com">qiujiandong1998@gmail.com</a> ·
+                <a class="cv-link" href="https://qiujiandong.github.io/about/">qiujiandong.github.io/about/</a>
+            </div>
+        </div>
+        <div class="print-only">
+            <div>qiujiandong1998@gmail.com ·
+                <a class="cv-link" href="https://qiujiandong.github.io/about/">qiujiandong.github.io/about/</a>
+            </div>
+        </div>
+        <div class="mobile-only">
+            <a class="cv-link" href="mailto:qiujiandong1998@gmail.com">qiujiandong1998@gmail.com</a>
+            <a class="cv-link" href="https://qiujiandong.github.io/about/">qiujiandong.github.io/about/</a>
+        </div>
+    </div>
+
+    <div class="social-icons" align="center" style="margin-top: 8px; margin-bottom: 0;">
+    </div>
+
+    <div class="cv-section" id="summary" style="margin-top: 8px; margin-bottom: 0px;">
+        <div class="cv-section-body">
+            <div class="cv-section-item">
+                <div class="cv-section-smaller" style="line-height: 1.6;">
+                    我是一名RISC-V软件开发工程师, 主要关注 <strong>软硬件协同的性能优化</strong>. 目前在武汉工作，就职于 <a href="https://www.nucleisys.com/">芯来科技（Nuclei System Technology）</a>。
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div>
+        <div class="cv-section" id="experience">
+            <div class="cv-section-title">工作经历</div>
+            <div class="cv-section-body">
+                <div class="cv-section-item">
+                    <div>
+                        <span class="cv-section-item-title">基础软件开发工程师</span>
+                        <!-- <span class="cv-details-btn" onclick="toggleDetails(this)">details</span><a class="cv-link cv-details-print-link" href="https://terrytangyuan.github.io/cv">[details]</a> -->
+                        <span class="cv-section-time">2024年6月 - 至今</span>
+                    </div>
+                    <div class="cv-section-smaller">
+                        <a class="cv-link" href="https://www.nucleisys.com/">芯来科技（武汉）有限公司</a>
+                    </div>
+                    <div class="cv-section-smallest">- 维护 <a class="cv-link" href="https://github.com/Nuclei-Software/nuclei-sdk">Nuclei SDK</a> 与 <a class="cv-link" href="https://github.com/Nuclei-Software/NMSIS">Nuclei NMSIS</a>, 适配新的CPU特性, 为算子库添加RVP/RVV性能优化.</div>
+                    <div class="cv-section-smallest">- 维护 <a class="cv-link" href="https://github.com/Nuclei-Software/nuclei-audio-library">Nuclei Audio Library</a>, <a class="cv-link" href="https://github.com/Nuclei-Software/nuclei-ai-library">Nuclei AI Library</a> 与 <a class="cv-link" href="https://github.com/Nuclei-Software/npk-tflm"> npk-tflm</a>, 熟悉音视频编解码, 移植常见的AI推理框架.</div>
+                    <!-- <div class="cv-details-content"> -->
+                    <!-- </div> -->
+                </div>
+                <div class="cv-section-item">
+                    <span class="cv-section-item-title">感知算法工程师</span>
+                    <span class="cv-section-time">2023年10月 - 2024年6月</span>
+                    <div class="cv-section-smaller">
+                        <a class="cv-link" href="https://www.minieye.cc">深圳佑驾创新科技股份有限公司</a>
+                    </div>
+                    <div class="cv-section-smallest">- 自研超声波障碍物检测算法，实现障碍物坐标定位与类型判断的功能.</div>
+                </div>
+                <div class="cv-section-item">
+                    <span class="cv-section-item-title">高性能计算工程师</span>
+                    <!-- <span class="cv-details-btn" onclick="toggleDetails(this)">details</span><a class="cv-link cv-details-print-link" href="https://terrytangyuan.github.io/cv">[details]</a> -->
+                    <span class="cv-section-time">2023年7月 - 2023年10月</span>
+                    <div class="cv-section-smaller">
+                        <a class="cv-link" href="https://www.minieye.cc">深圳佑驾创新科技股份有限公司</a>
+                    </div>
+                    <div class="cv-section-smallest">- 负责图像编解码相关工具 (基于Nvidia Video Codec SDK) 的维护</div>
+                    <div class="cv-section-smallest">- 基于Bazel构建DDS通信中间件, 编写单元测试</div>
+                    <!-- <div class="cv-details-content"> -->
+                    <!-- </div> -->
+                </div>
+            </div>
+        </div>
+
+        <div class="cv-section" id="projects">
+            <div class="cv-section-title"> 项目经历
+            </div>
+            <div class="cv-section-body">
+                <div class="cv-section-item">
+                    <span class="cv-section-item-title">
+                        <a class="cv-link" href="https://github.com/qiujiandong/gp-sup">基于国产器件的融合信息处理系统设计及跟踪算法实现</a>
+                    </span>
+                    <span class="cv-section-time">硕士毕业设计</span>
+                    <div class="cv-section-smallest">- 完成从单板硬件电路设计到算法实现验证的全链路工作;</div>
+                    <div class="cv-section-smallest">- 主要基于多核DSP实现KCF目标跟踪算法, 结合FPGA实现的硬件模块加速特征提取.</div>
+                </div>
+                <div class="cv-section-item">
+                    <span class="cv-section-item-title">
+                        <a class="cv-link" href="https://github.com/qiujiandong/bicubic">Verilog实现图像超分辨率算法</a>
+                    </span>
+                    <span class="cv-section-time">个人开源项目</span>
+                    <div class="cv-section-smallest"> 使用Verilog实现Bicubic插值算法, 将950x540图像上采样至3840x2160分辨率, 实现单周期16像素的并行输出.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="cv-section" id="education">
+            <div class="cv-section-title">教育经历</div>
+            <div class="cv-section-body">
+                <div class="cv-section-item">
+                    <span class="cv-section-item-title">
+                        <a class="cv-link" href="https://www.hust.edu/">华中科技大学</a>
+                    </span>
+                    <span class="cv-section-time">2020 - 2023</span>
+                    <div class="cv-section-smaller">控制科学与工程 硕士</div>
+                    <div class="cv-section-smallest">- 主要研究KCF目标跟踪算法的实现与优化, 在 <a class="cv-link" href="https://blog.csdn.net/qq_35787848">CSDN 博客</a> 中记录了相关研发过程</div>
+                </div>
+                <div class="cv-section-item">
+                    <span class="cv-section-item-title">
+                        <a class="cv-link" href="https://www.hust.edu/">华中科技大学</a>
+                    </span>
+                    <span class="cv-section-time">2016 - 2020</span>
+                    <div class="cv-section-smaller">集成电路设计与集成系统 本科</div>
+                    <div class="cv-section-smallest">- 加权成绩专业第一[<a class="cv-link" href="/assets/extra/college_score.pdf">成绩单</a>], 辅修计算机科学与技术专业. 熟悉计算机组成原理, 数字信号处理, 扎实掌握数理基础知识.</div>
+                </div>
+                <div class="cv-section-item">
+                    <span class="cv-section-item-title">
+                        <a class="cv-link" href="https://zh.wikipedia.org/wiki/%E6%B5%99%E6%B1%9F%E7%9C%81%E5%A5%89%E5%8C%96%E4%B8%AD%E5%AD%A6">浙江省宁波市奉化中学</a>
+                    </span>
+                    <span class="cv-section-time">2013 - 2016</span>
+                    <div class="cv-section-smallest">获得高中毕业文凭, 2016年浙江省高考<a class="cv-link" href="/assets/extra/high_school_score.jpg">省4322名, 前1.6%</a></div>
+                </div>
+            </div>
+        </div>
+
+    <!-- display only cv data -->
+    <div class="cv-section" id="awards">
+        <div class="cv-section-title">获奖经历</div>
+        <div class="cv-section-body">
+            <div class="cv-section-item">
+                <span class="cv-section-item-title">开放原子大赛</span>
+                <span class="cv-section-time">2024 - 2025</span>
+                <div class="cv-section-smallest">- 第三届 RISC-V 基础软件与应用创新大赛, <a class="cv-link" href="https://openatom.tech/2025nist/88b7524ab23119567685113c8b40fa05">RISC-V架构下基于vLLM的大模型推理加速</a>, 优秀奖, 2025 [<a class="cv-link" href="/assets/extra/openatom_riscv.pdf">证书</a>]
+                </div>
+                <div class="cv-section-smallest">- Tecorigin 算子开发任务挑战赛, 入围奖, 2024</div>
+            </div>
+            <div class="cv-section-item">
+                <span class="cv-section-item-title">大学期间获奖</span>
+                <span class="cv-section-time">2016-2023</span>
+                <div class="cv-section-smallest">- 国家奖学金, 2017-2018学年度 [<a class="cv-link" href="/assets/extra/national_scholarship.jpg">证书</a>]</div>
+                <div class="cv-section-smallest">- 华中科技大学三好学生, 2016-2017学年度 [<a class="cv-link" href="/assets/extra/three_good_scholarship.jpg">证书</a>]</div>
+                <div class="cv-section-smallest">- 湖北省大学生电子设计"TI杯"竞赛特等奖, 2018, [<a class="cv-link" href="/assets/extra/nuedc_2018.jpg">证书</a>]</div>
+                <div class="cv-section-smallest">- 全国大学生电子设计"TI杯"竞赛省一等奖, 2019</div>
+                <div class="cv-section-smallest">- 社会活动积极分子, 知行优秀三等奖学金, 2020-2021学年度</div>
+            </div>
+        </div>
+    </div>
+
+    </div>
+    </div>
+</div>
+<script>
+document.addEventListener('click', function(e) {
+    var menu = document.querySelector('.save-menu');
+    if (menu && !menu.contains(e.target)) {
+        menu.classList.remove('open');
+    }
+});
+
+function printWithDetails() {
+    var contents = document.querySelectorAll('.cv-details-content');
+    var btns = document.querySelectorAll('.cv-details-btn');
+    contents.forEach(function(el) { el.classList.add('open'); });
+    btns.forEach(function(el) { el.classList.add('open'); });
+    document.body.classList.add('print-with-details');
+    setTimeout(function() {
+        window.print();
+        contents.forEach(function(el) { el.classList.remove('open'); });
+        btns.forEach(function(el) { el.classList.remove('open'); });
+        document.body.classList.remove('print-with-details');
+    }, 100);
+}
+
+function toggleDetails(btn) {
+    var el = btn.nextElementSibling;
+    while (el && !el.classList.contains('cv-details-content')) {
+        el = el.nextElementSibling;
+    }
+    if (!el) {
+        var parent = btn.closest('.cv-section-item');
+        if (parent) {
+            var contents = parent.querySelectorAll(':scope > .cv-details-content');
+            if (contents.length > 0) el = contents[0];
+        }
+    }
+    if (el) {
+        el.classList.toggle('open');
+        btn.classList.toggle('open');
+        btn.textContent = el.classList.contains('open') ? 'hide' : 'details';
+    }
+}
+</script>
+
+</body></html>
