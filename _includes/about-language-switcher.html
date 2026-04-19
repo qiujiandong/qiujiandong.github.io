@@ -1,0 +1,121 @@
+<style>
+  .about-language-toggle {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+  }
+
+  .about-language-panel[hidden] {
+    display: none !important;
+  }
+</style>
+
+<div class="about-language-toggle" role="group" aria-label="Language switch">
+  <button type="button" class="btn btn--primary btn--small" data-lang="en" aria-pressed="true">
+    English
+  </button>
+  <button type="button" class="btn btn--inverse btn--small" data-lang="zh" aria-pressed="false">
+    中文
+  </button>
+</div>
+
+<section id="about-en" class="about-language-panel">
+  <p>Hi, I'm <strong>Jiandong Qiu</strong>.</p>
+
+  <p>
+    I am a pragmatic engineer focused on <strong>hardware-software co-design</strong>,
+    <strong>performance optimization</strong>, and building tools that make systems
+    easier to understand, measure, and improve. I am currently based in Wuhan, China
+    and working at <strong>Nuclei System Technology</strong>.
+  </p>
+
+  <p>On the technical side, I am most interested in:</p>
+
+  <ul>
+    <li>RISC-V software and ecosystem tooling</li>
+    <li>compiler, runtime, and profiling workflows</li>
+    <li>performance analysis and system-level optimization</li>
+    <li>practical engineering that turns low-level insight into measurable results</li>
+  </ul>
+
+  <p>
+    This website is where I keep a compact record of my work, writing, and background.
+    If you want a structured overview, you can start from the <a href="/cv/">CV</a>.
+    If you want to see what I am thinking about recently, take a look at the
+    <a href="/year-archive/">blog posts</a>.
+  </p>
+
+  <h2>Contact</h2>
+  <ul>
+    <li>Email: <a href="mailto:qiujiandong1998@gmail.com">qiujiandong1998@gmail.com</a></li>
+    <li>GitHub: <a href="https://github.com/qiujiandong">qiujiandong</a></li>
+  </ul>
+</section>
+
+<section id="about-zh" class="about-language-panel" hidden>
+  <p>你好，我是 <strong>裘剑东</strong>。 </p>
+
+  <p>
+    我是一名偏重实践的工程师, 主要关注 <strong>软硬件协同设计</strong>,
+    <strong>性能优化</strong>, 以及帮助团队更好理解和改进系统的工程工具与方法。
+    目前在中国武汉工作，就职于 <strong>芯来科技（Nuclei System Technology）</strong>。
+  </p>
+
+  <p>我长期感兴趣的方向包括：</p>
+
+  <ul>
+    <li>RISC-V 相关软件栈与工具链</li>
+    <li>编译器、运行时与性能分析流程</li>
+    <li>面向真实场景的系统级性能优化</li>
+    <li>用扎实、可验证的工程方法解决复杂问题</li>
+  </ul>
+
+  <p>
+    这个网站主要用来整理我的个人介绍、简历和写作内容。想快速了解我的经历，
+    可以查看 <a href="/cv/">CV</a>；想看近期记录和思考，可以阅读
+    <a href="/year-archive/">博客文章</a>。
+  </p>
+
+  <h2>联系方式</h2>
+  <ul>
+    <li>邮箱：<a href="mailto:qiujiandong1998@gmail.com">qiujiandong1998@gmail.com</a></li>
+    <li>GitHub：<a href="https://github.com/qiujiandong">qiujiandong</a></li>
+  </ul>
+</section>
+
+<script>
+  (function () {
+    const storageKey = "about-language";
+    const toggleButtons = Array.from(document.querySelectorAll(".about-language-toggle button"));
+    const panels = {
+      en: document.getElementById("about-en"),
+      zh: document.getElementById("about-zh"),
+    };
+
+    function setLanguage(language) {
+      const nextLanguage = language === "zh" ? "zh" : "en";
+
+      Object.entries(panels).forEach(([panelLanguage, panel]) => {
+        panel.hidden = panelLanguage !== nextLanguage;
+      });
+
+      toggleButtons.forEach((button) => {
+        const isActive = button.dataset.lang === nextLanguage;
+        button.classList.toggle("btn--primary", isActive);
+        button.classList.toggle("btn--inverse", !isActive);
+        button.setAttribute("aria-pressed", String(isActive));
+      });
+
+      localStorage.setItem(storageKey, nextLanguage);
+    }
+
+    toggleButtons.forEach((button) => {
+      button.addEventListener("click", function () {
+        setLanguage(button.dataset.lang);
+      });
+    });
+
+    setLanguage(localStorage.getItem(storageKey) || "en");
+  })();
+</script>
